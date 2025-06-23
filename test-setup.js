@@ -53,10 +53,27 @@ async function testConnections() {
 
     // Test Algorand Connection
     console.log('\nTesting Algorand connection...');
+    
+    // Validate ALGOD_SERVER URL before using it
+    const algodServer = process.env.ALGOD_SERVER || 'http://localhost';
+    const algodPort = process.env.ALGOD_PORT || '4001';
+    const algodToken = process.env.ALGOD_TOKEN || '';
+    
+    // Ensure the server URL is properly formatted
+    let serverUrl;
+    try {
+      serverUrl = new URL(algodServer);
+      console.log('Using Algorand server:', serverUrl.toString());
+    } catch (urlError) {
+      console.error('Invalid ALGOD_SERVER URL format:', algodServer);
+      console.log('Please ensure ALGOD_SERVER is set to a valid URL (e.g., http://localhost or https://testnet-api.algonode.cloud)');
+      return;
+    }
+    
     const algodClient = new algosdk.Algodv2(
-      '',
-      process.env.ALGOD_SERVER,
-      process.env.ALGOD_PORT
+      algodToken,
+      algodServer,
+      algodPort
     );
 
     const status = await algodClient.status().do();
@@ -64,7 +81,15 @@ async function testConnections() {
 
   } catch (error) {
     console.error('Error during testing:', error);
+    
+    // Provide helpful error messages for common issues
+    if (error.code === 'ERR_INVALID_URL') {
+      console.log('\n💡 Tip: Check your .env file and ensure ALGOD_SERVER is set to a valid URL');
+      console.log('Examples:');
+      console.log('  - For local node: ALGOD_SERVER=http://localhost');
+      console.log('  - For testnet: ALGOD_SERVER=https://testnet-api.algonode.cloud');
+    }
   }
 }
 
-testConnections(); 
+testConnections();

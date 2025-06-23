@@ -68,6 +68,12 @@ CREATOR_ADDRESS=your_algorand_creator_address
 CREATOR_MNEMONIC=your_algorand_creator_mnemonic
 ```
 
+**Important Notes for Algorand Configuration:**
+- `ALGOD_SERVER` must be a valid URL format
+- For local development: `ALGOD_SERVER=http://localhost`
+- For Algorand TestNet: `ALGOD_SERVER=https://testnet-api.algonode.cloud`
+- For Algorand MainNet: `ALGOD_SERVER=https://mainnet-api.algonode.cloud`
+
 ## API Endpoints
 
 ### POST /api/startups/register
@@ -110,4 +116,4 @@ Register a new startup with pitch document
 
 - Never commit your `.env` file
 - Keep your Algorand creator account mnemonic secure
-- Use appropriate access control for Supabase tables 
+- Use appropriate access control for Supabase tables
