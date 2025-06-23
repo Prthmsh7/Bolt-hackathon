@@ -2,15 +2,26 @@ import { WalletConnect } from './components/WalletConnect';
 import { PitchForm } from './components/PitchForm';
 import { useState } from 'react';
 import './App.css';
+import { Auth } from './components/Auth';
+import { useAuth } from './contexts/AuthContext';
 
 export default function App() {
   const [walletConnected, setWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
+  const { user, loading, signOut } = useAuth();
 
   const handleWalletConnection = (connected: boolean, address: string = '') => {
     setWalletConnected(connected);
     setWalletAddress(address);
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <Auth />;
+  }
 
   return (
     <div className="app-container" style={{
@@ -38,10 +49,11 @@ export default function App() {
         }}>
           Connect your wallet and submit your startup pitch to be stored on IPFS and minted as an NFT
         </p>
-        
-        <div style={{
-          marginBottom: walletConnected ? '40px' : '0'
-        }}>
+        <div style={{ marginBottom: user ? '16px' : '0', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
+          <span style={{ color: '#4B5563', fontWeight: 500 }}>{user.email}</span>
+          <button onClick={signOut} style={{ padding: '6px 16px', background: '#E53E3E', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Sign Out</button>
+        </div>
+        <div style={{ marginBottom: walletConnected ? '40px' : '0' }}>
           <WalletConnect onWalletConnection={handleWalletConnection} />
         </div>
       </header>
