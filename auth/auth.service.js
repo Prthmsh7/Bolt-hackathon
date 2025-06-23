@@ -18,12 +18,7 @@ class AuthService {
       process.env.PINATA_API_SECRET
     );
 
-    // Initialize Algorand client (TestNet)
-    this.algodClient = new algosdk.Algodv2(
-      '',  // No token needed for public nodes
-      'https://testnet-api.algonode.cloud',
-      443
-    );
+    // Note: Algorand client is not initialized here since users connect via Pera Wallet
   }
 
   async uploadToIPFS(dataOrFile) {
@@ -54,10 +49,17 @@ class AuthService {
     }
   }
 
-  async mintAlgorandNFT(ipfsUrl, walletAddress) {
+  async prepareAlgorandNFT(ipfsUrl, walletAddress) {
     try {
+      // Create a temporary Algorand client for getting suggested parameters
+      const algodClient = new algosdk.Algodv2(
+        '',  // No token needed for public nodes
+        'https://testnet-api.algonode.cloud',
+        443
+      );
+
       // Get suggested parameters
-      const suggestedParams = await this.algodClient.getTransactionParams().do();
+      const suggestedParams = await algodClient.getTransactionParams().do();
 
       // Create NFT metadata
       const metadata = {
@@ -121,8 +123,8 @@ class AuthService {
       // 1. Upload pitch to IPFS via Pinata
       const ipfsUrl = await this.uploadToIPFS(pitchFile);
 
-      // 2. Prepare NFT minting transaction
-      const nftTxnData = await this.mintAlgorandNFT(ipfsUrl, walletAddress);
+      // 2. Prepare NFT minting transaction (but don't mint yet - user will sign)
+      const nftTxnData = await this.prepareAlgorandNFT(ipfsUrl, walletAddress);
 
       // Return data for frontend to handle wallet signing
       return {
@@ -145,9 +147,16 @@ class AuthService {
   // Function to handle post-wallet-signing
   async finalizeRegistration(userId, pitchId, ipfsUrl, signedTxnResponse) {
     try {
+      // Create a temporary client to submit the signed transaction
+      const algodClient = new algosdk.Algodv2(
+        '',  // No token needed for public nodes
+        'https://testnet-api.algonode.cloud',
+        443
+      );
+
       // Submit signed transaction
-      const { txId } = await this.algodClient.sendRawTransaction(signedTxnResponse).do();
-      await algosdk.waitForConfirmation(this.algodClient, txId, 4);
+      const { txId } = await algodClient.sendRawTransaction(signedTxnResponse).do();
+      await algosdk.waitForConfirmation(algodClient, txId, 4);
 
       // Save to Supabase
       await this.saveToSupabase(userId, pitchId, ipfsUrl, txId);
@@ -168,4 +177,4 @@ class AuthService {
   }
 }
 
-module.exports = new AuthService(); 
+module.exports = new AuthService();
