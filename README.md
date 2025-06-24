@@ -18,6 +18,7 @@ A platform where startup founders can register and pitch their startup ideas, wi
 
 ## Setup Instructions
 
+
 1. Clone the repository
 2. Install dependencies:
    ```bash
