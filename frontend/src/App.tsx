@@ -13,16 +13,26 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import VideoStreamingPlatform from './components/VideoStreamingPlatform';
 import { keyframes } from '@mui/system';
 
 export default function App() {
   const [walletConnected, setWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
+  const [showVideoStreaming, setShowVideoStreaming] = useState(false);
   const { user, loading, signOut } = useAuth();
 
   const handleWalletConnection = (connected: boolean, address: string = '') => {
     setWalletConnected(connected);
     setWalletAddress(address);
+  };
+
+  const handleInvestStreamClick = () => {
+    setShowVideoStreaming(true);
+  };
+
+  const handleCloseVideoStreaming = () => {
+    setShowVideoStreaming(false);
   };
 
   if (loading) {
@@ -31,6 +41,11 @@ export default function App() {
 
   if (!user) {
     return <Auth />;
+  }
+
+  // Show video streaming platform if active
+  if (showVideoStreaming) {
+    return <VideoStreamingPlatform onClose={handleCloseVideoStreaming} />;
   }
 
   return (
@@ -214,6 +229,7 @@ export default function App() {
             <Button
               startIcon={<TrendingUpIcon />}
               color="primary"
+              onClick={handleInvestStreamClick}
               sx={{
                 textTransform: 'none',
                 fontWeight: 500,
