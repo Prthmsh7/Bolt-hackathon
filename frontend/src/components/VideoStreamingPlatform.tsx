@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 
 // Import the video streaming platform components
-import VideoPlayer from '../../components/video-streaming-platform/src/components/VideoPlayer';
-import AuthModal from '../../components/video-streaming-platform/src/components/AuthModal';
-import { Video } from '../../components/video-streaming-platform/src/types/Video';
+import VideoPlayer from '../../../components/video-streaming-platform/src/components/VideoPlayer';
+import AuthModal from '../../../components/video-streaming-platform/src/components/AuthModal';
+import { Video } from '../../../components/video-streaming-platform/src/types/Video';
 import { supabase } from '../lib/supabase';
 
 // Import the video streaming platform styles
-import '../../components/video-streaming-platform/src/index.css';
+import '../../../components/video-streaming-platform/src/index.css';
 
 interface VideoStreamingPlatformProps {
   onClose?: () => void;
