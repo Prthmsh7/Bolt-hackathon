@@ -200,11 +200,11 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
       console.log('Metadata uploaded, hash:', metadataHash);
       console.log('IPFS URL:', ipfsUrl);
 
-      // Prepare data for database insertion
+      // Prepare data for database insertion with explicit column mapping
       const dbData = {
         user_id: user.id,
         title: formData.title.trim(),
-        description: formData.description.trim(),
+        description: formData.description.trim() || null,
         founder_name: formData.founderName.trim(),
         company_name: formData.companyName.trim() || null,
         category: formData.category,
@@ -225,11 +225,46 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
 
       console.log('Inserting data into database:', dbData);
 
-      // Save to Supabase
+      // First, let's verify the table structure
+      const { data: tableInfo, error: tableError } = await supabase
+        .from('ip_registrations')
+        .select('*')
+        .limit(0);
+
+      if (tableError) {
+        console.error('Table structure check failed:', tableError);
+        throw new Error(`Database table error: ${tableError.message}`);
+      }
+
+      console.log('Table structure verified, proceeding with insert...');
+
+      // Save to Supabase with explicit column selection
       const { data: insertedData, error: dbError } = await supabase
         .from('ip_registrations')
         .insert([dbData])
-        .select()
+        .select(`
+          id,
+          user_id,
+          title,
+          description,
+          founder_name,
+          company_name,
+          category,
+          wallet_address,
+          ipfs_hash,
+          ipfs_url,
+          document_hash,
+          project_type,
+          business_model,
+          project_summary,
+          developers,
+          demo_link,
+          presentation_video,
+          github_repo,
+          status,
+          created_at,
+          updated_at
+        `)
         .single();
 
       if (dbError) {
@@ -239,17 +274,24 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
         console.error('Error details:', dbError.details);
         console.error('Error hint:', dbError.hint);
         
-        // Provide more specific error messages
+        // Provide more specific error messages based on error codes
         if (dbError.code === '23505') {
           throw new Error('A project with this title already exists. Please choose a different title.');
         } else if (dbError.code === '23502') {
           throw new Error('Missing required field. Please check all required fields are filled.');
         } else if (dbError.code === '42501') {
           throw new Error('Permission denied. Please make sure you are signed in properly.');
+        } else if (dbError.code === '42703') {
+          // Column does not exist error
+          if (dbError.message.includes('github_repo')) {
+            throw new Error('Database schema issue with github_repo column. Please contact support.');
+          } else {
+            throw new Error(`Database column error: ${dbError.message}`);
+          }
         } else if (dbError.message.includes('relation') && dbError.message.includes('does not exist')) {
           throw new Error('Database table not found. Please contact support.');
         } else {
-          throw new Error(`Database error: ${dbError.message}`);
+          throw new Error(`Database error: ${dbError.message}\n\nIf this problem persists, please contact support with the error details.`);
         }
       }
 
