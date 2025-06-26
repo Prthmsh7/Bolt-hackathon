@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface AuthModalProps {
@@ -17,6 +17,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showHelp, setShowHelp] = useState(false);
 
   const resetForm = () => {
     setEmail('');
@@ -25,6 +26,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
     setError('');
     setSuccess('');
     setShowPassword(false);
+    setShowHelp(false);
   };
 
   const handleClose = () => {
@@ -34,8 +36,42 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
     }
   };
 
+  const validateForm = () => {
+    if (!email.trim()) {
+      setError('Please enter your email address');
+      return false;
+    }
+
+    if (!email.includes('@') || !email.includes('.')) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+
+    if (!password) {
+      setError('Please enter your password');
+      return false;
+    }
+
+    if (!isLogin && password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return false;
+    }
+
+    if (!isLogin && !fullName.trim()) {
+      setError('Please enter your full name');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
     setError('');
     setSuccess('');
@@ -43,31 +79,42 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
     try {
       if (isLogin) {
         // Sign in
+        console.log('Attempting sign in for:', email);
+        
         const { data, error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
+          email: email.trim().toLowerCase(),
           password: password
         });
 
         if (error) {
           console.error('Sign in error:', error);
           
-          // Provide more user-friendly error messages
-          if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
-            throw new Error('Invalid email or password. Please check your credentials and try again. If you haven\'t signed up yet, please create an account first.');
+          // Provide specific, helpful error messages
+          if (error.message.includes('Invalid login credentials') || 
+              error.message.includes('invalid_credentials') ||
+              error.message.includes('Invalid email or password')) {
+            
+            setError('Invalid email or password. Please check your credentials and try again.');
+            setShowHelp(true);
+            
           } else if (error.message.includes('Email not confirmed')) {
-            throw new Error('Please check your email and click the confirmation link before signing in.');
+            setError('Please check your email and click the confirmation link before signing in.');
+            
           } else if (error.message.includes('Too many requests')) {
-            throw new Error('Too many login attempts. Please wait a few minutes before trying again.');
+            setError('Too many login attempts. Please wait a few minutes before trying again.');
+            
           } else if (error.message.includes('signup_disabled')) {
-            throw new Error('Account creation is currently disabled. Please contact support.');
+            setError('Account creation is currently disabled. Please contact support.');
+            
           } else {
-            throw new Error(`Sign in failed: ${error.message}`);
+            setError(`Sign in failed: ${error.message}`);
           }
+          return;
         }
 
         if (data.user) {
           console.log('Sign in successful:', data.user.email);
-          setSuccess('Successfully signed in!');
+          setSuccess('Successfully signed in! Welcome back.');
           
           // Small delay to show success message
           setTimeout(() => {
@@ -75,12 +122,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
               onAuthSuccess();
             }
             handleClose();
-          }, 1000);
+          }, 1500);
         }
+        
       } else {
         // Sign up
+        console.log('Attempting sign up for:', email);
+        
         const { data, error } = await supabase.auth.signUp({
-          email: email.trim(),
+          email: email.trim().toLowerCase(),
           password: password,
           options: {
             data: {
@@ -92,20 +142,32 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
         if (error) {
           console.error('Sign up error:', error);
           
-          // Provide more user-friendly error messages for signup
+          // Provide specific, helpful error messages for signup
           if (error.message.includes('User already registered')) {
-            throw new Error('An account with this email already exists. Please sign in instead or use a different email address.');
+            setError('An account with this email already exists. Please sign in instead.');
+            setTimeout(() => {
+              setIsLogin(true);
+              setPassword('');
+              setError('');
+            }, 2000);
+            
           } else if (error.message.includes('Password should be at least')) {
-            throw new Error('Password must be at least 6 characters long.');
+            setError('Password must be at least 6 characters long.');
+            
           } else if (error.message.includes('Invalid email')) {
-            throw new Error('Please enter a valid email address.');
-          } else if (error.message.includes('Signup is disabled') || error.message.includes('signup_disabled')) {
-            throw new Error('Account creation is currently disabled. Please contact support.');
+            setError('Please enter a valid email address.');
+            
+          } else if (error.message.includes('Signup is disabled') || 
+                     error.message.includes('signup_disabled')) {
+            setError('Account creation is currently disabled. Please contact support.');
+            
           } else if (error.message.includes('weak_password')) {
-            throw new Error('Password is too weak. Please use a stronger password with at least 6 characters.');
+            setError('Password is too weak. Please use a stronger password with at least 6 characters.');
+            
           } else {
-            throw new Error(`Sign up failed: ${error.message}`);
+            setError(`Sign up failed: ${error.message}`);
           }
+          return;
         }
 
         if (data.user) {
@@ -113,28 +175,27 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
           
           // Check if email confirmation is required
           if (!data.session && data.user && !data.user.email_confirmed_at) {
-            setSuccess('Account created successfully! Please check your email and click the confirmation link to complete your registration. After confirming, you can sign in.');
+            setSuccess('Account created successfully! Please check your email and click the confirmation link to complete your registration.');
             
             // Switch to login mode after successful signup
             setTimeout(() => {
               setIsLogin(true);
               setPassword('');
               setError('');
-            }, 3000);
+              setSuccess('Please check your email for the confirmation link, then sign in.');
+            }, 4000);
+            
           } else {
             // User is immediately signed in (email confirmation disabled)
-            setSuccess('Account created and signed in successfully!');
+            setSuccess('Account created and signed in successfully! Welcome to start.dev!');
             
-            // Wait a moment for the user to be fully created
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Try to create user profile - this might be handled by a database trigger
+            // Create user profile
             try {
               const { error: profileError } = await supabase
                 .from('user_profiles')
                 .upsert({
                   id: data.user.id,
-                  email: email.trim(),
+                  email: email.trim().toLowerCase(),
                   full_name: fullName.trim(),
                   subscription_status: 'free'
                 }, {
@@ -142,13 +203,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 });
 
               if (profileError) {
-                console.warn('Profile creation warning (might be handled by trigger):', profileError);
-                // Don't throw here, as the user is still created successfully
-                // The profile might be created by a database trigger
+                console.warn('Profile creation warning:', profileError);
               }
             } catch (profileError) {
-              console.warn('Profile creation failed, but user was created:', profileError);
-              // Continue anyway - the profile might be created by a trigger
+              console.warn('Profile creation failed:', profileError);
             }
 
             setTimeout(() => {
@@ -156,16 +214,24 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 onAuthSuccess();
               }
               handleClose();
-            }, 1000);
+            }, 1500);
           }
         }
       }
     } catch (error: any) {
       console.error('Auth error:', error);
-      setError(error.message || 'Authentication failed. Please try again.');
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleToggleMode = () => {
+    setIsLogin(!isLogin);
+    setError('');
+    setSuccess('');
+    setShowHelp(false);
+    setPassword('');
   };
 
   if (!isOpen) return null;
@@ -176,7 +242,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-light-border">
           <h2 className="text-xl font-bold text-text-primary">
-            {isLogin ? 'Sign In' : 'Create Account'}
+            {isLogin ? 'Welcome Back' : 'Create Account'}
           </h2>
           <button 
             onClick={handleClose}
@@ -188,32 +254,47 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
         </div>
 
         <div className="p-6">
+          {/* Info Banner */}
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+            <div className="flex items-start space-x-3">
+              <Info size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm">
+                <p className="text-blue-800 font-medium mb-1">
+                  {isLogin ? 'Signing In' : 'Creating Account'}
+                </p>
+                <p className="text-blue-700">
+                  {isLogin 
+                    ? 'Enter your email and password to access your account.'
+                    : 'Join start.dev to protect your IP and discover investment opportunities.'
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+
           <form onSubmit={handleAuth} className="space-y-4">
             {!isLogin && (
-              <>
-                {/* Full Name */}
-                <div className="space-y-2">
-                  <label className="flex items-center space-x-2 text-sm font-semibold text-text-primary">
-                    <User size={16} />
-                    <span>Full Name</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Enter your full name"
-                    className="w-full px-4 py-3 bg-white border border-light-border rounded-xl focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-primary placeholder-text-muted transition-all duration-300"
-                    required={!isLogin}
-                  />
-                </div>
-              </>
+              <div className="space-y-2">
+                <label className="flex items-center space-x-2 text-sm font-semibold text-text-primary">
+                  <User size={16} />
+                  <span>Full Name *</span>
+                </label>
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Enter your full name"
+                  className="w-full px-4 py-3 bg-white border border-light-border rounded-xl focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-primary placeholder-text-muted transition-all duration-300"
+                  required={!isLogin}
+                  disabled={isLoading}
+                />
+              </div>
             )}
 
-            {/* Email */}
             <div className="space-y-2">
               <label className="flex items-center space-x-2 text-sm font-semibold text-text-primary">
                 <Mail size={16} />
-                <span>Email</span>
+                <span>Email Address *</span>
               </label>
               <input
                 type="email"
@@ -222,43 +303,45 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 placeholder="Enter your email"
                 className="w-full px-4 py-3 bg-white border border-light-border rounded-xl focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-primary placeholder-text-muted transition-all duration-300"
                 required
+                disabled={isLoading}
               />
             </div>
 
-            {/* Password */}
             <div className="space-y-2">
               <label className="flex items-center space-x-2 text-sm font-semibold text-text-primary">
                 <Lock size={16} />
-                <span>Password</span>
+                <span>Password *</span>
               </label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder={isLogin ? "Enter your password" : "Create a password (min. 6 characters)"}
                   className="w-full px-4 py-3 pr-12 bg-white border border-light-border rounded-xl focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-primary placeholder-text-muted transition-all duration-300"
                   required
                   minLength={6}
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
+                  disabled={isLoading}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
               {!isLogin && (
                 <p className="text-xs text-text-muted">
-                  Password must be at least 6 characters long
+                  Use at least 6 characters with a mix of letters and numbers
                 </p>
               )}
             </div>
 
             {/* Success Message */}
             {success && (
-              <div className="p-3 bg-green-50 border border-green-200 rounded-lg flex items-start space-x-2">
+              <div className="p-4 bg-green-50 border border-green-200 rounded-xl flex items-start space-x-3">
                 <CheckCircle size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
                 <p className="text-green-700 text-sm">{success}</p>
               </div>
@@ -266,9 +349,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-2">
+              <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start space-x-3">
                 <AlertCircle size={16} className="text-red-600 mt-0.5 flex-shrink-0" />
-                <p className="text-red-600 text-sm">{error}</p>
+                <div className="flex-1">
+                  <p className="text-red-700 text-sm font-medium">{error}</p>
+                  {showHelp && isLogin && (
+                    <div className="mt-2 text-xs text-red-600">
+                      <p>• Make sure you've created an account first</p>
+                      <p>• Check your email and password for typos</p>
+                      <p>• Confirm your email if required</p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -276,7 +368,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-primary hover:bg-primary-dark hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 rounded-xl font-semibold text-white transition-all duration-300 flex items-center justify-center space-x-2"
+              className="w-full py-3 bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-semibold text-white transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
             >
               {isLoading ? (
                 <>
@@ -294,38 +386,33 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             <p className="text-text-secondary text-sm">
               {isLogin ? "Don't have an account?" : "Already have an account?"}
               <button
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setError('');
-                  setSuccess('');
-                }}
+                onClick={handleToggleMode}
                 disabled={isLoading}
                 className="ml-2 text-primary hover:text-primary-dark font-medium transition-colors disabled:opacity-50"
               >
-                {isLogin ? 'Sign Up' : 'Sign In'}
+                {isLogin ? 'Create one here' : 'Sign in instead'}
               </button>
             </p>
           </div>
 
-          {/* Helper Text */}
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-blue-700 text-xs">
+          {/* Help Section */}
+          <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+            <h4 className="font-medium text-text-primary mb-2 text-sm">Need Help?</h4>
+            <div className="text-xs text-text-muted space-y-1">
               {isLogin ? (
                 <>
-                  <strong>First time here?</strong> Click "Sign Up" to create a new account.
-                  <br />
-                  <strong>Trouble signing in?</strong> Make sure you've created an account first and confirmed your email if required.
-                  <br />
-                  <strong>Invalid credentials?</strong> Double-check your email and password for typos.
+                  <p>• <strong>New user?</strong> Click "Create one here" to sign up</p>
+                  <p>• <strong>Forgot password?</strong> Contact support for assistance</p>
+                  <p>• <strong>Email not confirmed?</strong> Check your inbox and spam folder</p>
                 </>
               ) : (
                 <>
-                  <strong>Creating an account?</strong> You may need to confirm your email before signing in.
-                  <br />
-                  <strong>Already have an account?</strong> Click "Sign In" to access your existing account.
+                  <p>• <strong>Already registered?</strong> Click "Sign in instead"</p>
+                  <p>• <strong>Email confirmation:</strong> You may need to verify your email</p>
+                  <p>• <strong>Password requirements:</strong> Minimum 6 characters</p>
                 </>
               )}
-            </p>
+            </div>
           </div>
         </div>
       </div>
