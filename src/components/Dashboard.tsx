@@ -161,7 +161,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         {/* Header - Improved typography and spacing */}
         <div className="mb-8 lg:mb-12">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary mb-3 lg:mb-4">
-            Welcome to <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">start.dev</span>
+            Welcome to <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">Seedora</span>
           </h1>
           <p className="text-text-secondary text-lg lg:text-xl max-w-3xl">
             Discover innovative projects, connect with founders, and invest in the future of technology.

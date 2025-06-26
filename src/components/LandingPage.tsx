@@ -80,7 +80,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       role: 'AI Engineer',
       company: 'DataMind AI',
       avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2',
-      quote: 'start.dev helped me protect my AI platform and connect with investors. The GitHub integration showcased my technical skills perfectly.',
+      quote: 'Seedora helped me protect my AI platform and connect with investors. The GitHub integration showcased my technical skills perfectly.',
       rating: 5
     },
     {
@@ -96,7 +96,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       role: 'FinTech Founder',
       company: 'PayFlow Technologies',
       avatar: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2',
-      quote: 'Found amazing investment opportunities through start.dev. The platform makes it easy to discover and evaluate innovative projects.',
+      quote: 'Found amazing investment opportunities through Seedora. The platform makes it easy to discover and evaluate innovative projects.',
       rating: 5
     }
   ];
@@ -165,9 +165,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 
                 <h1 className="text-5xl lg:text-7xl font-black leading-tight">
                   <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                    start
+                    Seedora
                   </span>
-                  <span className="text-text-primary">.dev</span>
                 </h1>
                 
                 <p className="text-xl lg:text-2xl text-text-secondary leading-relaxed max-w-2xl">
@@ -248,7 +247,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               Everything you need to <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">succeed</span>
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-              From IP protection to investment opportunities, start.dev provides all the tools developers and investors need.
+              From IP protection to investment opportunities, Seedora provides all the tools developers and investors need.
             </p>
           </div>
 
@@ -277,7 +276,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
-              How <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">start.dev</span> works
+              How <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Seedora</span> works
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
               Get started in minutes with our simple three-step process
@@ -326,7 +325,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               Loved by <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">developers</span> worldwide
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-              See what our community has to say about their experience with start.dev
+              See what our community has to say about their experience with Seedora
             </p>
           </div>
 
@@ -420,7 +419,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             Ready to protect your innovations?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of developers who trust start.dev to protect their intellectual property and connect with investors.
+            Join thousands of developers who trust Seedora to protect their intellectual property and connect with investors.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -447,7 +446,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="space-y-4">
               <h3 className="text-2xl font-bold">
-                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">start</span>.dev
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Seedora</span>
               </h3>
               <p className="text-gray-400 leading-relaxed">
                 The ultimate platform for developers and investors to protect IP and discover innovations.
@@ -491,7 +490,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           </div>
 
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 start.dev. All rights reserved. Built with ❤️ for developers worldwide.</p>
+            <p>&copy; 2024 Seedora. All rights reserved. Built with ❤️ for developers worldwide.</p>
           </div>
         </div>
       </footer>

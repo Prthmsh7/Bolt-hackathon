@@ -1,7 +1,7 @@
-# start.dev - The Ultimate Developer & Investor Platform
+# Seedora - The Ultimate Developer & Investor Platform
 
 <div align="center">
-  <img src="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&dpr=2" alt="start.dev Banner" width="800" height="400" style="border-radius: 12px; margin-bottom: 20px;">
+  <img src="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&dpr=2" alt="Seedora Banner" width="800" height="400" style="border-radius: 12px; margin-bottom: 20px;">
   
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   [![React](https://img.shields.io/badge/React-18.2.0-blue.svg)](https://reactjs.org/)
@@ -12,7 +12,7 @@
 
 ## 🚀 Overview
 
-**start.dev** is a revolutionary platform that bridges the gap between innovative developers and forward-thinking investors. Built with cutting-edge technology, it provides a comprehensive ecosystem for intellectual property protection, project showcasing, investment opportunities, and AI-powered market insights.
+**Seedora** is a revolutionary platform that bridges the gap between innovative developers and forward-thinking investors. Built with cutting-edge technology, it provides a comprehensive ecosystem for intellectual property protection, project showcasing, investment opportunities, and AI-powered market insights.
 
 ### 🎯 Mission Statement
 
@@ -104,8 +104,8 @@ Before you begin, ensure you have the following installed:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/start-dev.git
-   cd start-dev
+   git clone https://github.com/your-username/seedora.git
+   cd seedora
    ```
 
 2. **Install dependencies**
@@ -364,7 +364,7 @@ Machine Callable Programs (MCP) is an advanced AI system that provides:
 - **Predictive Analytics**: Future market forecasting and opportunity identification
 - **Natural Language Interface**: Chat-based interaction with AI assistant
 
-### MCP Features in start.dev
+### MCP Features in Seedora
 
 1. **Market Trend Analysis**
    ```typescript
@@ -706,7 +706,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ```
 MIT License
 
-Copyright (c) 2024 start.dev
+Copyright (c) 2024 Seedora
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -746,16 +746,16 @@ SOFTWARE.
 
 ### Community
 
-Special thanks to all contributors, beta testers, and community members who have helped shape start.dev into what it is today.
+Special thanks to all contributors, beta testers, and community members who have helped shape Seedora into what it is today.
 
 ---
 
 <div align="center">
-  <p>Built with ❤️ by the start.dev team</p>
+  <p>Built with ❤️ by the Seedora team</p>
   <p>
-    <a href="https://start.dev">Website</a> •
-    <a href="https://docs.start.dev">Documentation</a> •
-    <a href="https://github.com/start-dev/start-dev">GitHub</a> •
-    <a href="https://twitter.com/startdev">Twitter</a>
+    <a href="https://seedora.dev">Website</a> •
+    <a href="https://docs.seedora.dev">Documentation</a> •
+    <a href="https://github.com/seedora/seedora">GitHub</a> •
+    <a href="https://twitter.com/seedora">Twitter</a>
   </p>
 </div>

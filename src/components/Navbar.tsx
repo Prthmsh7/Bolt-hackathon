@@ -67,9 +67,8 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
               <div className="relative">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight">
                   <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent hover:from-primary-dark hover:via-secondary-dark hover:to-accent-dark transition-all duration-300 pulse-glow">
-                    start
+                    Seedora
                   </span>
-                  <span className="text-text-primary ml-1 sm:ml-1.5 lg:ml-2">.dev</span>
                 </h1>
                 <div className="absolute -bottom-1 sm:-bottom-1.5 lg:-bottom-2 left-0 w-full h-1 sm:h-1.5 lg:h-2 bg-gradient-to-r from-primary via-secondary to-accent rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
               </div>
@@ -173,7 +172,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                     {/* Footer */}
                     <div className="p-4 lg:p-6 border-t border-light-border text-center">
                       <p className="text-xs lg:text-sm text-text-muted">
-                        start.dev Platform • Version 2.1.0
+                        Seedora Platform • Version 2.1.0
                       </p>
                     </div>
                   </div>
