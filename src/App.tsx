@@ -6,15 +6,15 @@ import InvestmentStream from './components/InvestmentStream';
 import UserProfile from './components/UserProfile';
 import EnhancedAnalytics from './components/EnhancedAnalytics';
 import AuthModal from './components/Auth';
-import MCPAssistant from './components/MCPAssistant';
+import MCPAssistantButton from './components/MCPAssistantButton';
 import { supabase } from './lib/supabase';
 
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentPage, setCurrentPage] = useState<'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'about'>('dashboard');
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showMCPAssistant, setShowMCPAssistant] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [mcpInsights, setMcpInsights] = useState<any[]>([]);
 
   // Page load animation
   useEffect(() => {
@@ -43,6 +43,10 @@ function App() {
   const handleAuthSuccess = () => {
     setShowAuthModal(false);
     checkAuthStatus();
+  };
+
+  const handleInsightGenerated = (insight: any) => {
+    setMcpInsights(prev => [insight, ...prev]);
   };
 
   const renderCurrentPage = () => {
@@ -77,7 +81,6 @@ function App() {
         currentPage={currentPage}
         user={user}
         onShowAuth={() => setShowAuthModal(true)}
-        onShowMCPAssistant={() => setShowMCPAssistant(true)}
       />
       {renderCurrentPage()}
       
@@ -88,11 +91,8 @@ function App() {
         onAuthSuccess={handleAuthSuccess}
       />
 
-      {/* MCP Assistant */}
-      <MCPAssistant
-        isOpen={showMCPAssistant}
-        onClose={() => setShowMCPAssistant(false)}
-      />
+      {/* MCP Assistant Button (floating) */}
+      <MCPAssistantButton onInsightGenerated={handleInsightGenerated} />
     </div>
   );
 }

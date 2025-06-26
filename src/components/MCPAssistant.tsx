@@ -53,7 +53,11 @@ interface MCPAssistantProps {
   onInsightGenerated?: (insight: MCPInsight) => void;
 }
 
-const MCPAssistant: React.FC<MCPAssistantProps> = ({ isOpen, onClose, onInsightGenerated }) => {
+const MCPAssistant: React.FC<MCPAssistantProps> = ({ 
+  isOpen, 
+  onClose, 
+  onInsightGenerated 
+}) => {
   const [messages, setMessages] = useState<MCPMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -338,13 +342,11 @@ Could you be more specific about what you'd like to analyze? I can help with:
     }
   };
 
-  if (!isOpen) return null;
-
   return (
     <div className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${
       isMinimized ? 'w-80 h-16' : 'w-96 h-[600px]'
     }`}>
-      <div className="bg-white rounded-2xl border border-light-border shadow-2xl overflow-hidden">
+      <div className="bg-white rounded-2xl border border-light-border shadow-2xl overflow-hidden h-full flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-primary to-secondary p-4 text-white">
           <div className="flex items-center justify-between">
@@ -398,7 +400,7 @@ Could you be more specific about what you'd like to analyze? I can help with:
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 h-96">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message) => (
                 <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[80%] rounded-2xl p-3 ${
