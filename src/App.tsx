@@ -8,6 +8,7 @@ import EnhancedAnalytics from './components/EnhancedAnalytics';
 import AuthModal from './components/Auth';
 import MCPAssistantButton from './components/MCPAssistantButton';
 import LandingPage from './components/LandingPage';
+import AboutPage from './components/AboutPage';
 import { supabase } from './lib/supabase';
 
 function App() {
@@ -73,14 +74,7 @@ function App() {
       case 'analytics':
         return <EnhancedAnalytics onBack={() => setCurrentPage('dashboard')} />;
       case 'about':
-        return (
-          <div className="min-h-screen bg-light-bg text-text-primary fade-in flex items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold text-primary mb-4">About start.dev</h1>
-              <p className="text-text-secondary">Learn more about our investment platform</p>
-            </div>
-          </div>
-        );
+        return <AboutPage onBack={() => setCurrentPage('dashboard')} />;
       case 'dashboard':
       default:
         return <Dashboard onNavigate={handleNavigation} />;
