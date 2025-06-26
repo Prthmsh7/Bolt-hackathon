@@ -22,8 +22,26 @@ import {
   Clock,
   Percent,
   LineChart,
-  Database
+  Database,
+  Crown,
+  Heart,
+  Award,
+  Flame,
+  Sparkles,
+  Glasses,
+  Lightbulb,
+  Rocket,
+  Briefcase,
+  Layers,
+  Cpu,
+  Wallet,
+  Landmark,
+  Megaphone,
+  Repeat,
+  Shuffle,
+  Hexagon
 } from 'lucide-react';
+import { demoProjects, getTrendingProjects } from '../data/demoProjects';
 
 interface AnalyticsProps {
   onBack: () => void;
@@ -33,9 +51,32 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedTimeframe, setSelectedTimeframe] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'investments' | 'marketplace' | 'users'>('all');
+  const [showLeaderboard, setShowLeaderboard] = useState(true);
+  const [leaderboardProjects, setLeaderboardProjects] = useState<any[]>([]);
+  const [currentNounIndex, setCurrentNounIndex] = useState(0);
+  const [nounAuctionTimeLeft, setNounAuctionTimeLeft] = useState(86400); // 24 hours in seconds
 
   useEffect(() => {
     setIsLoaded(true);
+    // Get top 10 projects by likes
+    const topProjects = getTrendingProjects(10);
+    setLeaderboardProjects(topProjects);
+  }, []);
+
+  // Countdown timer for Nouns auction
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNounAuctionTimeLeft(prev => {
+        if (prev <= 1) {
+          // Auction ended - start new auction with next Noun
+          setCurrentNounIndex(prevIndex => (prevIndex + 1) % 10);
+          return 86400; // Reset to 24 hours
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   const timeframes = [
@@ -136,6 +177,29 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
     { region: 'Others', users: '2.7%', investments: '$35K' }
   ];
 
+  // Format time for Nouns auction
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Generate random Noun SVG (simplified for demo)
+  const generateNounSvg = (index: number) => {
+    const colors = ['#D5D7E1', '#E1D7D5', '#D5E1D7', '#E1D5E1', '#D7E1D5'];
+    const bgColor = colors[index % colors.length];
+    
+    return (
+      <div className="w-full h-full bg-white rounded-xl overflow-hidden">
+        <div style={{ backgroundColor: bgColor }} className="w-full h-full flex items-center justify-center">
+          <Hexagon size={64} className="text-primary" />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className={`min-h-screen bg-light-bg text-text-primary transition-all duration-1000 ${isLoaded ? 'fade-in' : 'opacity-0'}`}>
       {/* Header */}
@@ -208,6 +272,156 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Nouns-Style Leaderboard */}
+        {showLeaderboard && (
+          <div className="mb-12 bg-white rounded-2xl border border-light-border p-8 shadow-lg">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8">
+              <div className="flex items-center space-x-4 mb-4 lg:mb-0">
+                <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Crown size={32} className="text-white" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold text-text-primary">Project Leaderboard</h2>
+                  <p className="text-text-secondary text-lg">Top projects ranked by community likes</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <button 
+                  onClick={() => setShowLeaderboard(false)}
+                  className="px-4 py-2 border border-light-border rounded-lg text-text-secondary hover:text-text-primary hover:bg-light-hover transition-all duration-300"
+                >
+                  Hide Leaderboard
+                </button>
+                <button className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 rounded-xl text-white font-medium transition-all duration-300 shadow-lg hover:shadow-xl">
+                  <Megaphone size={18} />
+                  <span>Share Leaderboard</span>
+                </button>
+              </div>
+            </div>
+            
+            {/* Current Noun Auction - Nouns DAO Style */}
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 mb-8 border border-gray-200">
+              <div className="flex flex-col lg:flex-row items-center gap-8">
+                <div className="w-40 h-40 relative">
+                  {generateNounSvg(currentNounIndex)}
+                  <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                    #{currentNounIndex + 1}
+                  </div>
+                </div>
+                
+                <div className="flex-1">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <h3 className="text-2xl font-bold text-text-primary">Current Auction: Noun #{currentNounIndex + 1}</h3>
+                    <div className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 animate-pulse">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                      <span>LIVE</span>
+                    </div>
+                  </div>
+                  
+                  <p className="text-text-secondary mb-4">
+                    This Noun represents the top project in our leaderboard: <span className="font-semibold text-primary">{leaderboardProjects[currentNounIndex]?.title}</span>
+                  </p>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div className="bg-white rounded-lg p-3 border border-gray-200">
+                      <div className="text-sm text-text-muted">Current Bid</div>
+                      <div className="text-xl font-bold text-primary">$2,450</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 border border-gray-200">
+                      <div className="text-sm text-text-muted">Time Left</div>
+                      <div className="text-xl font-bold text-red-500">{formatTime(nounAuctionTimeLeft)}</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 border border-gray-200">
+                      <div className="text-sm text-text-muted">Bidders</div>
+                      <div className="text-xl font-bold text-blue-500">12</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 border border-gray-200">
+                      <div className="text-sm text-text-muted">Auction #</div>
+                      <div className="text-xl font-bold text-purple-500">{currentNounIndex + 1}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-4">
+                    <button className="px-6 py-3 bg-primary hover:bg-primary-dark rounded-xl text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center space-x-2">
+                      <DollarSign size={18} />
+                      <span>Place Bid</span>
+                    </button>
+                    <button className="px-6 py-3 bg-white border border-light-border hover:bg-light-hover rounded-xl text-text-primary font-medium transition-all duration-300">
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Leaderboard Table */}
+            <div className="overflow-hidden rounded-xl border border-light-border">
+              <table className="w-full">
+                <thead className="bg-light-card">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Rank</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Project</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Founder</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Category</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Likes</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Price</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-light-border">
+                  {leaderboardProjects.map((project, index) => (
+                    <tr key={project.id} className={`${index < 3 ? 'bg-yellow-50' : 'bg-white'} hover:bg-light-hover transition-colors duration-300`}>
+                      <td className="px-6 py-4">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
+                          index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
+                          index === 1 ? 'bg-gradient-to-r from-gray-400 to-gray-600' :
+                          index === 2 ? 'bg-gradient-to-r from-amber-600 to-amber-800' :
+                          'bg-gradient-to-r from-blue-500 to-blue-700'
+                        }`}>
+                          {index + 1}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                            {index === 0 ? <Crown size={20} className="text-yellow-500" /> :
+                             index === 1 ? <Award size={20} className="text-gray-500" /> :
+                             index === 2 ? <Medal size={20} className="text-amber-700" /> :
+                             <Lightbulb size={20} className="text-primary" />}
+                          </div>
+                          <div>
+                            <div className="font-medium text-text-primary">{project.title}</div>
+                            <div className="text-xs text-text-muted">{project.company_name}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-text-secondary">{project.founder_name}</td>
+                      <td className="px-6 py-4">
+                        <span className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                          {project.category}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-1 text-red-500 font-semibold">
+                          <Heart size={16} className="fill-current" />
+                          <span>{project.likes_count}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-primary">${project.price}</td>
+                      <td className="px-6 py-4">
+                        <button className="px-3 py-1 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors duration-300">
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-12">
           {kpis.map((kpi, index) => (
@@ -424,5 +638,26 @@ const Analytics: React.FC<AnalyticsProps> = ({ onBack }) => {
     </div>
   );
 };
+
+// Medal icon component for bronze medal
+function Medal(props: any) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <circle cx="12" cy="8" r="6" />
+      <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+    </svg>
+  );
+}
 
 export default Analytics;

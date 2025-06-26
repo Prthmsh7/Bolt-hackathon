@@ -42,12 +42,26 @@ import {
   SortAsc,
   SortDesc,
   Gavel,
-  Timer
+  Timer,
+  UserCheck,
+  Briefcase,
+  MapPinIcon,
+  BadgeCheck
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import AuctionSystem from './AuctionSystem';
-import { demoProjects, getTrendingProjects, getFeaturedProjects, getProjectsByCategory, searchProjects, DemoProject } from '../data/demoProjects';
+import { 
+  demoProjects, 
+  getTrendingProjects, 
+  getFeaturedProjects, 
+  getProjectsByCategory, 
+  searchProjects, 
+  searchDevelopers,
+  getDeveloperById,
+  DemoProject,
+  DeveloperProfile 
+} from '../data/demoProjects';
 
 interface MarketplaceProps {
   onBack: () => void;
@@ -67,10 +81,11 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   const [selectedSort, setSelectedSort] = useState('trending');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedItem, setSelectedItem] = useState<MarketplaceItem | null>(null);
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [showAuctions, setShowAuctions] = useState(false);
+  const [selectedDeveloper, setSelectedDeveloper] = useState<DeveloperProfile | null>(null);
   const [likeLoading, setLikeLoading] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'marketplace' | 'trending' | 'auctions' | 'featured'>('marketplace');
+  const [activeTab, setActiveTab] = useState<'marketplace' | 'trending' | 'auctions' | 'featured' | 'developers'>('marketplace');
+  const [searchResults, setSearchResults] = useState<{projects: MarketplaceItem[], developers: DeveloperProfile[]}>({projects: [], developers: []});
+  const [purchaseLoading, setPurchaseLoading] = useState<string | null>(null);
 
   const categories = [
     'all',
@@ -105,7 +120,11 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   }, [user]);
 
   useEffect(() => {
-    filterAndSortItems();
+    if (activeTab === 'developers') {
+      handleDeveloperSearch();
+    } else {
+      filterAndSortItems();
+    }
   }, [items, searchQuery, selectedCategory, selectedSort, activeTab]);
 
   const fetchMarketplaceItems = async () => {
@@ -130,6 +149,18 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
       console.error('Error fetching marketplace items:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeveloperSearch = () => {
+    if (searchQuery.trim()) {
+      const developers = searchDevelopers(searchQuery);
+      const projects = searchProjects(searchQuery);
+      setSearchResults({ developers, projects });
+    } else {
+      // Show all developers when no search query
+      const { searchDevelopers: allDevelopers } = require('../data/demoProjects');
+      setSearchResults({ developers: allDevelopers(''), projects: [] });
     }
   };
 
@@ -257,14 +288,48 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
     setSelectedItem(item);
   };
 
-  const handlePurchase = (item: MarketplaceItem) => {
+  const handlePurchaseShares = async (item: MarketplaceItem, quantity: number) => {
     if (!user) {
-      alert('Please sign in to purchase projects');
+      alert('Please sign in to purchase shares');
       return;
     }
-    
-    // This would open a purchase modal or redirect to purchase flow
-    alert(`Purchase flow for "${item.title}" ($${item.price.toLocaleString()}) would open here`);
+
+    if (purchaseLoading === item.id) return;
+
+    setPurchaseLoading(item.id);
+
+    try {
+      // Simulate purchase for demo
+      const totalCost = item.price * quantity;
+      
+      // Update local state
+      setItems(prevItems =>
+        prevItems.map(prevItem =>
+          prevItem.id === item.id
+            ? { 
+                ...prevItem, 
+                purchase_count: prevItem.purchase_count + 1,
+                shares_available: prevItem.shares_available - quantity
+              }
+            : prevItem
+        )
+      );
+
+      alert(`Successfully purchased ${quantity} shares for $${totalCost.toLocaleString()}!`);
+      
+      if (selectedItem && selectedItem.id === item.id) {
+        setSelectedItem({
+          ...selectedItem,
+          purchase_count: selectedItem.purchase_count + 1,
+          shares_available: selectedItem.shares_available - quantity
+        });
+      }
+    } catch (error) {
+      console.error('Error purchasing shares:', error);
+      alert('Failed to purchase shares. Please try again.');
+    } finally {
+      setPurchaseLoading(null);
+    }
   };
 
   const handleBid = (itemId: string, amount: number) => {
@@ -283,12 +348,6 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
-  };
-
-  const getLeaderboardItems = () => {
-    return [...items]
-      .sort((a, b) => b.likes_count - a.likes_count)
-      .slice(0, 10);
   };
 
   const ProjectCard = ({ item, rank }: { item: MarketplaceItem; rank?: number }) => (
@@ -382,8 +441,12 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
         <div className="space-y-2 mb-4">
           <div className="flex justify-between text-sm">
-            <span className="text-text-secondary">Price:</span>
+            <span className="text-text-secondary">Price per share:</span>
             <span className="font-bold text-primary text-lg">{formatPrice(item.price)}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-text-secondary">Available shares:</span>
+            <span className="font-semibold text-green-600">{item.shares_available}/{item.total_shares}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-text-secondary">Likes:</span>
@@ -391,10 +454,6 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
               <Heart size={14} className={item.user_has_liked ? 'fill-current' : ''} />
               <span>{item.likes_count}</span>
             </span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-text-secondary">Views:</span>
-            <span className="font-semibold text-blue-500">{item.views_count}</span>
           </div>
         </div>
 
@@ -406,36 +465,364 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
             View Details
           </button>
           <button
-            onClick={() => handlePurchase(item)}
-            className="flex-1 py-2 px-4 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-medium hover:scale-105 transition-all duration-300 text-sm shadow-lg flex items-center justify-center space-x-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              const quantity = 1; // Default to 1 share
+              handlePurchaseShares(item, quantity);
+            }}
+            disabled={purchaseLoading === item.id || item.shares_available <= 0}
+            className="flex-1 py-2 px-4 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-medium hover:scale-105 transition-all duration-300 text-sm shadow-lg flex items-center justify-center space-x-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <ShoppingCart size={14} />
-            <span>Buy Now</span>
+            {purchaseLoading === item.id ? (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            ) : (
+              <>
+                <ShoppingCart size={14} />
+                <span>Buy Share</span>
+              </>
+            )}
           </button>
         </div>
       </div>
     </div>
   );
 
-  const ProjectModal = ({ item, onClose }: { item: MarketplaceItem; onClose: () => void }) => (
+  const DeveloperCard = ({ developer }: { developer: DeveloperProfile }) => (
+    <div 
+      className="bg-white rounded-2xl border border-light-border p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group"
+      onClick={() => setSelectedDeveloper(developer)}
+    >
+      <div className="flex items-start space-x-4 mb-4">
+        <div className="relative">
+          <img 
+            src={developer.avatar_url}
+            alt={developer.name}
+            className="w-16 h-16 rounded-full object-cover ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300"
+          />
+          {developer.verified && (
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+              <BadgeCheck size={14} className="text-white" />
+            </div>
+          )}
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center space-x-2 mb-1">
+            <h3 className="font-bold text-lg text-text-primary group-hover:text-primary transition-colors duration-300">
+              {developer.name}
+            </h3>
+            {developer.verified && (
+              <BadgeCheck size={16} className="text-blue-500" />
+            )}
+          </div>
+          <p className="text-text-muted text-sm mb-1">@{developer.username}</p>
+          <div className="flex items-center space-x-4 text-xs text-text-muted">
+            <div className="flex items-center space-x-1">
+              <Building size={12} />
+              <span>{developer.company}</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <MapPinIcon size={12} />
+              <span>{developer.location}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p className="text-text-secondary text-sm mb-4 line-clamp-2">{developer.bio}</p>
+
+      <div className="flex flex-wrap gap-2 mb-4">
+        {developer.skills.slice(0, 3).map((skill, index) => (
+          <span 
+            key={index}
+            className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium"
+          >
+            {skill}
+          </span>
+        ))}
+        {developer.skills.length > 3 && (
+          <span className="px-2 py-1 bg-light-card text-text-muted rounded-full text-xs">
+            +{developer.skills.length - 3} more
+          </span>
+        )}
+      </div>
+
+      <div className="grid grid-cols-3 gap-4 text-center">
+        <div>
+          <div className="text-lg font-bold text-text-primary">{developer.projects.length}</div>
+          <div className="text-xs text-text-muted">Projects</div>
+        </div>
+        <div>
+          <div className="text-lg font-bold text-red-500">{developer.total_likes}</div>
+          <div className="text-xs text-text-muted">Likes</div>
+        </div>
+        <div>
+          <div className="text-lg font-bold text-blue-500">{developer.total_views}</div>
+          <div className="text-xs text-text-muted">Views</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const ProjectModal = ({ item, onClose }: { item: MarketplaceItem; onClose: () => void }) => {
+    const [shareQuantity, setShareQuantity] = useState(1);
+    const totalCost = item.price * shareQuantity;
+
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="p-8">
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex-1">
+                <div className="flex items-center space-x-3 mb-2">
+                  <h2 className="text-3xl font-bold text-text-primary">{item.title}</h2>
+                  {item.is_featured && (
+                    <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
+                      <Crown size={12} />
+                      <span>FEATURED</span>
+                    </div>
+                  )}
+                </div>
+                <p className="text-text-secondary">by {item.founder_name}</p>
+                {item.company_name && (
+                  <p className="text-text-muted text-sm">{item.company_name}</p>
+                )}
+              </div>
+              <button
+                onClick={onClose}
+                className="text-text-muted hover:text-text-primary transition-colors duration-300 text-2xl p-2"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-6">
+                <div>
+                  <h3 className="text-xl font-semibold text-text-primary mb-3">Project Description</h3>
+                  <p className="text-text-secondary leading-relaxed">{item.description}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-semibold text-text-primary mb-2">Category</h4>
+                    <p className="text-text-secondary">{item.category}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-text-primary mb-2">Project Type</h4>
+                    <p className="text-text-secondary">{item.project_type}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-text-primary mb-2">Business Model</h4>
+                    <p className="text-text-secondary">{item.business_model}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-text-primary mb-2">Registered</h4>
+                    <p className="text-text-secondary">{new Date(item.created_at).toLocaleDateString()}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-text-primary mb-2">Development Team</h4>
+                  <p className="text-text-secondary">{item.developers}</p>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  {item.demo_link && (
+                    <a
+                      href={item.demo_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors duration-300"
+                    >
+                      <ExternalLink size={16} />
+                      <span>View Demo</span>
+                    </a>
+                  )}
+                  {item.presentation_video && (
+                    <a
+                      href={item.presentation_video}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-300"
+                    >
+                      <Video size={16} />
+                      <span>Watch Video</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-light-card rounded-2xl p-6">
+                  <h3 className="text-lg font-semibold text-text-primary mb-4">Purchase Shares</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-text-secondary">Price per share:</span>
+                      <span className="font-bold text-primary text-xl">{formatPrice(item.price)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-text-secondary">Available shares:</span>
+                      <span className="font-semibold text-green-600">{item.shares_available}/{item.total_shares}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-text-secondary">Likes:</span>
+                      <span className="font-semibold text-red-500 flex items-center space-x-1">
+                        <Heart size={16} className={item.user_has_liked ? 'fill-current' : ''} />
+                        <span>{item.likes_count}</span>
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-text-secondary">Views:</span>
+                      <span className="font-semibold text-blue-500">{item.views_count}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-text-secondary">Purchases:</span>
+                      <span className="font-semibold text-green-500">{item.purchase_count}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6 space-y-4">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-text-secondary">
+                        Quantity (Shares)
+                      </label>
+                      <div className="flex items-center">
+                        <button 
+                          onClick={() => setShareQuantity(prev => Math.max(1, prev - 1))}
+                          className="px-3 py-2 bg-light-hover border border-light-border rounded-l-lg"
+                          disabled={shareQuantity <= 1}
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          min="1"
+                          max={item.shares_available}
+                          value={shareQuantity}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (!isNaN(value) && value >= 1 && value <= item.shares_available) {
+                              setShareQuantity(value);
+                            }
+                          }}
+                          className="w-full text-center py-2 border-y border-light-border"
+                        />
+                        <button 
+                          onClick={() => setShareQuantity(prev => Math.min(item.shares_available, prev + 1))}
+                          className="px-3 py-2 bg-light-hover border border-light-border rounded-r-lg"
+                          disabled={shareQuantity >= item.shares_available}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 bg-light-hover rounded-lg">
+                      <div className="flex justify-between font-medium">
+                        <span>Total Cost:</span>
+                        <span className="text-primary font-bold">{formatPrice(totalCost)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-3 mt-6">
+                    <button
+                      onClick={() => handleLike(item)}
+                      disabled={likeLoading === item.id}
+                      className={`flex-1 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 ${
+                        item.user_has_liked 
+                          ? 'bg-red-500 text-white hover:bg-red-600' 
+                          : 'bg-red-50 text-red-500 hover:bg-red-100'
+                      } ${likeLoading === item.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <Heart size={18} className={item.user_has_liked ? 'fill-current' : ''} />
+                      <span>{item.user_has_liked ? 'Liked' : 'Like'}</span>
+                    </button>
+                    <button
+                      onClick={() => handlePurchaseShares(item, shareQuantity)}
+                      disabled={purchaseLoading === item.id || item.shares_available < shareQuantity}
+                      className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 shadow-lg flex items-center justify-center space-x-2 disabled:opacity-50 disabled:hover:scale-100"
+                    >
+                      {purchaseLoading === item.id ? (
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      ) : (
+                        <>
+                          <ShoppingCart size={18} />
+                          <span>Buy Shares</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-light-card rounded-2xl p-6">
+                  <h3 className="text-lg font-semibold text-text-primary mb-4">Project Stats</h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-muted">Category:</span>
+                      <span className="font-medium text-text-primary">{item.category}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-muted">Status:</span>
+                      <span className="font-medium text-green-600 capitalize">{item.status}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-text-muted">Listed:</span>
+                      <span className="font-medium text-text-primary">
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const DeveloperModal = ({ developer, onClose }: { developer: DeveloperProfile; onClose: () => void }) => (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="p-8">
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex-1">
-              <div className="flex items-center space-x-3 mb-2">
-                <h2 className="text-3xl font-bold text-text-primary">{item.title}</h2>
-                {item.is_featured && (
-                  <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
-                    <Crown size={12} />
-                    <span>FEATURED</span>
+          <div className="flex items-start justify-between mb-8">
+            <div className="flex items-center space-x-6">
+              <div className="relative">
+                <img 
+                  src={developer.avatar_url}
+                  alt={developer.name}
+                  className="w-24 h-24 rounded-full object-cover ring-4 ring-primary/20"
+                />
+                {developer.verified && (
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <BadgeCheck size={16} className="text-white" />
                   </div>
                 )}
               </div>
-              <p className="text-text-secondary">by {item.founder_name}</p>
-              {item.company_name && (
-                <p className="text-text-muted text-sm">{item.company_name}</p>
-              )}
+              <div>
+                <div className="flex items-center space-x-2 mb-1">
+                  <h2 className="text-3xl font-bold text-text-primary">{developer.name}</h2>
+                  {developer.verified && (
+                    <BadgeCheck size={20} className="text-blue-500" />
+                  )}
+                </div>
+                <p className="text-text-secondary text-lg">@{developer.username}</p>
+                <div className="flex items-center space-x-4 text-text-muted mt-2">
+                  <div className="flex items-center space-x-1">
+                    <Building size={16} />
+                    <span>{developer.company}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <MapPinIcon size={16} />
+                    <span>{developer.location}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Calendar size={16} />
+                    <span>Joined {developer.joined_date}</span>
+                  </div>
+                </div>
+              </div>
             </div>
             <button
               onClick={onClose}
@@ -446,208 +833,136 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-8">
               <div>
-                <h3 className="text-xl font-semibold text-text-primary mb-3">Project Description</h3>
-                <p className="text-text-secondary leading-relaxed">{item.description}</p>
+                <h3 className="text-xl font-semibold text-text-primary mb-3">About</h3>
+                <p className="text-text-secondary leading-relaxed">{developer.bio}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-semibold text-text-primary mb-2">Category</h4>
-                  <p className="text-text-secondary">{item.category}</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-text-primary mb-2">Project Type</h4>
-                  <p className="text-text-secondary">{item.project_type}</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-text-primary mb-2">Business Model</h4>
-                  <p className="text-text-secondary">{item.business_model}</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-text-primary mb-2">Registered</h4>
-                  <p className="text-text-secondary">{new Date(item.created_at).toLocaleDateString()}</p>
+              <div>
+                <h3 className="text-xl font-semibold text-text-primary mb-4">Skills</h3>
+                <div className="flex flex-wrap gap-2">
+                  {developer.skills.map((skill, index) => (
+                    <span 
+                      key={index}
+                      className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium"
+                    >
+                      {skill}
+                    </span>
+                  ))}
                 </div>
               </div>
 
               <div>
-                <h4 className="font-semibold text-text-primary mb-2">Development Team</h4>
-                <p className="text-text-secondary">{item.developers}</p>
-              </div>
-
-              <div className="flex flex-wrap gap-4">
-                {item.demo_link && (
-                  <a
-                    href={item.demo_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors duration-300"
-                  >
-                    <ExternalLink size={16} />
-                    <span>View Demo</span>
-                  </a>
-                )}
-                {item.presentation_video && (
-                  <a
-                    href={item.presentation_video}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-300"
-                  >
-                    <Video size={16} />
-                    <span>Watch Video</span>
-                  </a>
-                )}
+                <h3 className="text-xl font-semibold text-text-primary mb-4">Projects</h3>
+                <div className="space-y-4">
+                  {developer.projects.map((project) => (
+                    <div 
+                      key={project.id}
+                      className="bg-light-card border border-light-border rounded-xl p-4 hover:border-primary/30 transition-all duration-300 cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const marketplaceItem = items.find(item => item.id === project.id);
+                        if (marketplaceItem) {
+                          handleViewItem(marketplaceItem);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <Code size={24} className="text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-text-primary">{project.title}</h4>
+                          <p className="text-text-muted text-sm">{project.category}</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-primary">${project.price}</div>
+                          <div className="text-xs text-text-muted">per share</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
             <div className="space-y-6">
               <div className="bg-light-card rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-text-primary mb-4">Purchase Details</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">Price:</span>
-                    <span className="font-bold text-primary text-xl">{formatPrice(item.price)}</span>
+                <h3 className="text-lg font-semibold text-text-primary mb-4">Developer Stats</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4 bg-white border border-light-border rounded-xl">
+                    <div className="text-2xl font-bold text-primary">{developer.projects.length}</div>
+                    <div className="text-text-muted text-sm">Projects</div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">Likes:</span>
-                    <span className="font-semibold text-red-500 flex items-center space-x-1">
-                      <Heart size={16} className={item.user_has_liked ? 'fill-current' : ''} />
-                      <span>{item.likes_count}</span>
-                    </span>
+                  <div className="text-center p-4 bg-white border border-light-border rounded-xl">
+                    <div className="text-2xl font-bold text-red-500">{developer.total_likes}</div>
+                    <div className="text-text-muted text-sm">Total Likes</div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">Views:</span>
-                    <span className="font-semibold text-blue-500">{item.views_count}</span>
+                  <div className="text-center p-4 bg-white border border-light-border rounded-xl">
+                    <div className="text-2xl font-bold text-blue-500">{developer.total_views}</div>
+                    <div className="text-text-muted text-sm">Total Views</div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">Purchases:</span>
-                    <span className="font-semibold text-green-500">{item.purchase_count}</span>
+                  <div className="text-center p-4 bg-white border border-light-border rounded-xl">
+                    <div className="text-2xl font-bold text-green-500">
+                      {developer.projects.reduce((sum, p) => sum + p.purchase_count, 0)}
+                    </div>
+                    <div className="text-text-muted text-sm">Purchases</div>
                   </div>
-                </div>
-                
-                <div className="flex space-x-3 mt-6">
-                  <button
-                    onClick={() => handleLike(item)}
-                    disabled={likeLoading === item.id}
-                    className={`flex-1 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 ${
-                      item.user_has_liked 
-                        ? 'bg-red-500 text-white hover:bg-red-600' 
-                        : 'bg-red-50 text-red-500 hover:bg-red-100'
-                    } ${likeLoading === item.id ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    <Heart size={18} className={item.user_has_liked ? 'fill-current' : ''} />
-                    <span>{item.user_has_liked ? 'Liked' : 'Like'}</span>
-                  </button>
-                  <button
-                    onClick={() => handlePurchase(item)}
-                    className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 shadow-lg flex items-center justify-center space-x-2"
-                  >
-                    <ShoppingCart size={18} />
-                    <span>Buy Now</span>
-                  </button>
                 </div>
               </div>
 
               <div className="bg-light-card rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-text-primary mb-4">Project Stats</h3>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-text-muted">Category:</span>
-                    <span className="font-medium text-text-primary">{item.category}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-text-muted">Status:</span>
-                    <span className="font-medium text-green-600 capitalize">{item.status}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-text-muted">Listed:</span>
-                    <span className="font-medium text-text-primary">
-                      {new Date(item.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
+                <h3 className="text-lg font-semibold text-text-primary mb-4">Available Shares</h3>
+                <div className="space-y-4">
+                  {developer.projects.map((project) => {
+                    const marketplaceItem = items.find(item => item.id === project.id);
+                    if (!marketplaceItem) return null;
+                    
+                    return (
+                      <div key={project.id} className="flex justify-between items-center">
+                        <div className="text-text-secondary">{project.title.slice(0, 20)}...</div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-green-600 font-medium">{marketplaceItem.shares_available}</span>
+                          <button
+                            onClick={() => handleViewItem(marketplaceItem)}
+                            className="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all duration-300"
+                          >
+                            <ShoppingCart size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
+
+              <button
+                onClick={() => {
+                  // Find the developer's first project with available shares
+                  const availableProject = developer.projects.find(p => {
+                    const marketplaceItem = items.find(item => item.id === p.id);
+                    return marketplaceItem && marketplaceItem.shares_available > 0;
+                  });
+                  
+                  if (availableProject) {
+                    const marketplaceItem = items.find(item => item.id === availableProject.id);
+                    if (marketplaceItem) {
+                      handleViewItem(marketplaceItem);
+                    }
+                  }
+                }}
+                className="w-full py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-semibold hover:scale-105 transition-all duration-300 shadow-lg flex items-center justify-center space-x-2"
+              >
+                <ShoppingCart size={18} />
+                <span>View Available Shares</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-
-  const LeaderboardModal = ({ onClose }: { onClose: () => void }) => {
-    const leaderboardItems = getLeaderboardItems();
-    
-    return (
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <div className="p-8">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
-                  <Crown size={24} className="text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-text-primary">Project Leaderboard</h2>
-                  <p className="text-text-secondary">Top projects ranked by community likes</p>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                className="text-text-muted hover:text-text-primary transition-colors duration-300 text-2xl p-2"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {leaderboardItems.map((item, index) => (
-                <div 
-                  key={item.id}
-                  className={`flex items-center space-x-4 p-4 rounded-xl border transition-all duration-300 hover:shadow-lg cursor-pointer ${
-                    index < 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200' : 'bg-light-card border-light-border hover:border-primary/30'
-                  }`}
-                  onClick={() => {
-                    onClose();
-                    handleViewItem(item);
-                  }}
-                >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
-                    index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
-                    index === 1 ? 'bg-gradient-to-r from-gray-400 to-gray-600' :
-                    index === 2 ? 'bg-gradient-to-r from-amber-600 to-amber-800' :
-                    'bg-gradient-to-r from-blue-500 to-blue-700'
-                  }`}>
-                    {index + 1}
-                  </div>
-                  
-                  <img 
-                    src={item.thumbnail_url} 
-                    alt={item.title}
-                    className="w-16 h-10 object-cover rounded-lg"
-                  />
-                  
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-text-primary line-clamp-1">{item.title}</h4>
-                    <p className="text-text-muted text-sm">{item.founder_name}</p>
-                  </div>
-                  
-                  <div className="text-right">
-                    <div className="flex items-center space-x-1 text-red-500 font-bold">
-                      <Heart size={16} className="fill-current" />
-                      <span>{item.likes_count}</span>
-                    </div>
-                    <p className="text-text-muted text-xs">{formatPrice(item.price)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="min-h-screen bg-light-bg">
@@ -669,12 +984,13 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
           {/* Navigation Tabs */}
           <div className="bg-white rounded-2xl border border-light-border p-2 mb-6 shadow-sm">
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               {[
                 { id: 'marketplace', label: 'All Projects', icon: ShoppingCart },
                 { id: 'trending', label: 'Trending', icon: TrendingUp },
                 { id: 'featured', label: 'Featured', icon: Crown },
-                { id: 'auctions', label: 'Live Auctions', icon: Gavel }
+                { id: 'auctions', label: 'Live Auctions', icon: Gavel },
+                { id: 'developers', label: 'Developers', icon: UserCheck }
               ].map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -724,7 +1040,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted" size={20} />
                     <input
                       type="text"
-                      placeholder="Search projects, founders, or categories..."
+                      placeholder={activeTab === 'developers' ? "Search developers, skills, or companies..." : "Search projects, founders, or categories..."}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full pl-10 pr-4 py-3 border border-light-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-text-primary placeholder-text-muted"
@@ -733,56 +1049,52 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 </div>
                 
                 <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="px-4 py-3 border border-light-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-text-primary bg-white min-w-[150px]"
-                  >
-                    {categories.map(category => (
-                      <option key={category} value={category}>
-                        {category === 'all' ? 'All Categories' : category}
-                      </option>
-                    ))}
-                  </select>
-                  
-                  <select
-                    value={selectedSort}
-                    onChange={(e) => setSelectedSort(e.target.value)}
-                    className="px-4 py-3 border border-light-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-text-primary bg-white min-w-[180px]"
-                  >
-                    {sortOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  {activeTab !== 'developers' && (
+                    <>
+                      <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="px-4 py-3 border border-light-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-text-primary bg-white min-w-[150px]"
+                      >
+                        {categories.map(category => (
+                          <option key={category} value={category}>
+                            {category === 'all' ? 'All Categories' : category}
+                          </option>
+                        ))}
+                      </select>
+                      
+                      <select
+                        value={selectedSort}
+                        onChange={(e) => setSelectedSort(e.target.value)}
+                        className="px-4 py-3 border border-light-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-text-primary bg-white min-w-[180px]"
+                      >
+                        {sortOptions.map(option => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
 
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => setViewMode('grid')}
-                      className={`p-3 rounded-xl transition-all duration-300 ${
-                        viewMode === 'grid' ? 'bg-primary text-white' : 'bg-light-card text-text-muted hover:text-text-primary'
-                      }`}
-                    >
-                      <Grid size={18} />
-                    </button>
-                    <button
-                      onClick={() => setViewMode('list')}
-                      className={`p-3 rounded-xl transition-all duration-300 ${
-                        viewMode === 'list' ? 'bg-primary text-white' : 'bg-light-card text-text-muted hover:text-text-primary'
-                      }`}
-                    >
-                      <List size={18} />
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={() => setShowLeaderboard(true)}
-                    className="flex items-center space-x-2 px-4 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg"
-                  >
-                    <Crown size={18} />
-                    <span>Leaderboard</span>
-                  </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => setViewMode('grid')}
+                          className={`p-3 rounded-xl transition-all duration-300 ${
+                            viewMode === 'grid' ? 'bg-primary text-white' : 'bg-light-card text-text-muted hover:text-text-primary'
+                          }`}
+                        >
+                          <Grid size={18} />
+                        </button>
+                        <button
+                          onClick={() => setViewMode('list')}
+                          className={`p-3 rounded-xl transition-all duration-300 ${
+                            viewMode === 'list' ? 'bg-primary text-white' : 'bg-light-card text-text-muted hover:text-text-primary'
+                          }`}
+                        >
+                          <List size={18} />
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -792,9 +1104,39 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         {/* Content based on active tab */}
         {activeTab === 'auctions' ? (
           <AuctionSystem onBid={handleBid} onViewItem={handleViewItem} />
+        ) : activeTab === 'developers' ? (
+          <>
+            {/* Developers Tab */}
+            <div className="mb-6">
+              <p className="text-text-secondary">
+                {searchQuery ? 
+                  `Found ${searchResults.developers.length} developers matching "${searchQuery}"` : 
+                  'Showing all developers'}
+              </p>
+            </div>
+
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-text-secondary">Loading developers...</p>
+              </div>
+            ) : searchResults.developers.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-2xl border border-light-border">
+                <User size={48} className="mx-auto mb-4 text-text-muted" />
+                <h3 className="text-xl font-semibold text-text-primary mb-2">No Developers Found</h3>
+                <p className="text-text-secondary">Try adjusting your search criteria</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {searchResults.developers.map((developer) => (
+                  <DeveloperCard key={developer.id} developer={developer} />
+                ))}
+              </div>
+            )}
+          </>
         ) : (
           <>
-            {/* Results */}
+            {/* Projects Tabs */}
             <div className="mb-6">
               <p className="text-text-secondary">
                 Showing {filteredItems.length} of {items.length} projects
@@ -838,9 +1180,12 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
           />
         )}
 
-        {/* Leaderboard Modal */}
-        {showLeaderboard && (
-          <LeaderboardModal onClose={() => setShowLeaderboard(false)} />
+        {/* Developer Detail Modal */}
+        {selectedDeveloper && (
+          <DeveloperModal 
+            developer={selectedDeveloper} 
+            onClose={() => setSelectedDeveloper(null)} 
+          />
         )}
       </div>
     </div>

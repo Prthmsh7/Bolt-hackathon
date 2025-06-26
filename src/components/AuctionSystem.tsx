@@ -14,8 +14,11 @@ import {
   Sparkles,
   ArrowUpRight,
   Target,
-  Flame
+  Flame,
+  Hexagon,
+  Shuffle
 } from 'lucide-react';
+import { demoProjects } from '../data/demoProjects';
 
 interface AuctionItem {
   id: string;
@@ -32,74 +35,122 @@ interface AuctionItem {
   views_count: number;
   is_featured: boolean;
   highest_bidder?: string;
+  nounId: number;
 }
 
 interface AuctionSystemProps {
   onBid: (itemId: string, amount: number) => void;
-  onViewItem: (item: AuctionItem) => void;
+  onViewItem: (item: any) => void;
 }
 
 const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
   const [currentAuction, setCurrentAuction] = useState<AuctionItem | null>(null);
   const [upcomingAuctions, setUpcomingAuctions] = useState<AuctionItem[]>([]);
+  const [pastAuctions, setPastAuctions] = useState<AuctionItem[]>([]);
   const [bidAmount, setBidAmount] = useState('');
   const [timeLeft, setTimeLeft] = useState(0);
+  const [nounSvg, setNounSvg] = useState<React.ReactNode | null>(null);
 
   // Mock auction data - in real app this would come from your backend
   useEffect(() => {
+    // Get top projects by likes for auctions
+    const topProjects = [...demoProjects].sort((a, b) => b.likes_count - a.likes_count);
+    
     const mockCurrentAuction: AuctionItem = {
-      id: '1',
-      title: 'AI-Powered Analytics Platform',
-      description: 'Revolutionary AI platform for real-time data analytics with machine learning capabilities.',
-      founder_name: 'Sarah Johnson',
-      category: 'AI/ML',
-      thumbnail_url: 'https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=2',
-      current_bid: 75000,
-      min_bid: 50000,
+      id: topProjects[0].id,
+      title: topProjects[0].title,
+      description: topProjects[0].description,
+      founder_name: topProjects[0].founder_name,
+      category: topProjects[0].category,
+      thumbnail_url: topProjects[0].thumbnail_url,
+      current_bid: 10,
+      min_bid: 10,
       bid_count: 23,
       time_remaining: 3600, // 1 hour in seconds
-      likes_count: 156,
-      views_count: 2340,
+      likes_count: topProjects[0].likes_count,
+      views_count: topProjects[0].views_count,
       is_featured: true,
-      highest_bidder: 'investor_xyz'
+      highest_bidder: 'investor_xyz',
+      nounId: 1
     };
 
     const mockUpcoming: AuctionItem[] = [
       {
-        id: '2',
-        title: 'Blockchain Security Protocol',
-        description: 'Next-generation security protocol for blockchain applications.',
-        founder_name: 'James Park',
-        category: 'Blockchain',
-        thumbnail_url: 'https://images.pexels.com/photos/8369648/pexels-photo-8369648.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=2',
+        id: topProjects[1].id,
+        title: topProjects[1].title,
+        description: topProjects[1].description,
+        founder_name: topProjects[1].founder_name,
+        category: topProjects[1].category,
+        thumbnail_url: topProjects[1].thumbnail_url,
         current_bid: 0,
-        min_bid: 80000,
+        min_bid: 10,
         bid_count: 0,
         time_remaining: 86400, // 24 hours
-        likes_count: 89,
-        views_count: 1560,
-        is_featured: false
+        likes_count: topProjects[1].likes_count,
+        views_count: topProjects[1].views_count,
+        is_featured: false,
+        nounId: 2
       },
       {
-        id: '3',
-        title: 'FinTech Payment Solution',
-        description: 'Revolutionary payment processing system for modern businesses.',
-        founder_name: 'Emma Davis',
-        category: 'Fintech',
-        thumbnail_url: 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=2',
+        id: topProjects[2].id,
+        title: topProjects[2].title,
+        description: topProjects[2].description,
+        founder_name: topProjects[2].founder_name,
+        category: topProjects[2].category,
+        thumbnail_url: topProjects[2].thumbnail_url,
         current_bid: 0,
-        min_bid: 60000,
+        min_bid: 10,
         bid_count: 0,
         time_remaining: 172800, // 48 hours
-        likes_count: 124,
-        views_count: 1890,
-        is_featured: true
+        likes_count: topProjects[2].likes_count,
+        views_count: topProjects[2].views_count,
+        is_featured: true,
+        nounId: 3
+      }
+    ];
+
+    const mockPast: AuctionItem[] = [
+      {
+        id: topProjects[3].id,
+        title: topProjects[3].title,
+        description: topProjects[3].description,
+        founder_name: topProjects[3].founder_name,
+        category: topProjects[3].category,
+        thumbnail_url: topProjects[3].thumbnail_url,
+        current_bid: 15,
+        min_bid: 10,
+        bid_count: 8,
+        time_remaining: 0,
+        likes_count: topProjects[3].likes_count,
+        views_count: topProjects[3].views_count,
+        is_featured: false,
+        highest_bidder: 'investor_abc',
+        nounId: 0
+      },
+      {
+        id: topProjects[4].id,
+        title: topProjects[4].title,
+        description: topProjects[4].description,
+        founder_name: topProjects[4].founder_name,
+        category: topProjects[4].category,
+        thumbnail_url: topProjects[4].thumbnail_url,
+        current_bid: 12,
+        min_bid: 10,
+        bid_count: 5,
+        time_remaining: 0,
+        likes_count: topProjects[4].likes_count,
+        views_count: topProjects[4].views_count,
+        is_featured: true,
+        highest_bidder: 'investor_def',
+        nounId: -1
       }
     ];
 
     setCurrentAuction(mockCurrentAuction);
     setUpcomingAuctions(mockUpcoming);
+    setPastAuctions(mockPast);
     setTimeLeft(mockCurrentAuction.time_remaining);
+    generateNounSvg(mockCurrentAuction.nounId);
   }, []);
 
   // Countdown timer
@@ -153,8 +204,22 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
   const getMinimumBid = () => {
     if (!currentAuction) return 0;
     return currentAuction.current_bid > 0 
-      ? currentAuction.current_bid + 1000 
+      ? currentAuction.current_bid + 1 
       : currentAuction.min_bid;
+  };
+
+  // Generate random Noun SVG (simplified for demo)
+  const generateNounSvg = (nounId: number) => {
+    const colors = ['#D5D7E1', '#E1D7D5', '#D5E1D7', '#E1D5E1', '#D7E1D5'];
+    const bgColor = colors[Math.abs(nounId) % colors.length];
+    
+    setNounSvg(
+      <div className="w-full h-full bg-white rounded-2xl overflow-hidden">
+        <div style={{ backgroundColor: bgColor }} className="w-full h-full flex items-center justify-center">
+          <Hexagon size={64} className="text-primary" />
+        </div>
+      </div>
+    );
   };
 
   if (!currentAuction) return null;
@@ -171,7 +236,7 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
               <Gavel size={32} className="text-white" />
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-text-primary">Live Auction</h2>
+              <h2 className="text-3xl font-bold text-text-primary">Nouns-Style Auction</h2>
               <p className="text-text-secondary text-lg">Today's featured innovation share</p>
             </div>
             <div className="ml-auto flex items-center space-x-3">
@@ -191,6 +256,24 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Auction Item */}
             <div className="space-y-6">
+              <div className="flex items-center space-x-6">
+                <div className="w-32 h-32 relative">
+                  {nounSvg}
+                  <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                    #{currentAuction.nounId}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-text-primary mb-2">Noun #{currentAuction.nounId}</h3>
+                  <p className="text-text-secondary mb-2">Representing: <span className="font-semibold">{currentAuction.title}</span></p>
+                  <div className="flex items-center space-x-2 text-text-muted text-sm">
+                    <span>by {currentAuction.founder_name}</span>
+                    <span>•</span>
+                    <span>{currentAuction.category}</span>
+                  </div>
+                </div>
+              </div>
+
               <div className="relative">
                 <img 
                   src={currentAuction.thumbnail_url}
@@ -213,7 +296,6 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
               </div>
 
               <div>
-                <h3 className="text-2xl font-bold text-text-primary mb-2">{currentAuction.title}</h3>
                 <p className="text-text-secondary mb-4">{currentAuction.description}</p>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
@@ -295,6 +377,26 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
                   </button>
                 </div>
               </div>
+
+              {/* Nouns DAO Info */}
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Hexagon size={24} className="text-primary" />
+                  <h4 className="text-lg font-bold text-text-primary">Nouns DAO Style</h4>
+                </div>
+                <p className="text-text-secondary text-sm mb-4">
+                  This auction follows the Nouns DAO model where one Noun is auctioned every day. 
+                  Each Noun represents a top project from our marketplace and gives the owner 
+                  governance rights in the platform.
+                </p>
+                <div className="flex items-center justify-between text-sm">
+                  <button className="text-primary font-medium">Learn More</button>
+                  <div className="flex items-center space-x-1">
+                    <Shuffle size={14} className="text-text-muted" />
+                    <span className="text-text-muted">Auction #{currentAuction.nounId}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -324,6 +426,20 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
               className="bg-light-card border border-light-border rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
               onClick={() => onViewItem(item)}
             >
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="w-16 h-16 bg-light-hover rounded-xl overflow-hidden">
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                    <Hexagon size={32} className="text-primary" />
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg text-text-primary group-hover:text-primary transition-colors duration-300">
+                    Noun #{item.nounId}
+                  </h4>
+                  <p className="text-text-muted text-sm">Starts in {formatTime(item.time_remaining)}</p>
+                </div>
+              </div>
+
               <div className="relative mb-4">
                 <img 
                   src={item.thumbnail_url}
@@ -366,6 +482,62 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Past Auctions */}
+      <div className="bg-white rounded-2xl border border-light-border p-8 shadow-sm">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-gray-500 to-gray-600 rounded-xl flex items-center justify-center">
+              <Gavel size={24} className="text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-text-primary">Past Auctions</h3>
+              <p className="text-text-secondary">Previously auctioned innovation shares</p>
+            </div>
+          </div>
+          <button className="text-primary hover:text-primary-dark font-medium">
+            View All →
+          </button>
+        </div>
+
+        <div className="overflow-hidden rounded-xl border border-light-border">
+          <table className="w-full">
+            <thead className="bg-light-card">
+              <tr>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Noun</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Project</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Founder</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Final Bid</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Winner</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-text-primary">Date</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-light-border">
+              {pastAuctions.map((auction, index) => (
+                <tr key={auction.id} className="bg-white hover:bg-light-hover transition-colors duration-300">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <Hexagon size={16} className="text-primary" />
+                      </div>
+                      <span className="font-medium">#{Math.abs(auction.nounId)}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-text-primary">{auction.title}</div>
+                  </td>
+                  <td className="px-6 py-4 text-text-secondary">{auction.founder_name}</td>
+                  <td className="px-6 py-4 font-bold text-primary">{formatCurrency(auction.current_bid)}</td>
+                  <td className="px-6 py-4 text-text-secondary">{auction.highest_bidder}</td>
+                  <td className="px-6 py-4 text-text-muted">
+                    {new Date(Date.now() - Math.abs(auction.nounId) * 86400000).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
