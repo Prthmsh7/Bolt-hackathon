@@ -153,9 +153,14 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
       setError(null);
       setSuccess(null);
 
+      console.log('Starting IP registration process...');
+      console.log('User ID:', user.id);
+      console.log('Form data:', formData);
+
       // Upload supporting document if provided
       let documentHash = '';
       if (formData.file) {
+        console.log('Uploading file to IPFS...');
         documentHash = await pinataService.uploadFile(formData.file, {
           type: 'ip_document',
           category: formData.category,
@@ -164,9 +169,11 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
           walletAddress,
           userId: user.id,
         });
+        console.log('File uploaded, hash:', documentHash);
       }
 
       // Upload IP metadata
+      console.log('Uploading metadata to IPFS...');
       const metadata = {
         title: formData.title,
         description: formData.description,
@@ -189,37 +196,64 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
 
       const metadataHash = await pinataService.uploadJSON(metadata);
       const ipfsUrl = await pinataService.getIPFSUrl(metadataHash);
+      
+      console.log('Metadata uploaded, hash:', metadataHash);
+      console.log('IPFS URL:', ipfsUrl);
+
+      // Prepare data for database insertion
+      const dbData = {
+        user_id: user.id,
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        founder_name: formData.founderName.trim(),
+        company_name: formData.companyName.trim() || null,
+        category: formData.category,
+        wallet_address: walletAddress || null,
+        ipfs_hash: metadataHash,
+        ipfs_url: ipfsUrl,
+        document_hash: documentHash || null,
+        project_type: formData.projectType,
+        business_model: formData.businessModel,
+        project_summary: formData.projectSummary.trim(),
+        developers: formData.developers.trim(),
+        demo_link: formData.demoLink.trim() || null,
+        presentation_video: formData.presentationVideo.trim() || null,
+        github_repo: formData.githubRepo.trim() || null,
+        status: 'pending', // Set initial status
+        created_at: new Date().toISOString(),
+      };
+
+      console.log('Inserting data into database:', dbData);
 
       // Save to Supabase
-      const { error: dbError } = await supabase
+      const { data: insertedData, error: dbError } = await supabase
         .from('ip_registrations')
-        .insert([
-          {
-            user_id: user.id,
-            title: formData.title,
-            description: formData.description,
-            founder_name: formData.founderName,
-            company_name: formData.companyName,
-            category: formData.category,
-            wallet_address: walletAddress,
-            ipfs_hash: metadataHash,
-            ipfs_url: ipfsUrl,
-            document_hash: documentHash || null,
-            project_type: formData.projectType,
-            business_model: formData.businessModel,
-            project_summary: formData.projectSummary,
-            developers: formData.developers,
-            demo_link: formData.demoLink || null,
-            presentation_video: formData.presentationVideo || null,
-            github_repo: formData.githubRepo || null,
-            created_at: new Date().toISOString(),
-          }
-        ]);
+        .insert([dbData])
+        .select()
+        .single();
 
       if (dbError) {
-        console.error('Database error:', dbError);
-        throw new Error('Failed to save registration to database');
+        console.error('Database error details:', dbError);
+        console.error('Error code:', dbError.code);
+        console.error('Error message:', dbError.message);
+        console.error('Error details:', dbError.details);
+        console.error('Error hint:', dbError.hint);
+        
+        // Provide more specific error messages
+        if (dbError.code === '23505') {
+          throw new Error('A project with this title already exists. Please choose a different title.');
+        } else if (dbError.code === '23502') {
+          throw new Error('Missing required field. Please check all required fields are filled.');
+        } else if (dbError.code === '42501') {
+          throw new Error('Permission denied. Please make sure you are signed in properly.');
+        } else if (dbError.message.includes('relation') && dbError.message.includes('does not exist')) {
+          throw new Error('Database table not found. Please contact support.');
+        } else {
+          throw new Error(`Database error: ${dbError.message}`);
+        }
       }
+
+      console.log('Successfully inserted into database:', insertedData);
 
       setSuccess({
         ipfsHash: metadataHash,
@@ -251,7 +285,15 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
 
     } catch (err) {
       console.error('Error registering IP:', err);
-      setError(err instanceof Error ? err.message : 'Failed to register IP. Please try again.');
+      let errorMessage = 'Failed to register IP. Please try again.';
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'object' && err !== null && 'message' in err) {
+        errorMessage = String(err.message);
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -321,7 +363,12 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
       {error && (
         <div className="flex items-center space-x-2 p-4 bg-red-50 border border-red-200 rounded-xl">
           <AlertCircle size={20} className="text-red-500 flex-shrink-0" />
-          <p className="text-red-700 text-sm">{error}</p>
+          <div>
+            <p className="text-red-700 text-sm font-medium">{error}</p>
+            <p className="text-red-600 text-xs mt-1">
+              If this problem persists, please contact support with the error details.
+            </p>
+          </div>
         </div>
       )}
 
@@ -346,7 +393,7 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
                       <span>{repo.language}</span>
                       <span>•</span>
                       <div className="flex items-center space-x-1">
-                        <Star size={12} />
+                        <span>⭐</span>
                         <span>{repo.stargazers_count}</span>
                       </div>
                     </div>
