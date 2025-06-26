@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Brain } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import MCPAssistant from './MCPAssistant';
 
 interface MCPAssistantButtonProps {
@@ -11,21 +11,28 @@ const MCPAssistantButton: React.FC<MCPAssistantButtonProps> = ({ onInsightGenera
 
   return (
     <>
-      {/* Floating button */}
+      {/* Floating chat button */}
       <button
         onClick={() => setShowAssistant(true)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 pulse-glow"
+        className="fixed bottom-6 right-6 z-40 w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 pulse-glow group"
         aria-label="Open MCP Assistant"
       >
-        <Brain size={24} className="text-white" />
+        <MessageCircle size={28} className="text-white group-hover:scale-110 transition-transform duration-300" />
+        
+        {/* Notification dot */}
+        <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full border-2 border-white flex items-center justify-center">
+          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+        </div>
       </button>
 
       {/* MCP Assistant Modal */}
-      <MCPAssistant
-        isOpen={showAssistant}
-        onClose={() => setShowAssistant(false)}
-        onInsightGenerated={onInsightGenerated}
-      />
+      {showAssistant && (
+        <MCPAssistant
+          isOpen={showAssistant}
+          onClose={() => setShowAssistant(false)}
+          onInsightGenerated={onInsightGenerated}
+        />
+      )}
     </>
   );
 };

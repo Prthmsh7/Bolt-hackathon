@@ -24,7 +24,9 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  Activity
+  Activity,
+  X,
+  Minimize2
 } from 'lucide-react';
 import { demoProjects, searchProjects, getTrendingProjects } from '../data/demoProjects';
 
@@ -72,11 +74,11 @@ const MCPAssistant: React.FC<MCPAssistantProps> = ({
       const welcomeMessage: MCPMessage = {
         id: 'welcome',
         type: 'assistant',
-        content: "Hello! I'm your MCP-powered investment assistant. I can analyze market trends, evaluate projects, assess risks, and provide personalized investment recommendations. What would you like to explore?",
+        content: "👋 Hello! I'm your MCP-powered investment assistant. I can analyze market trends, evaluate projects, assess risks, and provide personalized investment recommendations. What would you like to explore?",
         timestamp: new Date(),
         suggestions: [
           "Analyze trending projects",
-          "Show market opportunities",
+          "Show market opportunities", 
           "Evaluate investment risks",
           "Compare project categories",
           "Find undervalued projects"
@@ -137,7 +139,7 @@ ${trendingProjects.slice(0, 3).map((p, i) => `${i + 1}. ${p.title} - ${p.likes_c
         data: { trendingProjects },
         suggestions: [
           "Show AI project details",
-          "Compare category performance",
+          "Compare category performance", 
           "Analyze risk factors"
         ]
       };
@@ -342,17 +344,19 @@ Could you be more specific about what you'd like to analyze? I can help with:
     }
   };
 
+  if (!isOpen) return null;
+
   return (
     <div className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${
       isMinimized ? 'w-80 h-16' : 'w-96 h-[600px]'
     }`}>
       <div className="bg-white rounded-2xl border border-light-border shadow-2xl overflow-hidden h-full flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-secondary p-4 text-white">
+        <div className="bg-gradient-to-r from-primary to-secondary p-4 text-white flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                <Brain size={18} className="text-white" />
+                <MessageCircle size={18} className="text-white" />
               </div>
               <div>
                 <h3 className="font-bold">MCP Assistant</h3>
@@ -367,13 +371,13 @@ Could you be more specific about what you'd like to analyze? I can help with:
                 onClick={() => setIsMinimized(!isMinimized)}
                 className="p-1 hover:bg-white/20 rounded transition-colors duration-300"
               >
-                {isMinimized ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                {isMinimized ? <ChevronUp size={16} /> : <Minimize2 size={16} />}
               </button>
               <button
                 onClick={onClose}
                 className="p-1 hover:bg-white/20 rounded transition-colors duration-300"
               >
-                ✕
+                <X size={16} />
               </button>
             </div>
           </div>
@@ -382,7 +386,7 @@ Could you be more specific about what you'd like to analyze? I can help with:
         {!isMinimized && (
           <>
             {/* MCP Status */}
-            <div className="p-3 bg-light-card border-b border-light-border">
+            <div className="p-3 bg-light-card border-b border-light-border flex-shrink-0">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center space-x-2">
                   <Database size={12} className="text-primary" />
@@ -454,7 +458,7 @@ Could you be more specific about what you'd like to analyze? I can help with:
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-light-border">
+            <div className="p-4 border-t border-light-border flex-shrink-0">
               <div className="flex items-center space-x-2">
                 <input
                   type="text"
