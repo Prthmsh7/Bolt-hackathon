@@ -32,49 +32,53 @@ import {
   Video,
   Link as LinkIcon,
   FileText,
-  Sparkles
+  Sparkles,
+  ShoppingCart,
+  Crown,
+  Flame,
+  TrendingDown
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 interface MarketplaceProps {
   onBack: () => void;
 }
 
-interface Project {
+interface MarketplaceItem {
   id: string;
+  ip_registration_id: string;
   title: string;
   description: string;
-  founder_name: string;
-  company_name: string;
+  price: number;
   category: string;
-  project_type: string;
-  business_model: string;
-  project_summary: string;
-  developers: string;
+  founder_name: string;
+  company_name?: string;
   demo_link?: string;
   presentation_video?: string;
   ipfs_url: string;
-  created_at: string;
+  thumbnail_url?: string;
+  likes_count: number;
+  views_count: number;
+  purchase_count: number;
+  is_featured: boolean;
   status: string;
-  // Mock investment data
-  valuation?: string;
-  shares_available?: string;
-  min_investment?: string;
-  current_funding?: string;
-  investors_count?: number;
-  views?: number;
-  likes?: number;
+  created_at: string;
+  user_has_liked?: boolean;
 }
 
 const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
+  const { user } = useAuth();
+  const [items, setItems] = useState<MarketplaceItem[]>([]);
+  const [filteredItems, setFilteredItems] = useState<MarketplaceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedSort, setSelectedSort] = useState('newest');
+  const [selectedSort, setSelectedSort] = useState('likes');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedItem, setSelectedItem] = useState<MarketplaceItem | null>(null);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [likeLoading, setLikeLoading] = useState<string | null>(null);
 
   const categories = [
     'all',
@@ -94,225 +98,366 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   ];
 
   const sortOptions = [
+    { value: 'likes', label: 'Most Liked' },
     { value: 'newest', label: 'Newest First' },
     { value: 'oldest', label: 'Oldest First' },
-    { value: 'valuation_high', label: 'Highest Valuation' },
-    { value: 'valuation_low', label: 'Lowest Valuation' },
-    { value: 'popular', label: 'Most Popular' },
+    { value: 'price_high', label: 'Highest Price' },
+    { value: 'price_low', label: 'Lowest Price' },
+    { value: 'views', label: 'Most Viewed' },
+    { value: 'featured', label: 'Featured First' },
   ];
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    fetchMarketplaceItems();
+  }, [user]);
 
   useEffect(() => {
-    filterAndSortProjects();
-  }, [projects, searchQuery, selectedCategory, selectedSort]);
+    filterAndSortItems();
+  }, [items, searchQuery, selectedCategory, selectedSort]);
 
-  const fetchProjects = async () => {
+  const fetchMarketplaceItems = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('ip_registrations')
+      
+      // Fetch marketplace items
+      const { data: marketplaceData, error: marketplaceError } = await supabase
+        .from('marketplace_items')
         .select('*')
-        .eq('status', 'approved') // Only show approved projects
+        .eq('status', 'active')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (marketplaceError) throw marketplaceError;
 
-      // Add mock investment data to projects
-      const projectsWithMockData = (data || []).map((project, index) => ({
-        ...project,
-        valuation: generateMockValuation(),
-        shares_available: generateMockShares(),
-        min_investment: generateMockMinInvestment(),
-        current_funding: generateMockCurrentFunding(),
-        investors_count: Math.floor(Math.random() * 50) + 5,
-        views: Math.floor(Math.random() * 5000) + 100,
-        likes: Math.floor(Math.random() * 200) + 10,
-      }));
+      let itemsWithLikes = marketplaceData || [];
 
-      setProjects(projectsWithMockData);
+      // If user is authenticated, check which items they've liked
+      if (user) {
+        const { data: likesData, error: likesError } = await supabase
+          .from('project_likes')
+          .select('marketplace_item_id')
+          .eq('user_id', user.id);
+
+        if (!likesError && likesData) {
+          const likedItemIds = new Set(likesData.map(like => like.marketplace_item_id));
+          itemsWithLikes = itemsWithLikes.map(item => ({
+            ...item,
+            user_has_liked: likedItemIds.has(item.id)
+          }));
+        }
+      }
+
+      setItems(itemsWithLikes);
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      console.error('Error fetching marketplace items:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const generateMockValuation = () => {
-    const valuations = ['$500K', '$750K', '$1M', '$1.5M', '$2M', '$2.5M', '$3M', '$4M', '$5M'];
-    return valuations[Math.floor(Math.random() * valuations.length)];
-  };
-
-  const generateMockShares = () => {
-    const shares = ['5%', '8%', '10%', '12%', '15%', '18%', '20%', '25%'];
-    return shares[Math.floor(Math.random() * shares.length)];
-  };
-
-  const generateMockMinInvestment = () => {
-    const investments = ['$5K', '$10K', '$15K', '$20K', '$25K', '$30K', '$40K', '$50K'];
-    return investments[Math.floor(Math.random() * investments.length)];
-  };
-
-  const generateMockCurrentFunding = () => {
-    const funding = ['$25K', '$50K', '$75K', '$100K', '$150K', '$200K', '$250K', '$300K'];
-    return funding[Math.floor(Math.random() * funding.length)];
-  };
-
-  const filterAndSortProjects = () => {
-    let filtered = [...projects];
+  const filterAndSortItems = () => {
+    let filtered = [...items];
 
     // Filter by search query
     if (searchQuery) {
-      filtered = filtered.filter(project =>
-        project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.founder_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.category.toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter(item =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.founder_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item.company_name && item.company_name.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(project => project.category === selectedCategory);
+      filtered = filtered.filter(item => item.category === selectedCategory);
     }
 
-    // Sort projects
+    // Sort items
     switch (selectedSort) {
+      case 'likes':
+        filtered.sort((a, b) => b.likes_count - a.likes_count);
+        break;
       case 'newest':
         filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         break;
       case 'oldest':
         filtered.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
         break;
-      case 'popular':
-        filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
+      case 'views':
+        filtered.sort((a, b) => b.views_count - a.views_count);
         break;
-      case 'valuation_high':
-        filtered.sort((a, b) => {
-          const aVal = parseInt((a.valuation || '0').replace(/[^0-9]/g, ''));
-          const bVal = parseInt((b.valuation || '0').replace(/[^0-9]/g, ''));
-          return bVal - aVal;
-        });
+      case 'price_high':
+        filtered.sort((a, b) => b.price - a.price);
         break;
-      case 'valuation_low':
+      case 'price_low':
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+      case 'featured':
         filtered.sort((a, b) => {
-          const aVal = parseInt((a.valuation || '0').replace(/[^0-9]/g, ''));
-          const bVal = parseInt((b.valuation || '0').replace(/[^0-9]/g, ''));
-          return aVal - bVal;
+          if (a.is_featured && !b.is_featured) return -1;
+          if (!a.is_featured && b.is_featured) return 1;
+          return b.likes_count - a.likes_count;
         });
         break;
     }
 
-    setFilteredProjects(filtered);
+    setFilteredItems(filtered);
   };
 
-  const handleInvest = (project: Project) => {
-    // This would open an investment modal or redirect to investment flow
-    alert(`Investment flow for ${project.title} would open here`);
+  const handleLike = async (item: MarketplaceItem) => {
+    if (!user) {
+      alert('Please sign in to like projects');
+      return;
+    }
+
+    if (likeLoading === item.id) return;
+
+    setLikeLoading(item.id);
+
+    try {
+      if (item.user_has_liked) {
+        // Unlike
+        const { error } = await supabase
+          .from('project_likes')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('marketplace_item_id', item.id);
+
+        if (error) throw error;
+
+        // Update local state
+        setItems(prevItems =>
+          prevItems.map(prevItem =>
+            prevItem.id === item.id
+              ? {
+                  ...prevItem,
+                  likes_count: prevItem.likes_count - 1,
+                  user_has_liked: false
+                }
+              : prevItem
+          )
+        );
+      } else {
+        // Like
+        const { error } = await supabase
+          .from('project_likes')
+          .insert({
+            user_id: user.id,
+            marketplace_item_id: item.id
+          });
+
+        if (error) throw error;
+
+        // Update local state
+        setItems(prevItems =>
+          prevItems.map(prevItem =>
+            prevItem.id === item.id
+              ? {
+                  ...prevItem,
+                  likes_count: prevItem.likes_count + 1,
+                  user_has_liked: true
+                }
+              : prevItem
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      alert('Failed to update like. Please try again.');
+    } finally {
+      setLikeLoading(null);
+    }
   };
 
-  const ProjectCard = ({ project }: { project: Project }) => (
-    <div className="bg-white rounded-2xl border border-light-border overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer">
+  const handleViewItem = async (item: MarketplaceItem) => {
+    // Increment view count
+    try {
+      await supabase.rpc('increment_view_count', { item_id: item.id });
+      
+      // Update local state
+      setItems(prevItems =>
+        prevItems.map(prevItem =>
+          prevItem.id === item.id
+            ? { ...prevItem, views_count: prevItem.views_count + 1 }
+            : prevItem
+        )
+      );
+    } catch (error) {
+      console.error('Error incrementing view count:', error);
+    }
+
+    setSelectedItem(item);
+  };
+
+  const handlePurchase = (item: MarketplaceItem) => {
+    if (!user) {
+      alert('Please sign in to purchase projects');
+      return;
+    }
+    
+    // This would open a purchase modal or redirect to purchase flow
+    alert(`Purchase flow for "${item.title}" ($${item.price.toLocaleString()}) would open here`);
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
+
+  const getLeaderboardItems = () => {
+    return [...items]
+      .sort((a, b) => b.likes_count - a.likes_count)
+      .slice(0, 10);
+  };
+
+  const ProjectCard = ({ item, rank }: { item: MarketplaceItem; rank?: number }) => (
+    <div className="bg-white rounded-2xl border border-light-border overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer relative">
+      {/* Featured Badge */}
+      {item.is_featured && (
+        <div className="absolute top-3 left-3 z-10 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
+          <Crown size={12} />
+          <span>FEATURED</span>
+        </div>
+      )}
+
+      {/* Rank Badge for Leaderboard */}
+      {rank !== undefined && (
+        <div className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
+          rank === 1 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
+          rank === 2 ? 'bg-gradient-to-r from-gray-400 to-gray-600' :
+          rank === 3 ? 'bg-gradient-to-r from-amber-600 to-amber-800' :
+          'bg-gradient-to-r from-blue-500 to-blue-700'
+        }`}>
+          {rank}
+        </div>
+      )}
+
       <div className="relative">
-        <div className="w-full h-48 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <Code size={32} className="text-primary" />
-            </div>
-            <p className="text-text-muted text-sm font-medium">{project.category}</p>
-          </div>
+        <img 
+          src={item.thumbnail_url || 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=400&h=225&dpr=2'} 
+          alt={item.title}
+          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
+        
+        {/* Category Badge */}
+        <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">
+          {item.category}
         </div>
-        <div className="absolute top-3 right-3 flex space-x-2">
-          <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-            Available
-          </span>
-          {project.presentation_video && (
-            <div className="bg-red-500 text-white p-2 rounded-full">
-              <Video size={12} />
-            </div>
-          )}
-        </div>
-        <div className="absolute bottom-3 left-3 flex items-center space-x-2">
-          <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded text-xs">
-            {project.views} views
+
+        {/* Stats Overlay */}
+        <div className="absolute bottom-3 right-3 flex items-center space-x-2">
+          <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center space-x-1">
+            <Eye size={10} />
+            <span>{item.views_count}</span>
           </div>
-          <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded text-xs">
-            ❤️ {project.likes}
+          <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center space-x-1">
+            <Heart size={10} className={item.user_has_liked ? 'fill-current text-red-400' : ''} />
+            <span>{item.likes_count}</span>
           </div>
         </div>
       </div>
       
       <div className="p-6">
         <div className="flex items-start justify-between mb-3">
-          <h3 className="font-bold text-lg text-text-primary group-hover:text-primary transition-colors duration-300 line-clamp-2">
-            {project.title}
+          <h3 className="font-bold text-lg text-text-primary group-hover:text-primary transition-colors duration-300 line-clamp-2 flex-1">
+            {item.title}
           </h3>
-          <button className="text-text-muted hover:text-red-500 transition-colors duration-300">
-            <Heart size={20} />
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleLike(item);
+            }}
+            disabled={likeLoading === item.id}
+            className={`ml-3 p-2 rounded-full transition-all duration-300 ${
+              item.user_has_liked 
+                ? 'text-red-500 bg-red-50 hover:bg-red-100' 
+                : 'text-text-muted hover:text-red-500 hover:bg-red-50'
+            } ${likeLoading === item.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <Heart size={18} className={item.user_has_liked ? 'fill-current' : ''} />
           </button>
         </div>
         
-        <p className="text-text-secondary text-sm mb-4 line-clamp-2">{project.project_summary}</p>
+        <p className="text-text-secondary text-sm mb-4 line-clamp-2">{item.description}</p>
         
         <div className="flex items-center space-x-3 mb-4">
           <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
             <User size={16} className="text-primary" />
           </div>
           <div>
-            <p className="text-sm font-medium text-text-primary">{project.founder_name}</p>
-            {project.company_name && (
-              <p className="text-xs text-text-muted">{project.company_name}</p>
+            <p className="text-sm font-medium text-text-primary">{item.founder_name}</p>
+            {item.company_name && (
+              <p className="text-xs text-text-muted">{item.company_name}</p>
             )}
           </div>
         </div>
 
         <div className="space-y-2 mb-4">
           <div className="flex justify-between text-sm">
-            <span className="text-text-secondary">Valuation:</span>
-            <span className="font-semibold text-text-primary">{project.valuation}</span>
+            <span className="text-text-secondary">Price:</span>
+            <span className="font-bold text-primary text-lg">{formatPrice(item.price)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-text-secondary">Shares:</span>
-            <span className="font-semibold text-primary">{project.shares_available}</span>
+            <span className="text-text-secondary">Likes:</span>
+            <span className="font-semibold text-red-500 flex items-center space-x-1">
+              <Heart size={14} className={item.user_has_liked ? 'fill-current' : ''} />
+              <span>{item.likes_count}</span>
+            </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-text-secondary">Min. Investment:</span>
-            <span className="font-semibold text-secondary">{project.min_investment}</span>
+            <span className="text-text-secondary">Views:</span>
+            <span className="font-semibold text-blue-500">{item.views_count}</span>
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between space-x-3">
           <button
-            onClick={() => setSelectedProject(project)}
-            className="text-primary hover:text-primary-dark font-medium text-sm transition-colors duration-300"
+            onClick={() => handleViewItem(item)}
+            className="flex-1 py-2 px-4 bg-light-card border border-light-border rounded-lg text-text-primary font-medium hover:bg-primary/10 hover:border-primary/30 transition-all duration-300 text-sm"
           >
             View Details
           </button>
           <button
-            onClick={() => handleInvest(project)}
-            className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-lg font-medium hover:scale-105 transition-all duration-300 text-sm shadow-lg"
+            onClick={() => handlePurchase(item)}
+            className="flex-1 py-2 px-4 bg-gradient-to-r from-primary to-secondary text-white rounded-lg font-medium hover:scale-105 transition-all duration-300 text-sm shadow-lg flex items-center justify-center space-x-1"
           >
-            Invest Now
+            <ShoppingCart size={14} />
+            <span>Buy Now</span>
           </button>
         </div>
       </div>
     </div>
   );
 
-  const ProjectModal = ({ project, onClose }: { project: Project; onClose: () => void }) => (
+  const ProjectModal = ({ item, onClose }: { item: MarketplaceItem; onClose: () => void }) => (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="p-8">
           <div className="flex items-start justify-between mb-6">
-            <div>
-              <h2 className="text-3xl font-bold text-text-primary mb-2">{project.title}</h2>
-              <p className="text-text-secondary">by {project.founder_name}</p>
+            <div className="flex-1">
+              <div className="flex items-center space-x-3 mb-2">
+                <h2 className="text-3xl font-bold text-text-primary">{item.title}</h2>
+                {item.is_featured && (
+                  <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
+                    <Crown size={12} />
+                    <span>FEATURED</span>
+                  </div>
+                )}
+              </div>
+              <p className="text-text-secondary">by {item.founder_name}</p>
+              {item.company_name && (
+                <p className="text-text-muted text-sm">{item.company_name}</p>
+              )}
             </div>
             <button
               onClick={onClose}
-              className="text-text-muted hover:text-text-primary transition-colors duration-300 text-2xl"
+              className="text-text-muted hover:text-text-primary transition-colors duration-300 text-2xl p-2"
             >
               ×
             </button>
@@ -321,29 +466,25 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
               <div>
-                <h3 className="text-xl font-semibold text-text-primary mb-3">Project Summary</h3>
-                <p className="text-text-secondary leading-relaxed">{project.project_summary}</p>
+                <h3 className="text-xl font-semibold text-text-primary mb-3">Project Description</h3>
+                <p className="text-text-secondary leading-relaxed">{item.description}</p>
               </div>
 
-              <div>
-                <h3 className="text-xl font-semibold text-text-primary mb-3">Detailed Description</h3>
-                <p className="text-text-secondary leading-relaxed">{project.description}</p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-semibold text-text-primary mb-3">Business Model</h3>
-                <p className="text-text-secondary">{project.business_model}</p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-semibold text-text-primary mb-3">Team</h3>
-                <p className="text-text-secondary">{project.developers}</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-semibold text-text-primary mb-2">Category</h4>
+                  <p className="text-text-secondary">{item.category}</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-text-primary mb-2">Registered</h4>
+                  <p className="text-text-secondary">{new Date(item.created_at).toLocaleDateString()}</p>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-4">
-                {project.demo_link && (
+                {item.demo_link && (
                   <a
-                    href={project.demo_link}
+                    href={item.demo_link}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors duration-300"
@@ -352,9 +493,9 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                     <span>View Demo</span>
                   </a>
                 )}
-                {project.presentation_video && (
+                {item.presentation_video && (
                   <a
-                    href={project.presentation_video}
+                    href={item.presentation_video}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-300"
@@ -364,7 +505,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                   </a>
                 )}
                 <a
-                  href={project.ipfs_url}
+                  href={item.ipfs_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center space-x-2 bg-secondary text-white px-4 py-2 rounded-lg hover:bg-secondary-dark transition-colors duration-300"
@@ -377,61 +518,68 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
             <div className="space-y-6">
               <div className="bg-light-card rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-text-primary mb-4">Investment Details</h3>
+                <h3 className="text-lg font-semibold text-text-primary mb-4">Purchase Details</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Valuation:</span>
-                    <span className="font-semibold text-text-primary">{project.valuation}</span>
+                    <span className="text-text-secondary">Price:</span>
+                    <span className="font-bold text-primary text-xl">{formatPrice(item.price)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Shares Available:</span>
-                    <span className="font-semibold text-primary">{project.shares_available}</span>
+                    <span className="text-text-secondary">Likes:</span>
+                    <span className="font-semibold text-red-500 flex items-center space-x-1">
+                      <Heart size={16} className={item.user_has_liked ? 'fill-current' : ''} />
+                      <span>{item.likes_count}</span>
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Min. Investment:</span>
-                    <span className="font-semibold text-secondary">{project.min_investment}</span>
+                    <span className="text-text-secondary">Views:</span>
+                    <span className="font-semibold text-blue-500">{item.views_count}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Current Funding:</span>
-                    <span className="font-semibold text-accent">{project.current_funding}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-text-secondary">Investors:</span>
-                    <span className="font-semibold text-text-primary">{project.investors_count}</span>
+                    <span className="text-text-secondary">Purchases:</span>
+                    <span className="font-semibold text-green-500">{item.purchase_count}</span>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleInvest(project)}
-                  className="w-full mt-6 bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 shadow-lg"
-                >
-                  Invest in This Project
-                </button>
+                
+                <div className="flex space-x-3 mt-6">
+                  <button
+                    onClick={() => handleLike(item)}
+                    disabled={likeLoading === item.id}
+                    className={`flex-1 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 ${
+                      item.user_has_liked 
+                        ? 'bg-red-500 text-white hover:bg-red-600' 
+                        : 'bg-red-50 text-red-500 hover:bg-red-100'
+                    } ${likeLoading === item.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <Heart size={18} className={item.user_has_liked ? 'fill-current' : ''} />
+                    <span>{item.user_has_liked ? 'Liked' : 'Like'}</span>
+                  </button>
+                  <button
+                    onClick={() => handlePurchase(item)}
+                    className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 shadow-lg flex items-center justify-center space-x-2"
+                  >
+                    <ShoppingCart size={18} />
+                    <span>Buy Now</span>
+                  </button>
+                </div>
               </div>
 
               <div className="bg-light-card rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-text-primary mb-4">Project Info</h3>
+                <h3 className="text-lg font-semibold text-text-primary mb-4">Project Stats</h3>
                 <div className="space-y-3 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <Tag className="w-4 h-4 text-text-muted" />
-                    <span className="text-text-secondary">Category:</span>
-                    <span className="font-medium text-text-primary">{project.category}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-text-muted">Category:</span>
+                    <span className="font-medium text-text-primary">{item.category}</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Code className="w-4 h-4 text-text-muted" />
-                    <span className="text-text-secondary">Type:</span>
-                    <span className="font-medium text-text-primary">{project.project_type}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-text-muted">Status:</span>
+                    <span className="font-medium text-green-600 capitalize">{item.status}</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="w-4 h-4 text-text-muted" />
-                    <span className="text-text-secondary">Registered:</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-text-muted">Listed:</span>
                     <span className="font-medium text-text-primary">
-                      {new Date(project.created_at).toLocaleDateString()}
+                      {new Date(item.created_at).toLocaleDateString()}
                     </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Eye className="w-4 h-4 text-text-muted" />
-                    <span className="text-text-secondary">Views:</span>
-                    <span className="font-medium text-text-primary">{project.views}</span>
                   </div>
                 </div>
               </div>
@@ -441,6 +589,79 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
       </div>
     </div>
   );
+
+  const LeaderboardModal = ({ onClose }: { onClose: () => void }) => {
+    const leaderboardItems = getLeaderboardItems();
+    
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
+                  <Crown size={24} className="text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-text-primary">Project Leaderboard</h2>
+                  <p className="text-text-secondary">Top projects ranked by likes</p>
+                </div>
+              </div>
+              <button
+                onClick={onClose}
+                className="text-text-muted hover:text-text-primary transition-colors duration-300 text-2xl p-2"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {leaderboardItems.map((item, index) => (
+                <div 
+                  key={item.id}
+                  className={`flex items-center space-x-4 p-4 rounded-xl border transition-all duration-300 hover:shadow-lg cursor-pointer ${
+                    index < 3 ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200' : 'bg-light-card border-light-border hover:border-primary/30'
+                  }`}
+                  onClick={() => {
+                    onClose();
+                    handleViewItem(item);
+                  }}
+                >
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
+                    index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
+                    index === 1 ? 'bg-gradient-to-r from-gray-400 to-gray-600' :
+                    index === 2 ? 'bg-gradient-to-r from-amber-600 to-amber-800' :
+                    'bg-gradient-to-r from-blue-500 to-blue-700'
+                  }`}>
+                    {index + 1}
+                  </div>
+                  
+                  <img 
+                    src={item.thumbnail_url || 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=100&h=60&dpr=2'} 
+                    alt={item.title}
+                    className="w-16 h-10 object-cover rounded-lg"
+                  />
+                  
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-text-primary line-clamp-1">{item.title}</h4>
+                    <p className="text-text-muted text-sm">{item.founder_name}</p>
+                  </div>
+                  
+                  <div className="text-right">
+                    <div className="flex items-center space-x-1 text-red-500 font-bold">
+                      <Heart size={16} className="fill-current" />
+                      <span>{item.likes_count}</span>
+                    </div>
+                    <p className="text-text-muted text-xs">{formatPrice(item.price)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-light-bg">
@@ -455,8 +676,28 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
               ←
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-text-primary">Project Marketplace</h1>
-              <p className="text-text-secondary text-lg">Discover and invest in innovative registered projects</p>
+              <h1 className="text-3xl font-bold text-text-primary">IP Marketplace</h1>
+              <p className="text-text-secondary text-lg">Discover and purchase innovative registered projects</p>
+            </div>
+          </div>
+
+          {/* Stats Bar */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white rounded-xl border border-light-border p-4 text-center">
+              <div className="text-2xl font-bold text-primary">{items.length}</div>
+              <div className="text-text-muted text-sm">Total Projects</div>
+            </div>
+            <div className="bg-white rounded-xl border border-light-border p-4 text-center">
+              <div className="text-2xl font-bold text-red-500">{items.reduce((sum, item) => sum + item.likes_count, 0)}</div>
+              <div className="text-text-muted text-sm">Total Likes</div>
+            </div>
+            <div className="bg-white rounded-xl border border-light-border p-4 text-center">
+              <div className="text-2xl font-bold text-blue-500">{items.reduce((sum, item) => sum + item.views_count, 0)}</div>
+              <div className="text-text-muted text-sm">Total Views</div>
+            </div>
+            <div className="bg-white rounded-xl border border-light-border p-4 text-center">
+              <div className="text-2xl font-bold text-green-500">{items.filter(item => item.is_featured).length}</div>
+              <div className="text-text-muted text-sm">Featured</div>
             </div>
           </div>
 
@@ -500,6 +741,14 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                     </option>
                   ))}
                 </select>
+
+                <button
+                  onClick={() => setShowLeaderboard(true)}
+                  className="flex items-center space-x-2 px-4 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg"
+                >
+                  <Crown size={18} />
+                  <span>Leaderboard</span>
+                </button>
               </div>
             </div>
           </div>
@@ -508,7 +757,8 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         {/* Results */}
         <div className="mb-6">
           <p className="text-text-secondary">
-            Showing {filteredProjects.length} of {projects.length} projects
+            Showing {filteredItems.length} of {items.length} projects
+            {selectedSort === 'likes' && ' (sorted by most liked)'}
           </p>
         </div>
 
@@ -516,9 +766,9 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-text-secondary">Loading projects...</p>
+            <p className="text-text-secondary">Loading marketplace...</p>
           </div>
-        ) : filteredProjects.length === 0 ? (
+        ) : filteredItems.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-2xl border border-light-border">
             <Lightbulb size={48} className="mx-auto mb-4 text-text-muted" />
             <h3 className="text-xl font-semibold text-text-primary mb-2">No Projects Found</h3>
@@ -526,18 +776,23 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+            {filteredItems.map((item) => (
+              <ProjectCard key={item.id} item={item} />
             ))}
           </div>
         )}
 
         {/* Project Detail Modal */}
-        {selectedProject && (
+        {selectedItem && (
           <ProjectModal 
-            project={selectedProject} 
-            onClose={() => setSelectedProject(null)} 
+            item={selectedItem} 
+            onClose={() => setSelectedItem(null)} 
           />
+        )}
+
+        {/* Leaderboard Modal */}
+        {showLeaderboard && (
+          <LeaderboardModal onClose={() => setShowLeaderboard(false)} />
         )}
       </div>
     </div>

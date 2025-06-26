@@ -13,7 +13,12 @@ import {
   BarChart3,
   Zap,
   Target,
-  Award
+  Award,
+  Heart,
+  Eye,
+  Crown,
+  Flame,
+  ShoppingCart
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -73,6 +78,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       shares: '15%',
       price: '$50K',
       status: 'Available',
+      likes: 89,
+      views: 1240,
       image: 'https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=400&h=225&dpr=2'
     },
     { 
@@ -83,6 +90,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       shares: '20%',
       price: '$36K',
       status: 'Available',
+      likes: 67,
+      views: 890,
       image: 'https://images.pexels.com/photos/9800029/pexels-photo-9800029.jpeg?auto=compress&cs=tinysrgb&w=400&h=225&dpr=2'
     },
     { 
@@ -93,6 +102,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       shares: '12%',
       price: '$64K',
       status: 'Hot',
+      likes: 124,
+      views: 1560,
       image: 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=400&h=225&dpr=2'
     },
     { 
@@ -103,6 +114,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       shares: '18%',
       price: '$42K',
       status: 'Available',
+      likes: 78,
+      views: 1120,
       image: 'https://images.pexels.com/photos/3938023/pexels-photo-3938023.jpeg?auto=compress&cs=tinysrgb&w=400&h=225&dpr=2'
     },
     { 
@@ -113,6 +126,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       shares: '25%',
       price: '$30K',
       status: 'New',
+      likes: 45,
+      views: 670,
       image: 'https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=400&h=225&dpr=2'
     },
     { 
@@ -123,16 +138,22 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       shares: '10%',
       price: '$80K',
       status: 'Premium',
+      likes: 156,
+      views: 2340,
       image: 'https://images.pexels.com/photos/8369648/pexels-photo-8369648.jpeg?auto=compress&cs=tinysrgb&w=400&h=225&dpr=2'
     },
   ];
 
   const marketplaceHighlights = [
-    { title: 'New Project Listings', value: '12', description: 'This week' },
-    { title: 'Active Investors', value: '2.4K', description: 'Monthly active' },
-    { title: 'Avg. Investment', value: '$45K', description: 'Per project' },
-    { title: 'Success Stories', value: '89', description: 'Funded projects' },
+    { title: 'New Project Listings', value: '12', description: 'This week', icon: ShoppingCart, color: 'text-blue-600' },
+    { title: 'Active Investors', value: '2.4K', description: 'Monthly active', icon: Users, color: 'text-green-600' },
+    { title: 'Avg. Investment', value: '$45K', description: 'Per project', icon: DollarSign, color: 'text-purple-600' },
+    { title: 'Success Stories', value: '89', description: 'Funded projects', icon: Award, color: 'text-orange-600' },
   ];
+
+  const topLikedProjects = featuredProjects
+    .sort((a, b) => b.likes - a.likes)
+    .slice(0, 3);
 
   return (
     <div className="min-h-screen bg-light-bg text-text-primary fade-in">
@@ -183,8 +204,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 <ShoppingBag size={32} className="text-white" />
               </div>
               <div>
-                <h3 className="text-2xl lg:text-3xl font-bold text-text-primary mb-2">Project Marketplace</h3>
-                <p className="text-text-secondary text-lg">Browse and invest in innovative registered projects from talented developers</p>
+                <h3 className="text-2xl lg:text-3xl font-bold text-text-primary mb-2">IP Marketplace</h3>
+                <p className="text-text-secondary text-lg">Browse and purchase innovative registered projects from talented developers</p>
               </div>
             </div>
             <button 
@@ -201,11 +222,115 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {marketplaceHighlights.map((highlight, index) => (
             <div key={highlight.title} className="bg-white rounded-2xl border border-light-border p-6 text-center hover:shadow-lg transition-all duration-300 stagger-item" style={{ animationDelay: `${index * 0.1}s` }}>
+              <div className={`w-12 h-12 ${highlight.color === 'text-blue-600' ? 'bg-blue-50' : highlight.color === 'text-green-600' ? 'bg-green-50' : highlight.color === 'text-purple-600' ? 'bg-purple-50' : 'bg-orange-50'} rounded-xl flex items-center justify-center mx-auto mb-4`}>
+                <highlight.icon size={24} className={highlight.color} />
+              </div>
               <div className="text-2xl font-bold text-primary mb-2">{highlight.value}</div>
               <div className="text-sm font-medium text-text-primary mb-1">{highlight.title}</div>
               <div className="text-xs text-text-muted">{highlight.description}</div>
             </div>
           ))}
+        </div>
+
+        {/* Top Liked Projects Section */}
+        <div className="bg-white rounded-2xl border border-light-border p-8 lg:p-10 shadow-sm hover:shadow-lg transition-all duration-300 mb-12">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 lg:mb-10">
+            <div className="flex items-center space-x-6 mb-6 lg:mb-0">
+              <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Heart size={32} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl lg:text-3xl font-bold text-text-primary mb-2">Most Liked Projects</h2>
+                <p className="text-text-secondary text-lg">Community favorites in the marketplace</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => onNavigate('marketplace')}
+              className="flex items-center justify-center space-x-3 px-8 py-4 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 rounded-xl text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              <Crown size={20} />
+              <span>View Leaderboard</span>
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {topLikedProjects.map((project, index) => (
+              <div 
+                key={index} 
+                className="bg-white border border-light-border rounded-2xl overflow-hidden hover:border-primary/50 hover:shadow-xl transition-all duration-300 cursor-pointer card-hover stagger-item group relative" 
+                style={{ animationDelay: `${index * 0.1}s` }}
+                onClick={() => onNavigate('marketplace')}
+              >
+                {/* Rank Badge */}
+                <div className={`absolute top-3 left-3 z-10 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
+                  index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
+                  index === 1 ? 'bg-gradient-to-r from-gray-400 to-gray-600' :
+                  'bg-gradient-to-r from-amber-600 to-amber-800'
+                }`}>
+                  {index + 1}
+                </div>
+
+                <div className="relative">
+                  <img 
+                    src={project.image} 
+                    alt={project.name}
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
+                  <div className="absolute top-3 right-3">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      project.status === 'Hot' ? 'bg-red-500 text-white' :
+                      project.status === 'New' ? 'bg-green-500 text-white' :
+                      project.status === 'Premium' ? 'bg-purple-500 text-white' :
+                      'bg-blue-500 text-white'
+                    }`}>
+                      {project.status}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-3 left-3 text-white">
+                    <span className="text-sm font-medium bg-black/50 backdrop-blur-sm px-2 py-1 rounded">
+                      {project.category}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-3 right-3 flex items-center space-x-2">
+                    <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center space-x-1">
+                      <Eye size={10} />
+                      <span>{project.views}</span>
+                    </div>
+                    <div className="bg-red-500/90 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center space-x-1">
+                      <Heart size={10} className="fill-current" />
+                      <span>{project.likes}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-6">
+                  <h4 className="font-semibold text-lg text-text-primary group-hover:text-primary transition-colors duration-300 line-clamp-2 mb-2">
+                    {project.name}
+                  </h4>
+                  <p className="text-text-secondary text-sm mb-4">by {project.founder}</p>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-secondary">Valuation:</span>
+                      <span className="font-semibold text-text-primary">{project.valuation}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-secondary">Likes:</span>
+                      <span className="font-semibold text-red-500 flex items-center space-x-1">
+                        <Heart size={12} className="fill-current" />
+                        <span>{project.likes}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <button className="w-full py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
+                    View in Marketplace
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Featured Projects - Enhanced design */}
@@ -260,19 +385,31 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                       {project.category}
                     </span>
                   </div>
+                  <div className="absolute bottom-3 right-3 flex items-center space-x-2">
+                    <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center space-x-1">
+                      <Eye size={10} />
+                      <span>{project.views}</span>
+                    </div>
+                    <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center space-x-1">
+                      <Heart size={10} className={project.likes > 100 ? 'fill-current text-red-400' : ''} />
+                      <span>{project.likes}</span>
+                    </div>
+                  </div>
                 </div>
+                
                 <div className="p-6">
-                  <h4 className="font-semibold text-lg text-text-primary mb-2 line-clamp-2 group-hover:text-primary transition-colors duration-300">
+                  <h4 className="font-semibold text-lg text-text-primary group-hover:text-primary transition-colors duration-300 line-clamp-2 mb-2">
                     {project.name}
                   </h4>
                   <p className="text-text-secondary text-sm mb-4">by {project.founder}</p>
-                  <div className="space-y-3">
+                  
+                  <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-text-secondary">Valuation:</span>
                       <span className="font-semibold text-text-primary">{project.valuation}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-text-secondary">Shares Available:</span>
+                      <span className="text-text-secondary">Shares:</span>
                       <span className="font-semibold text-primary">{project.shares}</span>
                     </div>
                     <div className="flex justify-between text-sm">
@@ -280,7 +417,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                       <span className="font-semibold text-secondary">{project.price}</span>
                     </div>
                   </div>
-                  <button className="w-full mt-4 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
+
+                  <button className="w-full py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
                     View Details
                   </button>
                 </div>
