@@ -52,12 +52,14 @@ import {
   Search,
   RefreshCw,
   List,
-  Grid
+  Grid,
+  Github
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { WalletConnect } from './WalletConnect';
 import { IPRegistration } from './IPRegistration';
+import GitHubIntegration from './GitHubIntegration';
 
 interface UserProfileProps {
   onBack: () => void;
@@ -76,11 +78,28 @@ interface IPRegistration {
   demo_link?: string;
   presentation_video?: string;
   developers: string;
+  github_repo?: string;
+}
+
+interface GitHubRepo {
+  id: number;
+  name: string;
+  full_name: string;
+  description: string;
+  html_url: string;
+  language: string;
+  stargazers_count: number;
+  forks_count: number;
+  watchers_count: number;
+  created_at: string;
+  updated_at: string;
+  topics: string[];
+  private: boolean;
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
   const { user } = useAuth();
-  const [activeView, setActiveView] = useState<'overview' | 'developer' | 'investor' | 'wallet' | 'settings'>('overview');
+  const [activeView, setActiveView] = useState<'overview' | 'developer' | 'investor' | 'wallet' | 'settings' | 'github'>('overview');
   const [userRole, setUserRole] = useState<'developer' | 'investor' | null>(null);
   const [walletConnected, setWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
@@ -88,6 +107,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
   const [loadingIPs, setLoadingIPs] = useState(false);
   const [showIPForm, setShowIPForm] = useState(false);
   const [projectsView, setProjectsView] = useState<'list' | 'form'>('list');
+  const [selectedRepos, setSelectedRepos] = useState<GitHubRepo[]>([]);
 
   const [profileData, setProfileData] = useState({
     name: user?.email?.split('@')[0] || 'User',
@@ -179,6 +199,18 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
     setShowIPForm(false);
     // Refresh projects list
     fetchIPRegistrations();
+  };
+
+  const handleRepoSelected = (repo: GitHubRepo) => {
+    // Check if repo is already selected
+    if (selectedRepos.some(r => r.id === repo.id)) {
+      setSelectedRepos(selectedRepos.filter(r => r.id !== repo.id));
+    } else {
+      // Add repo to selected repos (max 5)
+      if (selectedRepos.length < 5) {
+        setSelectedRepos([...selectedRepos, repo]);
+      }
+    }
   };
 
   const stats = {
@@ -274,6 +306,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
               <span>Wallet</span>
             </button>
             <button
+              onClick={() => setActiveView('github')}
+              className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-3 rounded-xl text-white hover:bg-white/20 transition-all duration-300"
+            >
+              <Github size={18} />
+              <span>GitHub</span>
+            </button>
+            <button
               onClick={() => setActiveView('settings')}
               className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-3 rounded-xl text-white hover:bg-white/20 transition-all duration-300"
             >
@@ -316,7 +355,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <CheckCircle size={16} className="text-green-500" />
-                  <span>Upload presentation videos</span>
+                  <span>Connect GitHub repositories</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <CheckCircle size={16} className="text-green-500" />
@@ -449,6 +488,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
             <IPRegistration 
               walletAddress={walletAddress} 
               onSuccess={handleBackToProjects}
+              selectedRepos={selectedRepos}
             />
           </div>
         </div>
@@ -524,6 +564,20 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
                           <span className="text-text-muted">Business Model:</span>
                           <span className="text-text-primary font-medium">{project.business_model}</span>
                         </div>
+                        {project.github_repo && (
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-text-muted">GitHub:</span>
+                            <a 
+                              href={`https://github.com/${project.github_repo}`}
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-primary hover:text-primary-dark font-medium"
+                            >
+                              {project.github_repo}
+                            </a>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="flex items-center justify-between">
@@ -635,6 +689,21 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
     </div>
   );
 
+  const renderGitHubView = () => (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-2xl font-bold text-text-primary mb-2">GitHub Integration</h2>
+        <p className="text-text-secondary">Connect your GitHub account to showcase repositories and link them to your projects</p>
+      </div>
+      
+      <GitHubIntegration 
+        onRepoSelected={handleRepoSelected}
+        selectedRepos={selectedRepos}
+        maxRepos={5}
+      />
+    </div>
+  );
+
   const renderSettingsView = () => (
     <div className="space-y-8">
       <div>
@@ -702,6 +771,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
           {activeView === 'developer' && renderDeveloperView()}
           {activeView === 'investor' && renderInvestorView()}
           {activeView === 'wallet' && renderWalletView()}
+          {activeView === 'github' && renderGitHubView()}
           {activeView === 'settings' && renderSettingsView()}
         </div>
       </div>

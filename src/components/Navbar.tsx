@@ -14,7 +14,8 @@ import {
   Shield,
   CreditCard,
   HelpCircle,
-  BarChart3
+  BarChart3,
+  Brain
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -23,9 +24,10 @@ interface NavbarProps {
   currentPage: string;
   user?: any;
   onShowAuth: () => void;
+  onShowMCPAssistant?: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAuth }) => {
+const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAuth, onShowMCPAssistant }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -95,6 +97,17 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
 
           {/* Right Navigation + Profile */}
           <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-3">
+            {/* MCP Assistant Button */}
+            {onShowMCPAssistant && (
+              <button
+                onClick={onShowMCPAssistant}
+                className="hidden lg:flex items-center space-x-2 px-4 lg:px-5 py-2 lg:py-3 bg-gradient-to-r from-primary to-secondary rounded-lg lg:rounded-xl text-white font-medium hover:scale-105 transition-all duration-300 text-sm lg:text-base shadow-lg"
+              >
+                <Brain size={16} className="lg:w-5 lg:h-5" />
+                <span>MCP Assistant</span>
+              </button>
+            )}
+
             {/* Desktop Navigation Items */}
             <div className="hidden lg:flex items-center space-x-1 xl:space-x-3">
               {navigationItems.map((item) => (
@@ -225,6 +238,20 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
 
             {/* Mobile Navigation Items */}
             <div className="space-y-3 sm:space-y-4 px-4 sm:px-6">
+              {/* MCP Assistant Button (Mobile) */}
+              {onShowMCPAssistant && (
+                <button
+                  onClick={() => {
+                    onShowMCPAssistant();
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 rounded-xl sm:rounded-2xl text-base sm:text-lg font-semibold bg-gradient-to-r from-primary to-secondary text-white transition-all duration-300 group stagger-item ripple"
+                >
+                  <Brain className="w-5 h-5 sm:w-6 h-6 lg:w-7 h-7 group-hover:scale-110 transition-transform duration-300" />
+                  <span>MCP Assistant</span>
+                </button>
+              )}
+
               {navigationItems.map((item, index) => (
                 <button
                   key={item.id}

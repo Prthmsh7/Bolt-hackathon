@@ -4,14 +4,16 @@ import Dashboard from './components/Dashboard';
 import Marketplace from './components/Marketplace';
 import InvestmentStream from './components/InvestmentStream';
 import UserProfile from './components/UserProfile';
-import Analytics from './components/Analytics';
+import EnhancedAnalytics from './components/EnhancedAnalytics';
 import AuthModal from './components/Auth';
+import MCPAssistant from './components/MCPAssistant';
 import { supabase } from './lib/supabase';
 
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentPage, setCurrentPage] = useState<'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'about'>('dashboard');
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showMCPAssistant, setShowMCPAssistant] = useState(false);
   const [user, setUser] = useState<any>(null);
 
   // Page load animation
@@ -52,7 +54,7 @@ function App() {
       case 'user-profile':
         return <UserProfile onBack={() => setCurrentPage('dashboard')} />;
       case 'analytics':
-        return <Analytics onBack={() => setCurrentPage('dashboard')} />;
+        return <EnhancedAnalytics onBack={() => setCurrentPage('dashboard')} />;
       case 'about':
         return (
           <div className="min-h-screen bg-light-bg text-text-primary fade-in flex items-center justify-center">
@@ -75,6 +77,7 @@ function App() {
         currentPage={currentPage}
         user={user}
         onShowAuth={() => setShowAuthModal(true)}
+        onShowMCPAssistant={() => setShowMCPAssistant(true)}
       />
       {renderCurrentPage()}
       
@@ -83,6 +86,12 @@ function App() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         onAuthSuccess={handleAuthSuccess}
+      />
+
+      {/* MCP Assistant */}
+      <MCPAssistant
+        isOpen={showMCPAssistant}
+        onClose={() => setShowMCPAssistant(false)}
       />
     </div>
   );

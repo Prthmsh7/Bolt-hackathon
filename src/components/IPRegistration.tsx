@@ -18,7 +18,8 @@ import {
   Target,
   Lightbulb,
   Code,
-  Presentation
+  Presentation,
+  Github
 } from 'lucide-react';
 import { PinataService } from '../services/pinata.service';
 import { supabase } from '../lib/supabase';
@@ -27,6 +28,7 @@ import { useAuth } from '../contexts/AuthContext';
 interface IPRegistrationProps {
   walletAddress: string;
   onSuccess?: () => void;
+  selectedRepos?: any[];
 }
 
 interface IPFormData {
@@ -41,10 +43,11 @@ interface IPFormData {
   developers: string;
   demoLink: string;
   presentationVideo: string;
+  githubRepo: string;
   file?: File;
 }
 
-export function IPRegistration({ walletAddress, onSuccess }: IPRegistrationProps) {
+export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }: IPRegistrationProps) {
   const { user } = useAuth();
   const [formData, setFormData] = useState<IPFormData>({
     title: '',
@@ -58,6 +61,7 @@ export function IPRegistration({ walletAddress, onSuccess }: IPRegistrationProps
     developers: '',
     demoLink: '',
     presentationVideo: '',
+    githubRepo: selectedRepos.length > 0 ? selectedRepos[0].full_name : '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -175,6 +179,7 @@ export function IPRegistration({ walletAddress, onSuccess }: IPRegistrationProps
         developers: formData.developers,
         demoLink: formData.demoLink,
         presentationVideo: formData.presentationVideo,
+        githubRepo: formData.githubRepo,
         documentHash,
         walletAddress,
         userId: user.id,
@@ -206,6 +211,7 @@ export function IPRegistration({ walletAddress, onSuccess }: IPRegistrationProps
             developers: formData.developers,
             demo_link: formData.demoLink || null,
             presentation_video: formData.presentationVideo || null,
+            github_repo: formData.githubRepo || null,
             created_at: new Date().toISOString(),
           }
         ]);
@@ -233,6 +239,7 @@ export function IPRegistration({ walletAddress, onSuccess }: IPRegistrationProps
         developers: '',
         demoLink: '',
         presentationVideo: '',
+        githubRepo: '',
       });
 
       // Call success callback after a delay to show success message
@@ -315,6 +322,51 @@ export function IPRegistration({ walletAddress, onSuccess }: IPRegistrationProps
         <div className="flex items-center space-x-2 p-4 bg-red-50 border border-red-200 rounded-xl">
           <AlertCircle size={20} className="text-red-500 flex-shrink-0" />
           <p className="text-red-700 text-sm">{error}</p>
+        </div>
+      )}
+
+      {/* GitHub Repository Selection */}
+      {selectedRepos && selectedRepos.length > 0 && (
+        <div className="p-6 bg-primary/5 border border-primary/20 rounded-xl">
+          <div className="flex items-center space-x-3 mb-4">
+            <Github size={20} className="text-primary" />
+            <h3 className="font-semibold text-text-primary">GitHub Repository Connected</h3>
+          </div>
+          
+          <div className="space-y-4">
+            {selectedRepos.map((repo, index) => (
+              <div key={index} className="flex items-center justify-between p-4 bg-white rounded-lg border border-light-border">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <Code size={16} className="text-gray-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-text-primary">{repo.name}</h4>
+                    <div className="flex items-center space-x-2 text-xs text-text-muted">
+                      <span>{repo.language}</span>
+                      <span>•</span>
+                      <div className="flex items-center space-x-1">
+                        <Star size={12} />
+                        <span>{repo.stargazers_count}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <a
+                  href={repo.html_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-primary-dark"
+                >
+                  <ExternalLink size={16} />
+                </a>
+              </div>
+            ))}
+          </div>
+          
+          <p className="mt-4 text-sm text-text-muted">
+            This repository will be linked to your project registration, providing code verification and technical credibility.
+          </p>
         </div>
       )}
 
@@ -493,6 +545,33 @@ export function IPRegistration({ walletAddress, onSuccess }: IPRegistrationProps
               placeholder="List the team members and their roles (e.g., John Doe - Lead Developer, Jane Smith - UI/UX Designer)"
               required
             />
+          </div>
+        </div>
+
+        {/* GitHub Repository */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-text-primary flex items-center space-x-2">
+            <Github size={20} className="text-primary" />
+            <span>GitHub Repository</span>
+          </h3>
+
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-2">
+              GitHub Repository
+            </label>
+            <input
+              type="text"
+              name="githubRepo"
+              value={formData.githubRepo}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 border border-light-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-text-primary placeholder-text-muted transition-all duration-300"
+              placeholder="username/repository"
+            />
+            <p className="text-xs text-text-muted mt-1">
+              {selectedRepos && selectedRepos.length > 0 
+                ? "Repository selected from your GitHub account" 
+                : "Link a GitHub repository to your project (e.g., username/repository)"}
+            </p>
           </div>
         </div>
 
