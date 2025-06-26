@@ -47,7 +47,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState<'likes' | 'views' | 'price' | 'recent'>('likes');
   const [projects, setProjects] = useState<DemoProject[]>(demoProjects);
-  const [developers, setDevelopers] = useState<DeveloperProfile[]>(developerProjects);
+  const [developers, setDevelopers] = useState<DeveloperProfile[]>(developerProfiles); // Fixed typo here
   const [filteredProjects, setFilteredProjects] = useState<DemoProject[]>(demoProjects);
   const [filteredDevelopers, setFilteredDevelopers] = useState<DeveloperProfile[]>(developerProfiles);
   const [selectedProject, setSelectedProject] = useState<DemoProject | null>(null);
@@ -64,7 +64,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
     setIsLoaded(true);
   }, []);
 
-  // Filter and search logic
+  // Filter and search logic for projects
   useEffect(() => {
     let filtered = projects;
 
