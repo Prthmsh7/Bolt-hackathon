@@ -13,7 +13,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [username, setUsername] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,7 +21,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
     setEmail('');
     setPassword('');
     setFullName('');
-    setUsername('');
     setError('');
     setShowPassword(false);
   };
@@ -47,7 +45,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
           password: password
         });
 
-        if (error) throw error;
+        if (error) {
+          // Provide more user-friendly error messages
+          if (error.message.includes('Invalid login credentials')) {
+            throw new Error('Invalid email or password. Please check your credentials and try again.');
+          } else if (error.message.includes('Email not confirmed')) {
+            throw new Error('Please check your email and click the confirmation link before signing in.');
+          } else {
+            throw error;
+          }
+        }
 
         if (data.user) {
           if (onAuthSuccess) {
@@ -62,31 +69,43 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
           password: password,
           options: {
             data: {
-              full_name: fullName.trim(),
-              username: username.trim()
+              full_name: fullName.trim()
             }
           }
         });
 
-        if (error) throw error;
+        if (error) {
+          // Provide more user-friendly error messages for signup
+          if (error.message.includes('User already registered')) {
+            throw new Error('An account with this email already exists. Please sign in instead.');
+          } else if (error.message.includes('Password should be at least')) {
+            throw new Error('Password must be at least 6 characters long.');
+          } else if (error.message.includes('Invalid email')) {
+            throw new Error('Please enter a valid email address.');
+          } else {
+            throw error;
+          }
+        }
 
         if (data.user) {
-          // Create profile - only include fields that exist in the table
+          // Create user profile in the correct table (user_profiles)
           const { error: profileError } = await supabase
-            .from('profiles')
+            .from('user_profiles')
             .insert({
               id: data.user.id,
-              username: username.trim(),
+              email: email.trim(),
               full_name: fullName.trim(),
-              email: email.trim(), // Now this column should exist
-              subscribers_count: 0
+              subscription_status: 'free'
             });
 
           if (profileError) {
             console.error('Profile creation error:', profileError);
             // Don't throw here, as the user is still created successfully
+            // The profile will be created by the database trigger if it exists
           }
 
+          // Show success message for signup
+          setError('');
           if (onAuthSuccess) {
             onAuthSuccess();
           }
@@ -95,7 +114,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
       }
     } catch (error: any) {
       console.error('Auth error:', error);
-      setError(error.message || 'Authentication failed');
+      setError(error.message || 'Authentication failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -135,22 +154,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Enter your full name"
-                    className="w-full px-4 py-3 bg-white border border-light-border rounded-xl focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-primary placeholder-text-muted transition-all duration-300"
-                    required={!isLogin}
-                  />
-                </div>
-
-                {/* Username */}
-                <div className="space-y-2">
-                  <label className="flex items-center space-x-2 text-sm font-semibold text-text-primary">
-                    <User size={16} />
-                    <span>Username</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                    placeholder="Enter username"
                     className="w-full px-4 py-3 bg-white border border-light-border rounded-xl focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-primary placeholder-text-muted transition-all duration-300"
                     required={!isLogin}
                   />
@@ -244,6 +247,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
               </button>
             </p>
           </div>
+
+          {/* Helper Text */}
+          {isLogin && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-blue-700 text-xs">
+                <strong>First time here?</strong> Click "Sign Up" to create a new account.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
