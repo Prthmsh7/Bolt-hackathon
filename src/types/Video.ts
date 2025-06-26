@@ -28,6 +28,7 @@ export interface Video {
     totalRaised: string;
     investorsCount: number;
   };
+  cdnEnabled?: boolean; // Whether CDN acceleration is enabled
 }
 
 export interface Channel {
