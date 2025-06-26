@@ -46,17 +46,22 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
         });
 
         if (error) {
+          console.error('Sign in error:', error);
+          
           // Provide more user-friendly error messages
-          if (error.message.includes('Invalid login credentials')) {
-            throw new Error('Invalid email or password. Please check your credentials and try again.');
+          if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
+            throw new Error('Invalid email or password. Please check your credentials and try again. If you haven\'t signed up yet, please create an account first.');
           } else if (error.message.includes('Email not confirmed')) {
             throw new Error('Please check your email and click the confirmation link before signing in.');
+          } else if (error.message.includes('Too many requests')) {
+            throw new Error('Too many login attempts. Please wait a few minutes before trying again.');
           } else {
-            throw error;
+            throw new Error(`Sign in failed: ${error.message}`);
           }
         }
 
         if (data.user) {
+          console.log('Sign in successful:', data.user.email);
           if (onAuthSuccess) {
             onAuthSuccess();
           }
@@ -75,6 +80,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
         });
 
         if (error) {
+          console.error('Sign up error:', error);
+          
           // Provide more user-friendly error messages for signup
           if (error.message.includes('User already registered')) {
             throw new Error('An account with this email already exists. Please sign in instead.');
@@ -82,26 +89,40 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             throw new Error('Password must be at least 6 characters long.');
           } else if (error.message.includes('Invalid email')) {
             throw new Error('Please enter a valid email address.');
+          } else if (error.message.includes('Signup is disabled')) {
+            throw new Error('Account creation is currently disabled. Please contact support.');
           } else {
-            throw error;
+            throw new Error(`Sign up failed: ${error.message}`);
           }
         }
 
         if (data.user) {
-          // Create user profile in the correct table (user_profiles)
-          const { error: profileError } = await supabase
-            .from('user_profiles')
-            .insert({
-              id: data.user.id,
-              email: email.trim(),
-              full_name: fullName.trim(),
-              subscription_status: 'free'
-            });
+          console.log('Sign up successful:', data.user.email);
+          
+          // Wait a moment for the user to be fully created
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Try to create user profile - this might be handled by a database trigger
+          try {
+            const { error: profileError } = await supabase
+              .from('user_profiles')
+              .upsert({
+                id: data.user.id,
+                email: email.trim(),
+                full_name: fullName.trim(),
+                subscription_status: 'free'
+              }, {
+                onConflict: 'id'
+              });
 
-          if (profileError) {
-            console.error('Profile creation error:', profileError);
-            // Don't throw here, as the user is still created successfully
-            // The profile will be created by the database trigger if it exists
+            if (profileError) {
+              console.warn('Profile creation warning (might be handled by trigger):', profileError);
+              // Don't throw here, as the user is still created successfully
+              // The profile might be created by a database trigger
+            }
+          } catch (profileError) {
+            console.warn('Profile creation failed, but user was created:', profileError);
+            // Continue anyway - the profile might be created by a trigger
           }
 
           // Show success message for signup
@@ -249,13 +270,21 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
           </div>
 
           {/* Helper Text */}
-          {isLogin && (
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-blue-700 text-xs">
-                <strong>First time here?</strong> Click "Sign Up" to create a new account.
-              </p>
-            </div>
-          )}
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-blue-700 text-xs">
+              {isLogin ? (
+                <>
+                  <strong>First time here?</strong> Click "Sign Up" to create a new account.
+                  <br />
+                  <strong>Trouble signing in?</strong> Make sure you've created an account first and check your email/password.
+                </>
+              ) : (
+                <>
+                  <strong>Creating an account?</strong> After signing up, you can immediately sign in with your credentials.
+                </>
+              )}
+            </p>
+          </div>
         </div>
       </div>
     </div>
