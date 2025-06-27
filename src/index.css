@@ -92,7 +92,7 @@ body {
 
 .neo-btn.secondary {
   background: #FF9800;
-  color: #141414;
+  color: #FFFFFF;
 }
 
 .neo-btn.accent {
@@ -180,7 +180,7 @@ body {
 
 /* Enhanced progress bar */
 .progress-bar {
-  background: #4CAF50;
+  background: #FF9800;
   transition: width 0.5s ease;
   border-radius: 4px;
 }
@@ -456,4 +456,46 @@ textarea:focus {
     color: black !important;
     box-shadow: none !important;
   }
+}
+
+/* Hover effects for buttons */
+.hover-orange:hover {
+  background-color: #FF9800 !important;
+  color: white !important;
+  border-color: #141414 !important;
+}
+
+/* Investment tier styles */
+.investment-tier {
+  border: 1px solid #141414;
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.investment-tier:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #141414;
+}
+
+.investment-tier.selected {
+  background-color: #FF9800;
+  color: white;
+}
+
+.investment-tier.supporter {
+  background-color: #FFF59D;
+}
+
+.investment-tier.backer {
+  background-color: #FFCC80;
+}
+
+.investment-tier.partner {
+  background-color: #FFAB91;
+}
+
+.investment-tier.executive {
+  background-color: #FF9800;
+  color: white;
 }

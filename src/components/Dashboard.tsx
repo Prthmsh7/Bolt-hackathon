@@ -203,7 +203,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </div>
             <button 
               onClick={() => onNavigate('marketplace')}
-              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-white text-text-primary font-semibold"
+              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-secondary text-white font-semibold hover:bg-secondary"
             >
               <ShoppingBag size={20} />
               <span>Browse Marketplace</span>
@@ -239,7 +239,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </div>
             <button 
               onClick={() => onNavigate('marketplace')}
-              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-secondary text-white font-semibold"
+              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-secondary text-white font-semibold hover:bg-secondary"
             >
               <Crown size={20} />
               <span>View Leaderboard</span>
@@ -316,7 +316,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     </div>
                   </div>
 
-                  <button className="neo-btn w-full py-3 bg-primary text-white font-medium">
+                  <button className="neo-btn w-full py-3 bg-secondary text-white font-medium hover:bg-secondary">
                     View in Marketplace
                   </button>
                 </div>
@@ -339,7 +339,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </div>
             <button 
               onClick={() => onNavigate('marketplace')}
-              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-secondary text-white font-semibold"
+              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-secondary text-white font-semibold hover:bg-secondary"
             >
               <TrendingUp size={20} />
               <span>View All Projects</span>
@@ -409,7 +409,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     </div>
                   </div>
 
-                  <button className="neo-btn w-full py-3 bg-primary text-white font-medium">
+                  <button className="neo-btn w-full py-3 bg-secondary text-white font-medium hover:bg-secondary">
                     View Details
                   </button>
                 </div>

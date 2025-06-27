@@ -205,7 +205,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
           </div>
         </div>
 
-        <button className="w-full py-3 bg-primary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
+        <button className="neo-btn w-full py-3 bg-secondary text-white font-medium hover:bg-secondary">
           View Details
         </button>
       </div>
@@ -279,7 +279,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         )}
       </div>
 
-      <button className="w-full py-3 bg-secondary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
+      <button className="neo-btn w-full py-3 bg-secondary text-white font-medium hover:bg-secondary">
         View Profile
       </button>
     </div>
@@ -290,112 +290,143 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
     return (
       <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-light-border shadow-2xl">
-          <div className="relative">
+        <div className="neo-card bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          {/* Header with Image */}
+          <div className="relative h-64">
             <img 
               src={selectedProject.thumbnail_url}
               alt={selectedProject.title}
-              className="w-full h-64 object-cover"
+              className="w-full h-full object-cover"
             />
+            <div className="absolute inset-0 bg-black/40"></div>
+            
+            {/* Close button */}
             <button
               onClick={() => setShowProjectModal(false)}
-              className="absolute top-4 right-4 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-all duration-300"
+              className="absolute top-4 right-4 neo-btn p-2 bg-white text-text-primary hover:bg-light-hover"
             >
               ✕
             </button>
-            <div className="absolute bottom-4 left-4 text-white">
-              <span className="bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
+            
+            {/* Category badge */}
+            <div className="absolute bottom-4 left-4">
+              <span className="neo-btn bg-white px-3 py-1 text-sm font-medium">
                 {selectedProject.category}
               </span>
             </div>
+            
+            {/* Featured badge */}
+            {selectedProject.is_featured && (
+              <div className="absolute top-4 left-4">
+                <span className="neo-btn bg-secondary text-white px-3 py-1 text-sm font-bold flex items-center space-x-1">
+                  <Crown size={14} />
+                  <span>FEATURED</span>
+                </span>
+              </div>
+            )}
           </div>
 
+          {/* Content */}
           <div className="p-8">
-            <div className="flex items-start justify-between mb-6">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
               <div>
                 <h2 className="text-3xl font-bold text-text-primary mb-2">{selectedProject.title}</h2>
                 <p className="text-text-secondary text-lg">{selectedProject.company_name}</p>
               </div>
-              <div className="text-right">
-                <div className="text-3xl font-bold text-primary">{formatCurrency(selectedProject.price)}</div>
-                <div className="text-text-muted">Investment Price</div>
+              <div className="neo-card bg-accent p-6 text-center">
+                <div className="text-3xl font-bold text-text-primary">{formatCurrency(selectedProject.price)}</div>
+                <div className="text-text-secondary">Investment Price</div>
               </div>
             </div>
 
+            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="text-center p-4 bg-light-card rounded-xl">
+              <div className="neo-card bg-white p-4 text-center">
                 <Heart size={24} className="mx-auto mb-2 text-error" />
                 <div className="text-2xl font-bold text-text-primary">{selectedProject.likes_count}</div>
                 <div className="text-sm text-text-muted">Likes</div>
               </div>
-              <div className="text-center p-4 bg-light-card rounded-xl">
+              <div className="neo-card bg-white p-4 text-center">
                 <Eye size={24} className="mx-auto mb-2 text-primary" />
                 <div className="text-2xl font-bold text-text-primary">{selectedProject.views_count}</div>
                 <div className="text-sm text-text-muted">Views</div>
               </div>
-              <div className="text-center p-4 bg-light-card rounded-xl">
+              <div className="neo-card bg-white p-4 text-center">
                 <ShoppingBag size={24} className="mx-auto mb-2 text-success" />
                 <div className="text-2xl font-bold text-text-primary">{selectedProject.purchase_count}</div>
                 <div className="text-sm text-text-muted">Purchases</div>
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-xl font-bold text-text-primary mb-3">Description</h3>
+            <div className="space-y-8">
+              {/* Description */}
+              <div className="neo-card bg-white p-6">
+                <h3 className="text-xl font-bold text-text-primary mb-4">Description</h3>
                 <p className="text-text-secondary leading-relaxed">{selectedProject.description}</p>
               </div>
 
+              {/* Project Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-semibold text-text-primary mb-2">Project Details</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-text-muted">Type:</span>
-                      <span className="text-text-primary">{selectedProject.project_type}</span>
+                <div className="neo-card bg-white p-6">
+                  <h4 className="font-semibold text-text-primary mb-4">Project Details</h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center pb-2 border-b border-light-border">
+                      <span className="text-text-secondary">Type:</span>
+                      <span className="text-text-primary font-medium">{selectedProject.project_type}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-text-muted">Business Model:</span>
-                      <span className="text-text-primary">{selectedProject.business_model}</span>
+                    <div className="flex justify-between items-center pb-2 border-b border-light-border">
+                      <span className="text-text-secondary">Business Model:</span>
+                      <span className="text-text-primary font-medium">{selectedProject.business_model}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-text-muted">Status:</span>
+                    <div className="flex justify-between items-center pb-2 border-b border-light-border">
+                      <span className="text-text-secondary">Status:</span>
                       <span className="text-success font-medium">{selectedProject.status}</span>
                     </div>
+                    <div className="flex justify-between items-center pb-2 border-b border-light-border">
+                      <span className="text-text-secondary">Created:</span>
+                      <span className="text-text-primary font-medium">{formatDate(selectedProject.created_at)}</span>
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <h4 className="font-semibold text-text-primary mb-2">Founder</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-text-muted">Name:</span>
-                      <span className="text-text-primary">{selectedProject.founder_name}</span>
+                <div className="neo-card bg-white p-6">
+                  <h4 className="font-semibold text-text-primary mb-4">Founder</h4>
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                      <User size={24} className="text-primary" />
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-text-muted">Company:</span>
-                      <span className="text-text-primary">{selectedProject.company_name}</span>
+                    <div>
+                      <h5 className="font-bold text-text-primary">{selectedProject.founder_name}</h5>
+                      <p className="text-text-secondary">{selectedProject.company_name}</p>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-text-muted">Created:</span>
-                      <span className="text-text-primary">{formatDate(selectedProject.created_at)}</span>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center pb-2 border-b border-light-border">
+                      <span className="text-text-secondary">Experience:</span>
+                      <span className="text-text-primary font-medium">5+ years</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-2 border-b border-light-border">
+                      <span className="text-text-secondary">Projects:</span>
+                      <span className="text-text-primary font-medium">3</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-semibold text-text-primary mb-2">Development Team</h4>
-                <p className="text-text-secondary text-sm">{selectedProject.developers}</p>
+              {/* Development Team */}
+              <div className="neo-card bg-white p-6">
+                <h4 className="font-semibold text-text-primary mb-4">Development Team</h4>
+                <p className="text-text-secondary">{selectedProject.developers}</p>
               </div>
 
-              <div className="flex space-x-4">
+              {/* Links */}
+              <div className="flex flex-wrap gap-4">
                 {selectedProject.demo_link && (
                   <a
                     href={selectedProject.demo_link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-2 px-6 py-3 bg-secondary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300"
+                    className="neo-btn flex items-center space-x-2 px-6 py-3 bg-primary text-white"
                   >
                     <Globe size={18} />
                     <span>View Demo</span>
@@ -407,7 +438,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                     href={selectedProject.presentation_video}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-2 px-6 py-3 bg-accent text-primary rounded-xl font-medium hover:scale-105 transition-all duration-300"
+                    className="neo-btn flex items-center space-x-2 px-6 py-3 bg-accent text-primary"
                   >
                     <Eye size={18} />
                     <span>Watch Video</span>
@@ -416,7 +447,8 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 )}
               </div>
 
-              <button className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg">
+              {/* Investment Button */}
+              <button className="neo-btn w-full py-4 bg-secondary text-white font-bold text-lg">
                 Invest in This Project
               </button>
             </div>
@@ -431,11 +463,12 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
     return (
       <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-light-border shadow-2xl">
-          <div className="relative bg-accent p-8">
+        <div className="neo-card bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          {/* Header */}
+          <div className="bg-accent p-8 relative">
             <button
               onClick={() => setShowDeveloperModal(false)}
-              className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-text-primary hover:bg-white/30 transition-all duration-300"
+              className="absolute top-4 right-4 neo-btn p-2 bg-white text-text-primary hover:bg-light-hover"
             >
               ✕
             </button>
@@ -445,7 +478,8 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 <img 
                   src={selectedDeveloper.avatar_url}
                   alt={selectedDeveloper.name}
-                  className="w-24 h-24 rounded-2xl ring-4 ring-white/30"
+                  className="w-24 h-24 rounded-2xl neo-card"
+                  style={{ boxShadow: '5px 5px 0 #141414' }}
                 />
                 {selectedDeveloper.verified && (
                   <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-success rounded-full border-4 border-white flex items-center justify-center">
@@ -481,23 +515,24 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
           </div>
 
           <div className="p-8">
+            {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="text-center p-4 bg-light-card rounded-xl">
+              <div className="neo-card bg-white p-4 text-center">
                 <Code size={24} className="mx-auto mb-2 text-primary" />
                 <div className="text-2xl font-bold text-text-primary">{selectedDeveloper.projects.length}</div>
                 <div className="text-sm text-text-muted">Projects</div>
               </div>
-              <div className="text-center p-4 bg-light-card rounded-xl">
+              <div className="neo-card bg-white p-4 text-center">
                 <Heart size={24} className="mx-auto mb-2 text-error" />
                 <div className="text-2xl font-bold text-text-primary">{selectedDeveloper.total_likes}</div>
                 <div className="text-sm text-text-muted">Total Likes</div>
               </div>
-              <div className="text-center p-4 bg-light-card rounded-xl">
+              <div className="neo-card bg-white p-4 text-center">
                 <Eye size={24} className="mx-auto mb-2 text-primary" />
                 <div className="text-2xl font-bold text-text-primary">{selectedDeveloper.total_views}</div>
                 <div className="text-sm text-text-muted">Total Views</div>
               </div>
-              <div className="text-center p-4 bg-light-card rounded-xl">
+              <div className="neo-card bg-white p-4 text-center">
                 <Calendar size={24} className="mx-auto mb-2 text-success" />
                 <div className="text-2xl font-bold text-text-primary">
                   {Math.floor((new Date().getTime() - new Date(selectedDeveloper.joined_date).getTime()) / (1000 * 60 * 60 * 24 * 365))}y
@@ -507,13 +542,14 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
             </div>
 
             <div className="space-y-8">
-              <div>
+              {/* Skills */}
+              <div className="neo-card bg-white p-6">
                 <h3 className="text-xl font-bold text-text-primary mb-4">Skills & Expertise</h3>
                 <div className="flex flex-wrap gap-3">
                   {selectedDeveloper.skills.map((skill, index) => (
                     <span 
                       key={index}
-                      className="px-3 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium"
+                      className="neo-btn bg-white px-3 py-2 text-sm font-medium"
                     >
                       {skill}
                     </span>
@@ -521,15 +557,16 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 </div>
               </div>
 
-              <div>
+              {/* Projects */}
+              <div className="neo-card bg-white p-6">
                 <h3 className="text-xl font-bold text-text-primary mb-4">Projects</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {selectedDeveloper.projects.map((project, index) => (
-                    <div key={index} className="border border-light-border rounded-xl p-4 hover:border-primary/50 transition-all duration-300">
+                    <div key={index} className="neo-card bg-white p-4">
                       <h4 className="font-semibold text-text-primary mb-2">{project.title}</h4>
                       <p className="text-text-secondary text-sm mb-3 line-clamp-2">{project.description}</p>
                       <div className="flex items-center justify-between">
-                        <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs font-medium">
+                        <span className="neo-btn bg-white px-2 py-1 text-xs font-medium">
                           {project.category}
                         </span>
                         <div className="flex items-center space-x-3 text-sm text-text-muted">
@@ -548,11 +585,12 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 </div>
               </div>
 
+              {/* Action Buttons */}
               <div className="flex space-x-4">
-                <button className="flex-1 py-3 bg-primary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300">
+                <button className="neo-btn flex-1 py-3 bg-primary text-white">
                   Contact Developer
                 </button>
-                <button className="flex-1 py-3 bg-white border border-light-border text-text-primary rounded-xl font-medium hover:bg-light-hover transition-all duration-300">
+                <button className="neo-btn flex-1 py-3 bg-white">
                   View All Projects
                 </button>
               </div>
