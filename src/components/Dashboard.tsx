@@ -33,9 +33,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       change: '+23.1%',
       trend: 'up',
       icon: Users,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
+      color: 'text-primary',
+      bgColor: 'bg-accent',
     },
     {
       title: 'Marketplace Volume',
@@ -43,9 +42,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       change: '+18.7%',
       trend: 'up',
       icon: ShoppingBag,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-200',
+      color: 'text-primary',
+      bgColor: 'bg-secondary',
     },
     {
       title: 'Total Investments',
@@ -53,9 +51,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       change: '+15.3%',
       trend: 'up',
       icon: TrendingUp,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-      borderColor: 'border-purple-200',
+      color: 'text-primary',
+      bgColor: 'bg-accent',
     },
     {
       title: 'Success Rate',
@@ -64,8 +61,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       trend: 'up',
       icon: Activity,
       color: 'text-primary',
-      bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-200',
+      bgColor: 'bg-secondary',
     },
   ];
 
@@ -145,10 +141,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   ];
 
   const marketplaceHighlights = [
-    { title: 'New Project Listings', value: '12', description: 'This week', icon: ShoppingCart, color: 'text-blue-600' },
-    { title: 'Active Investors', value: '2.4K', description: 'Monthly active', icon: Users, color: 'text-green-600' },
-    { title: 'Avg. Investment', value: '$45K', description: 'Per project', icon: DollarSign, color: 'text-purple-600' },
-    { title: 'Success Stories', value: '89', description: 'Funded projects', icon: Award, color: 'text-orange-600' },
+    { title: 'New Project Listings', value: '12', description: 'This week', icon: ShoppingCart, color: 'text-primary' },
+    { title: 'Active Investors', value: '2.4K', description: 'Monthly active', icon: Users, color: 'text-primary' },
+    { title: 'Avg. Investment', value: '$45K', description: 'Per project', icon: DollarSign, color: 'text-primary' },
+    { title: 'Success Stories', value: '89', description: 'Funded projects', icon: Award, color: 'text-primary' },
   ];
 
   const topLikedProjects = featuredProjects
@@ -158,26 +154,26 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-light-bg text-text-primary fade-in">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-        {/* Header - Improved typography and spacing */}
+        {/* Header */}
         <div className="mb-8 lg:mb-12">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary mb-3 lg:mb-4">
-            Welcome to <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">Seedora</span>
+            Welcome to <span className="text-primary">Seedora</span>
           </h1>
           <p className="text-text-secondary text-lg lg:text-xl max-w-3xl">
             Discover innovative projects, connect with founders, and invest in the future of technology.
           </p>
         </div>
 
-        {/* Stats Grid - Enhanced design */}
+        {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-12 lg:mb-16">
           {stats.map((stat, index) => (
-            <div key={stat.title} className={`bg-white rounded-2xl border ${stat.borderColor} p-6 lg:p-8 card-hover stagger-item shadow-sm hover:shadow-lg transition-all duration-300`} style={{ animationDelay: `${index * 0.1}s` }}>
+            <div key={stat.title} className={`neo-card ${stat.bgColor} p-6 lg:p-8 stagger-item`} style={{ animationDelay: `${index * 0.1}s` }}>
               <div className="flex items-center justify-between mb-6">
-                <div className={`p-4 rounded-xl ${stat.bgColor}`}>
+                <div className={`p-4 rounded-xl bg-white border border-light-border`}>
                   <stat.icon className={`w-6 h-6 lg:w-8 h-8 ${stat.color}`} />
                 </div>
                 <div className={`flex items-center space-x-2 text-sm font-semibold px-3 py-1 rounded-full ${
-                  stat.trend === 'up' ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'
+                  stat.trend === 'up' ? 'text-success bg-white' : 'text-error bg-white'
                 }`}>
                   {stat.trend === 'up' ? (
                     <ArrowUpRight className="w-4 h-4" />
@@ -195,12 +191,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           ))}
         </div>
 
-        {/* Quick Access to Marketplace - Enhanced design */}
-        <div className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 rounded-2xl border border-primary/20 p-8 lg:p-10 mb-12 lg:mb-16 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
+        {/* Quick Access to Marketplace */}
+        <div className="neo-card bg-accent p-8 lg:p-10 mb-12 lg:mb-16 relative overflow-hidden">
           <div className="relative flex flex-col lg:flex-row lg:items-center justify-between space-y-6 lg:space-y-0">
             <div className="flex items-center space-x-6">
-              <div className="w-16 h-16 lg:w-20 h-20 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="neo-btn w-16 h-16 lg:w-20 h-20 bg-primary flex items-center justify-center">
                 <ShoppingBag size={32} className="text-white" />
               </div>
               <div>
@@ -210,7 +205,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </div>
             <button 
               onClick={() => onNavigate('marketplace')}
-              className="flex items-center justify-center space-x-3 px-8 py-4 bg-white hover:bg-light-hover rounded-xl text-text-primary font-semibold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl border border-light-border"
+              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-white text-text-primary font-semibold"
             >
               <ShoppingBag size={20} />
               <span>Browse Marketplace</span>
@@ -221,8 +216,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         {/* Marketplace Highlights */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {marketplaceHighlights.map((highlight, index) => (
-            <div key={highlight.title} className="bg-white rounded-2xl border border-light-border p-6 text-center hover:shadow-lg transition-all duration-300 stagger-item" style={{ animationDelay: `${index * 0.1}s` }}>
-              <div className={`w-12 h-12 ${highlight.color === 'text-blue-600' ? 'bg-blue-50' : highlight.color === 'text-green-600' ? 'bg-green-50' : highlight.color === 'text-purple-600' ? 'bg-purple-50' : 'bg-orange-50'} rounded-xl flex items-center justify-center mx-auto mb-4`}>
+            <div key={highlight.title} className="neo-card bg-white p-6 text-center stagger-item" style={{ animationDelay: `${index * 0.1}s` }}>
+              <div className={`w-12 h-12 bg-accent rounded-xl flex items-center justify-center mx-auto mb-4 border border-light-border`}>
                 <highlight.icon size={24} className={highlight.color} />
               </div>
               <div className="text-2xl font-bold text-primary mb-2">{highlight.value}</div>
@@ -233,10 +228,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         </div>
 
         {/* Top Liked Projects Section */}
-        <div className="bg-white rounded-2xl border border-light-border p-8 lg:p-10 shadow-sm hover:shadow-lg transition-all duration-300 mb-12">
+        <div className="neo-card bg-white p-8 lg:p-10 mb-12">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 lg:mb-10">
             <div className="flex items-center space-x-6 mb-6 lg:mb-0">
-              <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="neo-btn w-16 h-16 bg-secondary flex items-center justify-center">
                 <Heart size={32} className="text-white" />
               </div>
               <div>
@@ -246,7 +241,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </div>
             <button 
               onClick={() => onNavigate('marketplace')}
-              className="flex items-center justify-center space-x-3 px-8 py-4 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 rounded-xl text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-secondary text-white font-semibold"
             >
               <Crown size={20} />
               <span>View Leaderboard</span>
@@ -257,15 +252,15 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             {topLikedProjects.map((project, index) => (
               <div 
                 key={index} 
-                className="bg-white border border-light-border rounded-2xl overflow-hidden hover:border-primary/50 hover:shadow-xl transition-all duration-300 cursor-pointer card-hover stagger-item group relative" 
+                className="neo-card bg-white overflow-hidden cursor-pointer group stagger-item" 
                 style={{ animationDelay: `${index * 0.1}s` }}
                 onClick={() => onNavigate('marketplace')}
               >
                 {/* Rank Badge */}
                 <div className={`absolute top-3 left-3 z-10 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
-                  index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
-                  index === 1 ? 'bg-gradient-to-r from-gray-400 to-gray-600' :
-                  'bg-gradient-to-r from-amber-600 to-amber-800'
+                  index === 0 ? 'bg-secondary' :
+                  index === 1 ? 'bg-text-muted' :
+                  'bg-warning'
                 }`}>
                   {index + 1}
                 </div>
@@ -274,15 +269,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   <img 
                     src={project.image} 
                     alt={project.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-48 object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
                   <div className="absolute top-3 right-3">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      project.status === 'Hot' ? 'bg-red-500 text-white' :
-                      project.status === 'New' ? 'bg-green-500 text-white' :
-                      project.status === 'Premium' ? 'bg-purple-500 text-white' :
-                      'bg-blue-500 text-white'
+                      project.status === 'Hot' ? 'bg-error text-white' :
+                      project.status === 'New' ? 'bg-success text-white' :
+                      project.status === 'Premium' ? 'bg-primary text-white' :
+                      'bg-accent text-text-primary'
                     }`}>
                       {project.status}
                     </span>
@@ -297,7 +291,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                       <Eye size={10} />
                       <span>{project.views}</span>
                     </div>
-                    <div className="bg-red-500/90 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center space-x-1">
+                    <div className="bg-error/90 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center space-x-1">
                       <Heart size={10} className="fill-current" />
                       <span>{project.likes}</span>
                     </div>
@@ -305,7 +299,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 </div>
                 
                 <div className="p-6">
-                  <h4 className="font-semibold text-lg text-text-primary group-hover:text-primary transition-colors duration-300 line-clamp-2 mb-2">
+                  <h4 className="font-semibold text-lg text-text-primary mb-2">
                     {project.name}
                   </h4>
                   <p className="text-text-secondary text-sm mb-4">by {project.founder}</p>
@@ -317,14 +311,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-text-secondary">Likes:</span>
-                      <span className="font-semibold text-red-500 flex items-center space-x-1">
+                      <span className="font-semibold text-error flex items-center space-x-1">
                         <Heart size={12} className="fill-current" />
                         <span>{project.likes}</span>
                       </span>
                     </div>
                   </div>
 
-                  <button className="w-full py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
+                  <button className="neo-btn w-full py-3 bg-primary text-white font-medium">
                     View in Marketplace
                   </button>
                 </div>
@@ -333,11 +327,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* Featured Projects - Enhanced design */}
-        <div className="bg-white rounded-2xl border border-light-border p-8 lg:p-10 shadow-sm hover:shadow-lg transition-all duration-300">
+        {/* Featured Projects */}
+        <div className="neo-card bg-white p-8 lg:p-10">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 lg:mb-10">
             <div className="flex items-center space-x-6 mb-6 lg:mb-0">
-              <div className="w-16 h-16 bg-gradient-to-r from-secondary to-accent rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="neo-btn w-16 h-16 bg-secondary flex items-center justify-center">
                 <Star size={32} className="text-white" />
               </div>
               <div>
@@ -347,19 +341,19 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </div>
             <button 
               onClick={() => onNavigate('marketplace')}
-              className="flex items-center justify-center space-x-3 px-8 py-4 bg-gradient-to-r from-secondary to-accent hover:from-secondary-dark hover:to-accent-dark rounded-xl text-white font-semibold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-secondary text-white font-semibold"
             >
               <TrendingUp size={20} />
               <span>View All Projects</span>
             </button>
           </div>
           
-          {/* Project Grid - Enhanced grid */}
+          {/* Project Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {featuredProjects.map((project, index) => (
               <div 
                 key={index} 
-                className="bg-white border border-light-border rounded-2xl overflow-hidden hover:border-primary/50 hover:shadow-xl transition-all duration-300 cursor-pointer card-hover stagger-item group" 
+                className="neo-card bg-white overflow-hidden cursor-pointer group stagger-item" 
                 style={{ animationDelay: `${index * 0.1}s` }}
                 onClick={() => onNavigate('marketplace')}
               >
@@ -367,15 +361,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   <img 
                     src={project.image} 
                     alt={project.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-48 object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
                   <div className="absolute top-3 right-3">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      project.status === 'Hot' ? 'bg-red-500 text-white' :
-                      project.status === 'New' ? 'bg-green-500 text-white' :
-                      project.status === 'Premium' ? 'bg-purple-500 text-white' :
-                      'bg-blue-500 text-white'
+                      project.status === 'Hot' ? 'bg-error text-white' :
+                      project.status === 'New' ? 'bg-success text-white' :
+                      project.status === 'Premium' ? 'bg-primary text-white' :
+                      'bg-accent text-text-primary'
                     }`}>
                       {project.status}
                     </span>
@@ -398,7 +391,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 </div>
                 
                 <div className="p-6">
-                  <h4 className="font-semibold text-lg text-text-primary group-hover:text-primary transition-colors duration-300 line-clamp-2 mb-2">
+                  <h4 className="font-semibold text-lg text-text-primary mb-2">
                     {project.name}
                   </h4>
                   <p className="text-text-secondary text-sm mb-4">by {project.founder}</p>
@@ -418,7 +411,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     </div>
                   </div>
 
-                  <button className="w-full py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
+                  <button className="neo-btn w-full py-3 bg-primary text-white font-medium">
                     View Details
                   </button>
                 </div>
@@ -431,27 +424,27 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
           <button 
             onClick={() => onNavigate('user-profile')}
-            className="bg-white border border-light-border rounded-2xl p-8 hover:bg-primary/5 hover:border-primary/30 transition-all duration-300 card-hover text-left group"
+            className="neo-card bg-white p-8 text-left group"
           >
-            <UserCheck className="w-10 h-10 text-primary mb-4 group-hover:scale-110 transition-transform duration-300" />
+            <UserCheck className="w-10 h-10 text-primary mb-4" />
             <h4 className="font-semibold text-xl text-text-primary mb-3">Register Your Project</h4>
             <p className="text-text-secondary">Protect your IP and showcase your innovation to investors</p>
           </button>
           
           <button 
             onClick={() => onNavigate('marketplace')}
-            className="bg-white border border-light-border rounded-2xl p-8 hover:bg-secondary/5 hover:border-secondary/30 transition-all duration-300 card-hover text-left group"
+            className="neo-card bg-white p-8 text-left group"
           >
-            <ShoppingBag className="w-10 h-10 text-secondary mb-4 group-hover:scale-110 transition-transform duration-300" />
+            <ShoppingBag className="w-10 h-10 text-secondary mb-4" />
             <h4 className="font-semibold text-xl text-text-primary mb-3">Explore Marketplace</h4>
             <p className="text-text-secondary">Discover and invest in promising registered projects</p>
           </button>
           
           <button 
             onClick={() => onNavigate('analytics')}
-            className="bg-white border border-light-border rounded-2xl p-8 hover:bg-accent/5 hover:border-accent/30 transition-all duration-300 card-hover text-left group"
+            className="neo-card bg-white p-8 text-left group"
           >
-            <BarChart3 className="w-10 h-10 text-accent mb-4 group-hover:scale-110 transition-transform duration-300" />
+            <BarChart3 className="w-10 h-10 text-accent mb-4" />
             <h4 className="font-semibold text-xl text-text-primary mb-3">View Analytics</h4>
             <p className="text-text-secondary">Track performance and market insights</p>
           </button>

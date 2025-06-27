@@ -41,29 +41,29 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       icon: Shield,
       title: 'IP Protection',
       description: 'Register your projects as intellectual property on the blockchain for permanent protection',
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-50'
+      color: 'text-primary',
+      bgColor: 'bg-accent'
     },
     {
       icon: Github,
       title: 'GitHub Integration',
       description: 'Connect your GitHub repositories to showcase your technical expertise and code quality',
-      color: 'text-gray-700',
-      bgColor: 'bg-gray-50'
+      color: 'text-primary',
+      bgColor: 'bg-secondary'
     },
     {
       icon: TrendingUp,
       title: 'Investment Opportunities',
       description: 'Discover and invest in innovative projects from talented developers worldwide',
-      color: 'text-green-500',
-      bgColor: 'bg-green-50'
+      color: 'text-primary',
+      bgColor: 'bg-accent'
     },
     {
       icon: BarChart3,
       title: 'MCP Analytics',
       description: 'AI-powered insights using Machine Callable Programs for smart investment decisions',
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-50'
+      color: 'text-primary',
+      bgColor: 'bg-secondary'
     }
   ];
 
@@ -113,7 +113,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         'Community access'
       ],
       popular: false,
-      color: 'border-gray-200'
+      color: 'border-light-border'
     },
     {
       name: 'Professional',
@@ -141,30 +141,25 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         'Advanced analytics'
       ],
       popular: false,
-      color: 'border-gray-200'
+      color: 'border-light-border'
     }
   ];
 
   return (
     <div className="min-h-screen bg-light-bg">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 min-h-screen flex items-center">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-primary/20 to-transparent rounded-full -translate-y-48 translate-x-48"></div>
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-secondary/20 to-transparent rounded-full translate-y-40 -translate-x-40"></div>
-        </div>
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <section className="relative overflow-hidden bg-accent min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="space-y-6">
-                <div className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 border border-primary/20">
+                <div className="neo-btn inline-flex items-center space-x-2 bg-white px-4 py-2">
                   <Sparkles size={16} className="text-primary" />
                   <span className="text-sm font-medium text-text-primary">Powered by Blockchain & AI</span>
                 </div>
                 
                 <h1 className="text-5xl lg:text-7xl font-black leading-tight">
-                  <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                  <span className="text-primary">
                     Seedora
                   </span>
                 </h1>
@@ -177,14 +172,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={onGetStarted}
-                  className="flex items-center justify-center space-x-3 px-8 py-4 bg-gradient-to-r from-primary to-secondary rounded-xl text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-primary text-white font-bold text-lg"
                 >
                   <Rocket size={24} />
                   <span>Get Started Free</span>
                   <ArrowRight size={20} />
                 </button>
                 
-                <button className="flex items-center justify-center space-x-3 px-8 py-4 bg-white/80 backdrop-blur-sm border border-light-border rounded-xl text-text-primary font-semibold text-lg hover:bg-white transition-all duration-300">
+                <button className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-white text-text-primary font-semibold text-lg">
                   <Play size={20} />
                   <span>Watch Demo</span>
                 </button>
@@ -192,30 +187,30 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
               <div className="flex items-center space-x-8 text-sm text-text-muted">
                 <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-green-500" />
+                  <CheckCircle size={16} className="text-success" />
                   <span>No credit card required</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-green-500" />
+                  <CheckCircle size={16} className="text-success" />
                   <span>Free forever plan</span>
                 </div>
               </div>
             </div>
 
             <div className="relative">
-              <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-light-border p-8 shadow-2xl">
+              <div className="neo-card bg-white p-8">
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xl font-bold text-text-primary">Live Platform Stats</h3>
-                    <div className="flex items-center space-x-2 text-green-500">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <div className="flex items-center space-x-2 text-success">
+                      <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
                       <span className="text-sm font-medium">Live</span>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     {stats.map((stat, index) => (
-                      <div key={index} className="text-center p-4 bg-light-card rounded-xl border border-light-border">
+                      <div key={index} className="text-center p-4 neo-card bg-accent">
                         <stat.icon size={24} className="mx-auto mb-2 text-primary" />
                         <div className="text-2xl font-bold text-text-primary">{stat.number}</div>
                         <div className="text-sm text-text-muted">{stat.label}</div>
@@ -223,7 +218,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                     ))}
                   </div>
                   
-                  <div className="p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl border border-primary/20">
+                  <div className="neo-card bg-accent p-4">
                     <div className="flex items-center space-x-3">
                       <MessageCircle size={20} className="text-primary" />
                       <div>
@@ -244,7 +239,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
-              Everything you need to <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">succeed</span>
+              Everything you need to <span className="text-primary">succeed</span>
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
               From IP protection to investment opportunities, Seedora provides all the tools developers and investors need.
@@ -255,12 +250,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className={`p-8 rounded-2xl border border-light-border hover:border-primary/50 transition-all duration-300 cursor-pointer group ${
-                  activeFeature === index ? 'bg-primary/5 border-primary/50' : 'bg-white hover:shadow-lg'
+                className={`neo-card ${feature.bgColor} p-8 cursor-pointer group ${
+                  activeFeature === index ? 'transform translate-x-[-2px] translate-y-[-2px]' : ''
                 }`}
                 onMouseEnter={() => setActiveFeature(index)}
               >
-                <div className={`w-16 h-16 ${feature.bgColor} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`w-16 h-16 bg-white border border-light-border rounded-xl flex items-center justify-center mb-6`}>
                   <feature.icon size={32} className={feature.color} />
                 </div>
                 <h3 className="text-xl font-bold text-text-primary mb-4">{feature.title}</h3>
@@ -272,11 +267,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-light-card">
+      <section className="py-20 bg-light-bg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
-              How <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Seedora</span> works
+              How <span className="text-primary">Seedora</span> works
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
               Get started in minutes with our simple three-step process
@@ -285,7 +280,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div className="neo-btn w-20 h-20 bg-primary flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">1</span>
               </div>
               <h3 className="text-xl font-bold text-text-primary mb-4">Register & Connect</h3>
@@ -295,7 +290,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </div>
 
             <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-r from-secondary to-accent rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div className="neo-btn w-20 h-20 bg-secondary flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-white">2</span>
               </div>
               <h3 className="text-xl font-bold text-text-primary mb-4">Protect Your IP</h3>
@@ -305,8 +300,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </div>
 
             <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-r from-accent to-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-2xl font-bold text-white">3</span>
+              <div className="neo-btn w-20 h-20 bg-accent flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-primary">3</span>
               </div>
               <h3 className="text-xl font-bold text-text-primary mb-4">Invest & Grow</h3>
               <p className="text-text-secondary leading-relaxed">
@@ -322,7 +317,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
-              Loved by <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">developers</span> worldwide
+              Loved by <span className="text-primary">developers</span> worldwide
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
               See what our community has to say about their experience with Seedora
@@ -331,10 +326,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-light-card rounded-2xl p-8 border border-light-border hover:shadow-lg transition-all duration-300">
+              <div key={index} className="neo-card bg-white p-8">
                 <div className="flex items-center space-x-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} size={16} className="text-yellow-400 fill-current" />
+                    <Star key={i} size={16} className="text-warning fill-current" />
                   ))}
                 </div>
                 
@@ -344,7 +339,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   <img 
                     src={testimonial.avatar} 
                     alt={testimonial.name}
-                    className="w-12 h-12 rounded-full ring-2 ring-primary/30"
+                    className="w-12 h-12 rounded-full border-2 border-primary"
                   />
                   <div>
                     <h4 className="font-semibold text-text-primary">{testimonial.name}</h4>
@@ -358,11 +353,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 bg-light-card">
+      <section className="py-20 bg-light-bg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
-              Simple, <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">transparent</span> pricing
+              Simple, <span className="text-primary">transparent</span> pricing
             </h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
               Choose the plan that's right for you. Start free and upgrade as you grow.
@@ -371,10 +366,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {pricingPlans.map((plan, index) => (
-              <div key={index} className={`relative bg-white rounded-2xl p-8 border-2 ${plan.color} ${plan.popular ? 'shadow-xl scale-105' : 'hover:shadow-lg'} transition-all duration-300`}>
+              <div key={index} className={`relative neo-card bg-white p-8 border-2 ${plan.color} ${plan.popular ? 'transform translate-x-[-4px] translate-y-[-4px]' : ''}`}>
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-full text-sm font-bold flex items-center space-x-2">
+                    <div className="neo-btn bg-secondary text-white px-4 py-2 text-sm font-bold flex items-center space-x-2">
                       <Crown size={16} />
                       <span>Most Popular</span>
                     </div>
@@ -390,7 +385,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 <ul className="space-y-4 mb-8">
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-center space-x-3">
-                      <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
+                      <CheckCircle size={16} className="text-success flex-shrink-0" />
                       <span className="text-text-secondary">{feature}</span>
                     </li>
                   ))}
@@ -398,10 +393,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
                 <button
                   onClick={onGetStarted}
-                  className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 ${
+                  className={`neo-btn w-full py-3 font-semibold ${
                     plan.popular
-                      ? 'bg-gradient-to-r from-primary to-secondary text-white hover:scale-105 shadow-lg'
-                      : 'bg-light-card border border-light-border text-text-primary hover:bg-light-hover'
+                      ? 'bg-primary text-white'
+                      : 'bg-white border border-light-border text-text-primary'
                   }`}
                 >
                   Get Started
@@ -413,7 +408,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary via-secondary to-accent">
+      <section className="py-20 bg-primary">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
             Ready to protect your innovations?
@@ -425,14 +420,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={onGetStarted}
-              className="flex items-center justify-center space-x-3 px-8 py-4 bg-white text-primary rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-white text-primary font-bold text-lg"
             >
               <Rocket size={24} />
               <span>Start Building Today</span>
               <ArrowRight size={20} />
             </button>
             
-            <button className="flex items-center justify-center space-x-3 px-8 py-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white font-semibold text-lg hover:bg-white/30 transition-all duration-300">
+            <button className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-secondary text-white font-semibold text-lg">
               <MessageCircle size={20} />
               <span>Talk to Sales</span>
             </button>
@@ -441,26 +436,26 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
+      <footer className="bg-primary text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="space-y-4">
               <h3 className="text-2xl font-bold">
-                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Seedora</span>
+                <span className="text-white">Seedora</span>
               </h3>
-              <p className="text-gray-400 leading-relaxed">
+              <p className="text-white/80 leading-relaxed">
                 The ultimate platform for developers and investors to protect IP and discover innovations.
               </p>
               <div className="flex items-center space-x-4">
-                <Github size={20} className="text-gray-400 hover:text-white cursor-pointer transition-colors" />
-                <Globe size={20} className="text-gray-400 hover:text-white cursor-pointer transition-colors" />
-                <MessageCircle size={20} className="text-gray-400 hover:text-white cursor-pointer transition-colors" />
+                <Github size={20} className="text-white/60 hover:text-white cursor-pointer transition-colors" />
+                <Globe size={20} className="text-white/60 hover:text-white cursor-pointer transition-colors" />
+                <MessageCircle size={20} className="text-white/60 hover:text-white cursor-pointer transition-colors" />
               </div>
             </div>
 
             <div>
               <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-gray-400">
+              <ul className="space-y-2 text-white/80">
                 <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">API</a></li>
@@ -470,7 +465,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-gray-400">
+              <ul className="space-y-2 text-white/80">
                 <li><a href="#" className="hover:text-white transition-colors">About</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
@@ -480,7 +475,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400">
+              <ul className="space-y-2 text-white/80">
                 <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Community</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
@@ -489,7 +484,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+          <div className="border-t border-white/20 mt-12 pt-8 text-center text-white/60">
             <p>&copy; 2024 Seedora. All rights reserved. Built with ❤️ for developers worldwide.</p>
           </div>
         </div>

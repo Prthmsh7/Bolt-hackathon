@@ -58,19 +58,17 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
   ];
 
   return (
-    <nav className="bg-white/95 backdrop-blur-md border-b border-light-border sticky top-0 z-50 shadow-sm">
+    <nav className="bg-white border-b border-light-border sticky top-0 z-50 neo-card" style={{ borderRadius: '0px', boxShadow: '0 5px 0 #141414' }}>
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
         <div className="flex items-center justify-between h-16 sm:h-20 lg:h-24">
           {/* Brand */}
           <div className="flex-shrink-0">
             <div className="flex items-center group cursor-pointer" onClick={() => handleNavClick('dashboard')}>
               <div className="relative">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight">
-                  <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent hover:from-primary-dark hover:via-secondary-dark hover:to-accent-dark transition-all duration-300 pulse-glow">
-                    Seedora
-                  </span>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-primary">
+                  Seedora
                 </h1>
-                <div className="absolute -bottom-1 sm:-bottom-1.5 lg:-bottom-2 left-0 w-full h-1 sm:h-1.5 lg:h-2 bg-gradient-to-r from-primary via-secondary to-accent rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                <div className="absolute -bottom-1 sm:-bottom-1.5 lg:-bottom-2 left-0 w-full h-1 sm:h-1.5 lg:h-2 bg-secondary rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
               </div>
             </div>
           </div>
@@ -85,10 +83,9 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-10 sm:pl-12 lg:pl-14 xl:pl-16 pr-4 sm:pr-6 lg:pr-8 xl:pr-10 py-2 sm:py-3 lg:py-4 xl:py-5 border border-light-border rounded-lg sm:rounded-xl lg:rounded-2xl bg-white placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30 text-sm sm:text-base lg:text-lg font-medium transition-all duration-300 text-text-primary shadow-sm"
+                className="block w-full pl-10 sm:pl-12 lg:pl-14 xl:pl-16 pr-4 sm:pr-6 lg:pr-8 xl:pr-10 py-2 sm:py-3 lg:py-4 xl:py-5 border border-light-border rounded-lg sm:rounded-xl lg:rounded-2xl bg-white placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm sm:text-base lg:text-lg font-medium transition-all duration-300 text-text-primary shadow-neo-sm"
                 placeholder="Search projects, founders, investors..."
               />
-              <div className="absolute inset-0 rounded-lg sm:rounded-xl lg:rounded-2xl bg-gradient-to-r from-primary/10 to-secondary/10 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             </div>
           </div>
 
@@ -100,13 +97,13 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`flex items-center space-x-2 lg:space-x-3 px-3 lg:px-4 xl:px-6 py-2 lg:py-3 xl:py-4 rounded-lg lg:rounded-xl text-sm lg:text-base xl:text-lg font-semibold transition-all duration-300 group btn-animate ripple ${
+                  className={`neo-btn flex items-center space-x-2 lg:space-x-3 px-3 lg:px-4 xl:px-6 py-2 lg:py-3 xl:py-4 text-sm lg:text-base xl:text-lg font-semibold transition-all duration-300 ${
                     currentPage === item.id 
-                      ? 'text-primary bg-primary/10 border border-primary/30' 
-                      : 'text-text-secondary hover:text-text-primary bg-white hover:bg-primary/10 border border-light-border'
+                      ? 'bg-primary text-white' 
+                      : 'bg-white text-text-primary hover:bg-accent'
                   }`}
                 >
-                  <item.icon className="w-4 h-4 lg:w-5 h-5 xl:w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
+                  <item.icon className="w-4 h-4 lg:w-5 h-5 xl:w-6 h-6" />
                   <span className="hidden xl:inline">{item.label}</span>
                 </button>
               ))}
@@ -117,14 +114,14 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
               <div className="hidden lg:block ml-2 lg:ml-4 xl:ml-8 relative">
                 <button 
                   onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                  className="flex items-center justify-center w-10 h-10 lg:w-12 h-12 xl:w-14 h-14 bg-gradient-to-r from-primary to-secondary rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 group pulse-glow morph-shape"
+                  className="neo-btn flex items-center justify-center w-10 h-10 lg:w-12 h-12 xl:w-14 h-14 bg-secondary rounded-full"
                 >
-                  <User className="w-5 h-5 lg:w-6 h-6 xl:w-7 h-7 text-white group-hover:scale-110 transition-transform duration-300" />
+                  <User className="w-5 h-5 lg:w-6 h-6 xl:w-7 h-7 text-text-primary" />
                 </button>
 
                 {/* Profile Dropdown Menu */}
                 {showProfileDropdown && (
-                  <div className="absolute top-full right-0 mt-2 lg:mt-3 w-80 lg:w-96 bg-white rounded-xl lg:rounded-2xl shadow-2xl border border-light-border bounce-in z-50">
+                  <div className="absolute top-full right-0 mt-2 lg:mt-3 w-80 lg:w-96 bg-white rounded-xl lg:rounded-2xl border border-light-border shadow-neo z-50">
                     {/* User Info Header */}
                     <div className="p-6 lg:p-8 border-b border-light-border">
                       <div className="flex items-center space-x-4 lg:space-x-6">
@@ -132,9 +129,9 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                           <img 
                             src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&dpr=2" 
                             alt="Profile"
-                            className="w-16 h-16 lg:w-20 h-20 rounded-full ring-2 ring-primary/30 morph-shape"
+                            className="w-16 h-16 lg:w-20 h-20 rounded-full border-2 border-primary"
                           />
-                          <div className="absolute -bottom-1 -right-1 w-5 h-5 lg:w-6 h-6 bg-secondary rounded-full border-2 border-white pulse-glow"></div>
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 lg:w-6 h-6 bg-secondary rounded-full border-2 border-white"></div>
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-lg lg:text-xl text-text-primary">{user.email}</h3>
@@ -143,9 +140,9 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                         </div>
                         <button 
                           onClick={() => onNavigate('user-profile')}
-                          className="p-2 lg:p-3 bg-light-hover hover:bg-primary/10 rounded-lg lg:rounded-xl transition-all duration-300 scale-hover"
+                          className="neo-btn p-2 lg:p-3 bg-light-hover"
                         >
-                          <Edit size={16} className="lg:w-5 lg:h-5 text-text-muted hover:text-primary" />
+                          <Edit size={16} className="lg:w-5 lg:h-5 text-text-muted" />
                         </button>
                       </div>
                     </div>
@@ -159,8 +156,8 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                             item.action();
                             setShowProfileDropdown(false);
                           }}
-                          className={`w-full flex items-center space-x-3 lg:space-x-4 px-6 lg:px-8 py-3 lg:py-4 hover:bg-light-hover transition-all duration-300 text-left ripple text-base lg:text-lg ${
-                            item.danger ? 'text-red-500 hover:text-red-600' : 'text-text-secondary hover:text-text-primary'
+                          className={`w-full flex items-center space-x-3 lg:space-x-4 px-6 lg:px-8 py-3 lg:py-4 hover:bg-light-hover transition-all duration-300 text-left text-base lg:text-lg ${
+                            item.danger ? 'text-error hover:text-error' : 'text-text-secondary hover:text-text-primary'
                           }`}
                         >
                           <item.icon size={18} className="lg:w-5 lg:h-5" />
@@ -181,7 +178,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
             ) : (
               <button
                 onClick={onShowAuth}
-                className="hidden lg:flex items-center space-x-2 px-4 lg:px-6 py-2 lg:py-3 bg-primary hover:bg-primary-dark rounded-lg lg:rounded-xl text-white font-medium hover:scale-105 transition-all duration-300 text-sm lg:text-base shadow-lg"
+                className="hidden lg:flex neo-btn items-center space-x-2 px-4 lg:px-6 py-2 lg:py-3 bg-primary text-white text-sm lg:text-base"
               >
                 <User size={16} className="lg:w-5 lg:h-5" />
                 <span>Sign In</span>
@@ -191,7 +188,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 sm:p-3 lg:p-4 text-text-muted hover:text-primary bg-white hover:bg-primary/10 border border-light-border rounded-lg sm:rounded-xl lg:rounded-2xl transition-all duration-300 group ml-2 sm:ml-4 lg:ml-8 scale-hover"
+              className="lg:hidden neo-btn p-2 sm:p-3 lg:p-4 text-text-muted hover:text-primary bg-white ml-2 sm:ml-4 lg:ml-8"
             >
               <div className="relative w-5 h-5 sm:w-6 h-6 lg:w-7 h-7">
                 <Menu className={`w-5 h-5 sm:w-6 h-6 lg:w-7 h-7 absolute transition-all duration-300 ${isMenuOpen ? 'opacity-0 rotate-180' : 'opacity-100 rotate-0'}`} />
@@ -216,7 +213,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-12 sm:pl-16 pr-6 sm:pr-10 py-3 sm:py-4 lg:py-5 border border-light-border rounded-xl sm:rounded-2xl bg-white placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30 text-base sm:text-lg font-medium transition-all duration-300 text-text-primary"
+                  className="block w-full pl-12 sm:pl-16 pr-6 sm:pr-10 py-3 sm:py-4 lg:py-5 border border-light-border rounded-xl sm:rounded-2xl bg-white placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-base sm:text-lg font-medium transition-all duration-300 text-text-primary shadow-neo-sm"
                   placeholder="Search projects, founders, investors..."
                 />
               </div>
@@ -228,14 +225,14 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 rounded-xl sm:rounded-2xl text-base sm:text-lg font-semibold transition-all duration-300 group stagger-item ripple ${
+                  className={`neo-btn flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 text-base sm:text-lg font-semibold transition-all duration-300 stagger-item ${
                     currentPage === item.id 
-                      ? 'text-primary bg-primary/10 border border-primary/30' 
-                      : 'text-text-secondary hover:text-text-primary bg-white hover:bg-primary/10 border border-light-border'
+                      ? 'bg-primary text-white' 
+                      : 'bg-white text-text-primary hover:bg-accent'
                   }`}
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <item.icon className="w-5 h-5 sm:w-6 h-6 lg:w-7 h-7 group-hover:scale-110 transition-transform duration-300" />
+                  <item.icon className="w-5 h-5 sm:w-6 h-6 lg:w-7 h-7" />
                   <span>{item.label}</span>
                 </button>
               ))}
@@ -247,9 +244,9 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                     onNavigate('user-profile');
                     setIsMenuOpen(false);
                   }}
-                  className="flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 rounded-xl sm:rounded-2xl text-base sm:text-lg font-semibold text-white bg-gradient-to-r from-primary to-secondary shadow-lg transition-all duration-300 group stagger-item btn-animate"
+                  className="neo-btn flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 text-base sm:text-lg font-semibold text-white bg-secondary stagger-item"
                 >
-                  <User className="w-5 h-5 sm:w-6 h-6 lg:w-7 h-7 group-hover:scale-110 transition-transform duration-300" />
+                  <User className="w-5 h-5 sm:w-6 h-6 lg:w-7 h-7" />
                   <span>Profile</span>
                 </button>
               ) : (
@@ -258,9 +255,9 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                     onShowAuth();
                     setIsMenuOpen(false);
                   }}
-                  className="flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 rounded-xl sm:rounded-2xl text-base sm:text-lg font-semibold text-white bg-gradient-to-r from-primary to-secondary shadow-lg transition-all duration-300 group stagger-item btn-animate"
+                  className="neo-btn flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 text-base sm:text-lg font-semibold text-white bg-primary stagger-item"
                 >
-                  <User className="w-5 h-5 sm:w-6 h-6 lg:w-7 h-7 group-hover:scale-110 transition-transform duration-300" />
+                  <User className="w-5 h-5 sm:w-6 h-6 lg:w-7 h-7" />
                   <span>Sign In</span>
                 </button>
               )}
