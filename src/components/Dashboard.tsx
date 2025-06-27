@@ -11,13 +11,11 @@ import {
   Play,
   UserCheck,
   BarChart3,
-  Zap,
   Target,
   Award,
   Heart,
   Eye,
   Crown,
-  Flame,
   ShoppingCart
 } from 'lucide-react';
 
@@ -231,7 +229,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         <div className="neo-card bg-white p-8 lg:p-10 mb-12">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 lg:mb-10">
             <div className="flex items-center space-x-6 mb-6 lg:mb-0">
-              <div className="neo-btn w-16 h-16 bg-secondary flex items-center justify-center">
+              <div className="neo-btn w-16 h-16 bg-error flex items-center justify-center">
                 <Heart size={32} className="text-white" />
               </div>
               <div>
@@ -384,7 +382,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                       <span>{project.views}</span>
                     </div>
                     <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center space-x-1">
-                      <Heart size={10} className={project.likes > 100 ? 'fill-current text-red-400' : ''} />
+                      <Heart size={10} className={project.likes > 100 ? 'fill-current text-error' : ''} />
                       <span>{project.likes}</span>
                     </div>
                   </div>

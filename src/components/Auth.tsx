@@ -238,7 +238,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md border border-light-border shadow-2xl">
+      <div className="neo-card bg-white w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-light-border">
           <h2 className="text-xl font-bold text-text-primary">
@@ -368,7 +368,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-semibold text-white transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+              className="neo-btn w-full py-3 bg-primary text-white font-semibold flex items-center justify-center space-x-2"
             >
               {isLoading ? (
                 <>

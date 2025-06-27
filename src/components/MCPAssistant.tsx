@@ -10,7 +10,6 @@ import {
   BarChart3, 
   Target, 
   Lightbulb, 
-  Zap, 
   Brain, 
   Database, 
   Globe, 
@@ -350,9 +349,9 @@ Could you be more specific about what you'd like to analyze? I can help with:
     <div className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${
       isMinimized ? 'w-80 h-16' : 'w-96 h-[600px]'
     }`}>
-      <div className="bg-white rounded-2xl border border-light-border shadow-2xl overflow-hidden h-full flex flex-col">
+      <div className="neo-card bg-white h-full flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-secondary p-4 text-white flex-shrink-0">
+        <div className="bg-primary p-4 text-white flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
@@ -361,7 +360,7 @@ Could you be more specific about what you'd like to analyze? I can help with:
               <div>
                 <h3 className="font-bold">MCP Assistant</h3>
                 <div className="flex items-center space-x-2 text-xs text-white/80">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
                   <span>{activeNodes.length} nodes active</span>
                 </div>
               </div>
@@ -386,7 +385,7 @@ Could you be more specific about what you'd like to analyze? I can help with:
         {!isMinimized && (
           <>
             {/* MCP Status */}
-            <div className="p-3 bg-light-card border-b border-light-border flex-shrink-0">
+            <div className="p-3 bg-light-bg border-b border-light-border flex-shrink-0">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center space-x-2">
                   <Database size={12} className="text-primary" />
@@ -394,7 +393,7 @@ Could you be more specific about what you'd like to analyze? I can help with:
                 </div>
                 <div className="flex items-center space-x-1">
                   {activeNodes.map((node, index) => (
-                    <div key={node} className="w-2 h-2 bg-green-400 rounded-full animate-pulse" style={{ animationDelay: `${index * 0.2}s` }}></div>
+                    <div key={node} className="w-2 h-2 bg-success rounded-full animate-pulse" style={{ animationDelay: `${index * 0.2}s` }}></div>
                   ))}
                 </div>
               </div>
@@ -409,8 +408,8 @@ Could you be more specific about what you'd like to analyze? I can help with:
                 <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[80%] rounded-2xl p-3 ${
                     message.type === 'user' 
-                      ? 'bg-primary text-white' 
-                      : 'bg-light-card border border-light-border'
+                      ? 'neo-btn bg-primary text-white' 
+                      : 'neo-card bg-light-bg'
                   }`}>
                     <div className="flex items-start space-x-2">
                       {message.type === 'assistant' && (
@@ -441,7 +440,7 @@ Could you be more specific about what you'd like to analyze? I can help with:
               
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-light-card border border-light-border rounded-2xl p-3">
+                  <div className="neo-card bg-light-bg p-3">
                     <div className="flex items-center space-x-2">
                       <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
                         <Bot size={12} className="text-primary" />
@@ -466,13 +465,13 @@ Could you be more specific about what you'd like to analyze? I can help with:
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask about investments, trends, or risks..."
-                  className="flex-1 px-3 py-2 border border-light-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-sm"
+                  className="flex-1 px-3 py-2 border border-light-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
                   disabled={isLoading}
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!inputMessage.trim() || isLoading}
-                  className="p-2 bg-primary text-white rounded-xl hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                  className="neo-btn p-2 bg-primary text-white disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send size={16} />
                 </button>

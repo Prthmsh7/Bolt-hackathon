@@ -100,6 +100,16 @@ body {
   color: #141414;
 }
 
+.neo-btn.success {
+  background: #4CAF50;
+  color: #FFFFFF;
+}
+
+.neo-btn.error {
+  background: #f44336;
+  color: #FFFFFF;
+}
+
 /* Enhanced button animations */
 .btn-animate {
   transition: all 0.2s ease;
