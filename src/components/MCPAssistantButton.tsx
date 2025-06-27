@@ -14,13 +14,13 @@ const MCPAssistantButton: React.FC<MCPAssistantButtonProps> = ({ onInsightGenera
       {/* Floating chat button */}
       <button
         onClick={() => setShowAssistant(true)}
-        className="fixed bottom-6 right-6 z-40 w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 pulse-glow group"
+        className="fixed bottom-6 right-6 z-40 w-16 h-16 neo-btn bg-primary rounded-full flex items-center justify-center group"
         aria-label="Open MCP Assistant"
       >
         <MessageCircle size={28} className="text-white group-hover:scale-110 transition-transform duration-300" />
         
         {/* Notification dot */}
-        <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full border-2 border-white flex items-center justify-center">
+        <div className="absolute -top-1 -right-1 w-4 h-4 bg-secondary rounded-full border-2 border-white flex items-center justify-center">
           <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
         </div>
       </button>

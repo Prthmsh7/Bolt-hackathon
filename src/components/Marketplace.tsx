@@ -47,7 +47,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState<'likes' | 'views' | 'price' | 'recent'>('likes');
   const [projects, setProjects] = useState<DemoProject[]>(demoProjects);
-  const [developers, setDevelopers] = useState<DeveloperProfile[]>(developerProfiles); // Fixed typo here
+  const [developers, setDevelopers] = useState<DeveloperProfile[]>(developerProfiles);
   const [filteredProjects, setFilteredProjects] = useState<DemoProject[]>(demoProjects);
   const [filteredDevelopers, setFilteredDevelopers] = useState<DeveloperProfile[]>(developerProfiles);
   const [selectedProject, setSelectedProject] = useState<DemoProject | null>(null);
@@ -152,7 +152,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
         <div className="absolute top-3 right-3">
           {project.is_featured && (
-            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
+            <span className="bg-secondary text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
               <Crown size={12} />
               <span>FEATURED</span>
             </span>
@@ -169,7 +169,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
             <span>{project.views_count}</span>
           </div>
           <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center space-x-1">
-            <Heart size={10} className={project.likes_count > 100 ? 'fill-current text-red-400' : ''} />
+            <Heart size={10} className={project.likes_count > 100 ? 'fill-current text-error' : ''} />
             <span>{project.likes_count}</span>
           </div>
         </div>
@@ -198,14 +198,14 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-text-secondary">Likes:</span>
-            <span className="font-semibold text-red-500 flex items-center space-x-1">
+            <span className="font-semibold text-error flex items-center space-x-1">
               <Heart size={12} className="fill-current" />
               <span>{project.likes_count}</span>
             </span>
           </div>
         </div>
 
-        <button className="w-full py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
+        <button className="w-full py-3 bg-primary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
           View Details
         </button>
       </div>
@@ -227,7 +227,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
             className="w-16 h-16 rounded-2xl ring-2 ring-primary/30 group-hover:scale-105 transition-transform duration-300"
           />
           {developer.verified && (
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-success rounded-full border-2 border-white flex items-center justify-center">
               <CheckCircle size={12} className="text-white" />
             </div>
           )}
@@ -238,7 +238,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
               {developer.name}
             </h4>
             {developer.verified && (
-              <CheckCircle size={16} className="text-green-500" />
+              <CheckCircle size={16} className="text-success" />
             )}
           </div>
           <p className="text-text-secondary text-sm mb-1">@{developer.username}</p>
@@ -279,7 +279,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         )}
       </div>
 
-      <button className="w-full py-3 bg-gradient-to-r from-secondary to-accent text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
+      <button className="w-full py-3 bg-secondary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
         View Profile
       </button>
     </div>
@@ -324,17 +324,17 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="text-center p-4 bg-light-card rounded-xl">
-                <Heart size={24} className="mx-auto mb-2 text-red-500" />
+                <Heart size={24} className="mx-auto mb-2 text-error" />
                 <div className="text-2xl font-bold text-text-primary">{selectedProject.likes_count}</div>
                 <div className="text-sm text-text-muted">Likes</div>
               </div>
               <div className="text-center p-4 bg-light-card rounded-xl">
-                <Eye size={24} className="mx-auto mb-2 text-blue-500" />
+                <Eye size={24} className="mx-auto mb-2 text-primary" />
                 <div className="text-2xl font-bold text-text-primary">{selectedProject.views_count}</div>
                 <div className="text-sm text-text-muted">Views</div>
               </div>
               <div className="text-center p-4 bg-light-card rounded-xl">
-                <ShoppingBag size={24} className="mx-auto mb-2 text-green-500" />
+                <ShoppingBag size={24} className="mx-auto mb-2 text-success" />
                 <div className="text-2xl font-bold text-text-primary">{selectedProject.purchase_count}</div>
                 <div className="text-sm text-text-muted">Purchases</div>
               </div>
@@ -360,7 +360,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-text-muted">Status:</span>
-                      <span className="text-green-600 font-medium">{selectedProject.status}</span>
+                      <span className="text-success font-medium">{selectedProject.status}</span>
                     </div>
                   </div>
                 </div>
@@ -407,7 +407,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                     href={selectedProject.presentation_video}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-2 px-6 py-3 bg-accent text-white rounded-xl font-medium hover:scale-105 transition-all duration-300"
+                    className="flex items-center space-x-2 px-6 py-3 bg-accent text-primary rounded-xl font-medium hover:scale-105 transition-all duration-300"
                   >
                     <Eye size={18} />
                     <span>Watch Video</span>
@@ -416,7 +416,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 )}
               </div>
 
-              <button className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg">
+              <button className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg">
                 Invest in This Project
               </button>
             </div>
@@ -432,7 +432,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
     return (
       <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-light-border shadow-2xl">
-          <div className="relative bg-gradient-to-r from-primary/10 to-secondary/10 p-8">
+          <div className="relative bg-accent p-8">
             <button
               onClick={() => setShowDeveloperModal(false)}
               className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-text-primary hover:bg-white/30 transition-all duration-300"
@@ -448,7 +448,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                   className="w-24 h-24 rounded-2xl ring-4 ring-white/30"
                 />
                 {selectedDeveloper.verified && (
-                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-success rounded-full border-4 border-white flex items-center justify-center">
                     <CheckCircle size={16} className="text-white" />
                   </div>
                 )}
@@ -457,7 +457,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 <div className="flex items-center space-x-3 mb-2">
                   <h2 className="text-3xl font-bold text-text-primary">{selectedDeveloper.name}</h2>
                   {selectedDeveloper.verified && (
-                    <CheckCircle size={24} className="text-green-500" />
+                    <CheckCircle size={24} className="text-success" />
                   )}
                 </div>
                 <p className="text-text-secondary text-lg mb-2">@{selectedDeveloper.username}</p>
@@ -488,17 +488,17 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 <div className="text-sm text-text-muted">Projects</div>
               </div>
               <div className="text-center p-4 bg-light-card rounded-xl">
-                <Heart size={24} className="mx-auto mb-2 text-red-500" />
+                <Heart size={24} className="mx-auto mb-2 text-error" />
                 <div className="text-2xl font-bold text-text-primary">{selectedDeveloper.total_likes}</div>
                 <div className="text-sm text-text-muted">Total Likes</div>
               </div>
               <div className="text-center p-4 bg-light-card rounded-xl">
-                <Eye size={24} className="mx-auto mb-2 text-blue-500" />
+                <Eye size={24} className="mx-auto mb-2 text-primary" />
                 <div className="text-2xl font-bold text-text-primary">{selectedDeveloper.total_views}</div>
                 <div className="text-sm text-text-muted">Total Views</div>
               </div>
               <div className="text-center p-4 bg-light-card rounded-xl">
-                <Calendar size={24} className="mx-auto mb-2 text-green-500" />
+                <Calendar size={24} className="mx-auto mb-2 text-success" />
                 <div className="text-2xl font-bold text-text-primary">
                   {Math.floor((new Date().getTime() - new Date(selectedDeveloper.joined_date).getTime()) / (1000 * 60 * 60 * 24 * 365))}y
                 </div>
@@ -549,7 +549,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
               </div>
 
               <div className="flex space-x-4">
-                <button className="flex-1 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300">
+                <button className="flex-1 py-3 bg-primary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300">
                   Contact Developer
                 </button>
                 <button className="flex-1 py-3 bg-white border border-light-border text-text-primary rounded-xl font-medium hover:bg-light-hover transition-all duration-300">
@@ -577,7 +577,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 ←
               </button>
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
                   <ShoppingBag size={24} className="text-white" />
                 </div>
                 <div>

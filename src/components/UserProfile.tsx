@@ -215,21 +215,21 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
 
   const stats = {
     developer: [
-      { label: 'Projects Registered', value: ipRegistrations.length, icon: Shield, color: 'bg-blue-500' },
-      { label: 'Approved Projects', value: ipRegistrations.filter(ip => ip.status === 'approved').length, icon: CheckCircle, color: 'bg-green-500' },
-      { label: 'Total Views', value: '2.4K', icon: Eye, color: 'bg-purple-500' },
-      { label: 'Success Rate', value: '94%', icon: Target, color: 'bg-orange-500' }
+      { label: 'Projects Registered', value: ipRegistrations.length, icon: Shield, color: 'bg-primary' },
+      { label: 'Approved Projects', value: ipRegistrations.filter(ip => ip.status === 'approved').length, icon: CheckCircle, color: 'bg-success' },
+      { label: 'Total Views', value: '2.4K', icon: Eye, color: 'bg-secondary' },
+      { label: 'Success Rate', value: '94%', icon: Target, color: 'bg-accent' }
     ],
     investor: [
-      { label: 'Total Invested', value: '$125K', icon: DollarSign, color: 'bg-green-500' },
-      { label: 'Active Investments', value: '12', icon: TrendingUp, color: 'bg-blue-500' },
-      { label: 'Portfolio Growth', value: '+24.5%', icon: BarChart3, color: 'bg-purple-500' },
-      { label: 'ROI', value: '18.7%', icon: Target, color: 'bg-orange-500' }
+      { label: 'Total Invested', value: '$125K', icon: DollarSign, color: 'bg-success' },
+      { label: 'Active Investments', value: '12', icon: TrendingUp, color: 'bg-primary' },
+      { label: 'Portfolio Growth', value: '+24.5%', icon: BarChart3, color: 'bg-secondary' },
+      { label: 'ROI', value: '18.7%', icon: Target, color: 'bg-accent' }
     ]
   };
 
   const renderHeader = () => (
-    <div className="relative overflow-hidden bg-gradient-to-br from-primary via-secondary to-accent rounded-3xl p-8 mb-8 text-white">
+    <div className="relative overflow-hidden bg-accent rounded-3xl p-8 mb-8 text-text-primary">
       <div className="absolute inset-0 bg-black/20"></div>
       <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
       <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
@@ -248,7 +248,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
             
             <div>
               <h1 className="text-3xl font-bold mb-2">{profileData.name}</h1>
-              <div className="flex flex-wrap items-center gap-4 text-white/80 mb-3">
+              <div className="flex flex-wrap items-center gap-4 text-text-secondary mb-3">
                 <div className="flex items-center space-x-2">
                   <Mail size={16} />
                   <span>{profileData.email}</span>
@@ -268,14 +268,14 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
               
               {/* Role Switcher */}
               <div className="flex items-center space-x-3">
-                <span className="text-white/60 text-sm">I am a:</span>
+                <span className="text-text-secondary text-sm">I am a:</span>
                 <div className="flex bg-white/10 backdrop-blur-sm rounded-xl p-1 border border-white/20">
                   <button
                     onClick={() => handleRoleSwitch('developer')}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                       userRole === 'developer' 
                         ? 'bg-white text-primary shadow-lg' 
-                        : 'text-white/80 hover:text-white hover:bg-white/10'
+                        : 'text-text-primary hover:text-primary hover:bg-white/10'
                     }`}
                   >
                     <Code size={16} />
@@ -286,7 +286,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
                     className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                       userRole === 'investor' 
                         ? 'bg-white text-primary shadow-lg' 
-                        : 'text-white/80 hover:text-white hover:bg-white/10'
+                        : 'text-text-primary hover:text-primary hover:bg-white/10'
                     }`}
                   >
                     <TrendingUp size={16} />
@@ -300,21 +300,21 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setActiveView('wallet')}
-              className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-3 rounded-xl text-white hover:bg-white/20 transition-all duration-300"
+              className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-3 rounded-xl text-text-primary hover:bg-white/20 transition-all duration-300"
             >
               <Wallet size={18} />
               <span>Wallet</span>
             </button>
             <button
               onClick={() => setActiveView('github')}
-              className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-3 rounded-xl text-white hover:bg-white/20 transition-all duration-300"
+              className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-3 rounded-xl text-text-primary hover:bg-white/20 transition-all duration-300"
             >
               <Github size={18} />
               <span>GitHub</span>
             </button>
             <button
               onClick={() => setActiveView('settings')}
-              className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-3 rounded-xl text-white hover:bg-white/20 transition-all duration-300"
+              className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-3 rounded-xl text-text-primary hover:bg-white/20 transition-all duration-300"
             >
               <Settings size={18} />
               <span>Settings</span>
@@ -329,7 +329,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
     <div className="space-y-8">
       {!userRole ? (
         <div className="text-center py-16">
-          <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
             <User size={32} className="text-white" />
           </div>
           <h2 className="text-2xl font-bold text-text-primary mb-4">Welcome to start.dev!</h2>
@@ -350,15 +350,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
               </p>
               <div className="space-y-2 text-sm text-text-muted">
                 <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-green-500" />
+                  <CheckCircle size={16} className="text-success" />
                   <span>Register IP for projects</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-green-500" />
+                  <CheckCircle size={16} className="text-success" />
                   <span>Connect GitHub repositories</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-green-500" />
+                  <CheckCircle size={16} className="text-success" />
                   <span>Showcase working demos</span>
                 </div>
               </div>
@@ -381,15 +381,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
               </p>
               <div className="space-y-2 text-sm text-text-muted">
                 <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-green-500" />
+                  <CheckCircle size={16} className="text-success" />
                   <span>Browse registered projects</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-green-500" />
+                  <CheckCircle size={16} className="text-success" />
                   <span>Review project details</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-green-500" />
+                  <CheckCircle size={16} className="text-success" />
                   <span>Make informed investments</span>
                 </div>
               </div>
@@ -447,7 +447,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
               </button>
               <button
                 onClick={handleNewProject}
-                className="flex items-center space-x-2 bg-gradient-to-r from-primary to-secondary px-6 py-3 rounded-xl text-white font-medium hover:scale-105 transition-all duration-300 shadow-lg"
+                className="flex items-center space-x-2 bg-primary px-6 py-3 rounded-xl text-white font-medium hover:scale-105 transition-all duration-300 shadow-lg"
               >
                 <Plus size={18} />
                 <span>New Project</span>
@@ -545,9 +545,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
                           </div>
                         </div>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          project.status === 'approved' ? 'bg-green-100 text-green-700' :
-                          project.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-red-100 text-red-700'
+                          project.status === 'approved' ? 'bg-success/20 text-success' :
+                          project.status === 'pending' ? 'bg-warning/20 text-warning' :
+                          'bg-error/20 text-error'
                         }`}>
                           {project.status}
                         </span>
@@ -675,12 +675,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
         <WalletConnect onWalletConnection={handleWalletConnection} />
         
         {walletConnected && (
-          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+          <div className="mt-6 p-4 bg-success/10 border border-success/20 rounded-xl">
             <div className="flex items-center space-x-2">
-              <CheckCircle size={20} className="text-green-600" />
+              <CheckCircle size={20} className="text-success" />
               <div>
-                <p className="text-green-800 font-medium">Wallet Successfully Connected</p>
-                <p className="text-green-600 text-sm">Address: {walletAddress}</p>
+                <p className="text-text-primary font-medium">Wallet Successfully Connected</p>
+                <p className="text-text-secondary text-sm">Address: {walletAddress}</p>
               </div>
             </div>
           </div>
