@@ -205,7 +205,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
           </div>
         </div>
 
-        <button className="w-full py-3 bg-primary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
+        <button className="neo-btn w-full py-3 bg-secondary text-white font-medium hover:bg-secondary">
           View Details
         </button>
       </div>
@@ -279,7 +279,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         )}
       </div>
 
-      <button className="w-full py-3 bg-secondary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg">
+      <button className="neo-btn w-full py-3 bg-secondary text-white font-medium hover:bg-secondary">
         View Profile
       </button>
     </div>
@@ -416,7 +416,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 )}
               </div>
 
-              <button className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg">
+              <button className="neo-btn w-full py-4 bg-secondary text-white rounded-xl font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg">
                 Invest in This Project
               </button>
             </div>
@@ -549,10 +549,10 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
               </div>
 
               <div className="flex space-x-4">
-                <button className="flex-1 py-3 bg-primary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300">
+                <button className="neo-btn flex-1 py-3 bg-primary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300">
                   Contact Developer
                 </button>
-                <button className="flex-1 py-3 bg-white border border-light-border text-text-primary rounded-xl font-medium hover:bg-light-hover transition-all duration-300">
+                <button className="neo-btn flex-1 py-3 bg-white border border-light-border text-text-primary rounded-xl font-medium hover:bg-light-hover transition-all duration-300">
                   View All Projects
                 </button>
               </div>

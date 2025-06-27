@@ -95,10 +95,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   // Investment tiers
   const investmentTiers = [
-    { name: 'Supporter', min: 50, max: 499, benefits: ['Early access to content', 'Exclusive updates'], color: 'text-primary', icon: Star },
-    { name: 'Backer', min: 500, max: 2499, benefits: ['All Supporter benefits', 'Monthly video calls', 'Behind-the-scenes content'], color: 'text-secondary', icon: Award },
-    { name: 'Partner', min: 2500, max: 9999, benefits: ['All Backer benefits', 'Co-producer credit', 'Input on future content'], color: 'text-accent', icon: Sparkles },
-    { name: 'Executive', min: 10000, max: Infinity, benefits: ['All Partner benefits', 'Revenue sharing', 'Direct collaboration opportunities'], color: 'text-primary', icon: Zap }
+    { name: 'Supporter', min: 50, max: 499, benefits: ['Early access to content', 'Exclusive updates'], color: 'text-primary', bgColor: 'bg-primary/10', icon: Star },
+    { name: 'Backer', min: 500, max: 2499, benefits: ['All Supporter benefits', 'Monthly video calls', 'Behind-the-scenes content'], color: 'text-secondary', bgColor: 'bg-secondary/10', icon: Award },
+    { name: 'Partner', min: 2500, max: 9999, benefits: ['All Backer benefits', 'Co-producer credit', 'Input on future content'], color: 'text-accent', bgColor: 'bg-accent/10', icon: Sparkles },
+    { name: 'Executive', min: 10000, max: Infinity, benefits: ['All Partner benefits', 'Revenue sharing', 'Direct collaboration opportunities'], color: 'text-secondary', bgColor: 'bg-secondary/10', icon: Zap }
   ];
 
   // Check CDN status on component mount
@@ -873,7 +873,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <div className="w-full bg-light-border rounded-full h-3 mb-3 overflow-hidden">
                   <div 
                     className="progress-bar h-3 rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                    style={{ width: `${Math.min(progressPercentage, 100)}%`, background: '#FF9800' }}
                   ></div>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -916,13 +916,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     return (
                       <div 
                         key={tier.name}
-                        className={`border rounded-xl p-4 cursor-pointer transition-all duration-300 stagger-item card-hover ${
+                        className={`border rounded-xl p-4 cursor-pointer transition-all duration-300 stagger-item ${
                           selectedInvestmentTier === tier.name 
                             ? 'border-secondary bg-secondary/10' 
                             : 'border-light-border hover:border-primary/50 hover:bg-primary/5'
                         }`}
                         onClick={() => setSelectedInvestmentTier(tier.name)}
-                        style={{ animationDelay: `${index * 0.1}s` }}
+                        style={{ animationDelay: `${index * 0.1}s`, backgroundColor: selectedInvestmentTier === tier.name ? tier.bgColor : '' }}
                       >
                         <div className="flex justify-between items-center mb-2">
                           <div className="flex items-center space-x-2">

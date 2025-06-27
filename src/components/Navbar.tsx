@@ -97,9 +97,9 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`neo-btn flex items-center space-x-2 lg:space-x-3 px-3 lg:px-4 xl:px-6 py-2 lg:py-3 xl:py-4 text-sm lg:text-base xl:text-lg font-semibold transition-all duration-300 ${
+                  className={`neo-btn flex items-center space-x-2 lg:space-x-3 px-3 lg:px-4 xl:px-6 py-2 lg:py-3 xl:py-4 text-sm lg:text-base xl:text-lg font-semibold transition-all duration-300 hover-orange ${
                     currentPage === item.id 
-                      ? 'bg-primary text-white' 
+                      ? 'bg-secondary text-white' 
                       : 'bg-white text-text-primary hover:bg-accent'
                   }`}
                 >
@@ -116,7 +116,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                   onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                   className="neo-btn flex items-center justify-center w-10 h-10 lg:w-12 h-12 xl:w-14 h-14 bg-secondary rounded-full"
                 >
-                  <User className="w-5 h-5 lg:w-6 h-6 xl:w-7 h-7 text-text-primary" />
+                  <User className="w-5 h-5 lg:w-6 h-6 xl:w-7 h-7 text-white" />
                 </button>
 
                 {/* Profile Dropdown Menu */}
@@ -178,7 +178,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
             ) : (
               <button
                 onClick={onShowAuth}
-                className="hidden lg:flex neo-btn items-center space-x-2 px-4 lg:px-6 py-2 lg:py-3 bg-primary text-white text-sm lg:text-base"
+                className="hidden lg:flex neo-btn items-center space-x-2 px-4 lg:px-6 py-2 lg:py-3 bg-secondary text-white text-sm lg:text-base hover-orange"
               >
                 <User size={16} className="lg:w-5 lg:h-5" />
                 <span>Sign In</span>
@@ -225,9 +225,9 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`neo-btn flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 text-base sm:text-lg font-semibold transition-all duration-300 stagger-item ${
+                  className={`neo-btn flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 text-base sm:text-lg font-semibold transition-all duration-300 stagger-item hover-orange ${
                     currentPage === item.id 
-                      ? 'bg-primary text-white' 
+                      ? 'bg-secondary text-white' 
                       : 'bg-white text-text-primary hover:bg-accent'
                   }`}
                   style={{ animationDelay: `${index * 0.1}s` }}
@@ -244,7 +244,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                     onNavigate('user-profile');
                     setIsMenuOpen(false);
                   }}
-                  className="neo-btn flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 text-base sm:text-lg font-semibold text-white bg-secondary stagger-item"
+                  className="neo-btn flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 text-base sm:text-lg font-semibold text-white bg-secondary stagger-item hover-orange"
                 >
                   <User className="w-5 h-5 sm:w-6 h-6 lg:w-7 h-7" />
                   <span>Profile</span>
@@ -255,7 +255,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                     onShowAuth();
                     setIsMenuOpen(false);
                   }}
-                  className="neo-btn flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 text-base sm:text-lg font-semibold text-white bg-primary stagger-item"
+                  className="neo-btn flex items-center space-x-4 sm:space-x-6 w-full px-6 sm:px-8 py-4 sm:py-5 lg:py-6 text-base sm:text-lg font-semibold text-white bg-secondary stagger-item hover-orange"
                 >
                   <User className="w-5 h-5 sm:w-6 h-6 lg:w-7 h-7" />
                   <span>Sign In</span>
