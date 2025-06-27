@@ -59,9 +59,9 @@ export function WalletConnect({ onWalletConnection }: WalletConnectProps) {
 
   if (error) {
     return (
-      <div className="flex items-center space-x-2 p-4 bg-red-50 border border-red-200 rounded-xl">
-        <AlertCircle size={20} className="text-red-500 flex-shrink-0" />
-        <p className="text-red-700 text-sm">{error}</p>
+      <div className="flex items-center space-x-2 p-4 bg-error/10 border border-error/20 rounded-xl">
+        <AlertCircle size={20} className="text-error flex-shrink-0" />
+        <p className="text-error text-sm">{error}</p>
       </div>
     );
   }
@@ -71,8 +71,8 @@ export function WalletConnect({ onWalletConnection }: WalletConnectProps) {
       <div className="bg-white rounded-xl border border-light-border p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-              <CheckCircle size={20} className="text-green-600" />
+            <div className="w-10 h-10 bg-success/10 rounded-xl flex items-center justify-center">
+              <CheckCircle size={20} className="text-success" />
             </div>
             <div>
               <h3 className="font-semibold text-text-primary">Wallet Connected</h3>
@@ -83,7 +83,7 @@ export function WalletConnect({ onWalletConnection }: WalletConnectProps) {
           </div>
           <button
             onClick={disconnectWallet}
-            className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-300"
+            className="px-4 py-2 text-sm font-medium text-error hover:text-error bg-error/10 hover:bg-error/20 rounded-lg transition-all duration-300"
           >
             Disconnect
           </button>
@@ -105,7 +105,7 @@ export function WalletConnect({ onWalletConnection }: WalletConnectProps) {
         <button
           onClick={connectWallet}
           disabled={connecting}
-          className="w-full py-3 bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-white font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+          className="w-full py-3 bg-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-white font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
         >
           {connecting ? (
             <>

@@ -45,7 +45,8 @@ import {
   Bot,
   Search,
   Settings,
-  Bell
+  Bell,
+  AlertCircle
 } from 'lucide-react';
 import { demoProjects, getTrendingProjects } from '../data/demoProjects';
 import MCPAssistant from './MCPAssistant';
@@ -122,9 +123,9 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
       change: '+18.7%',
       trend: 'up',
       icon: DollarSign,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-200',
+      color: 'text-success',
+      bgColor: 'bg-success/10',
+      borderColor: 'border-success/20',
       description: 'Total amount invested across all funds'
     },
     {
@@ -133,9 +134,9 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
       change: '+15.3%',
       trend: 'up',
       icon: Users,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
+      borderColor: 'border-primary/20',
       description: 'Monthly active users on the platform'
     },
     {
@@ -144,9 +145,9 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
       change: '+2.1%',
       trend: 'up',
       icon: TrendingUp,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-      borderColor: 'border-purple-200',
+      color: 'text-secondary',
+      bgColor: 'bg-secondary/10',
+      borderColor: 'border-secondary/20',
       description: 'Average portfolio return rate'
     },
     {
@@ -155,9 +156,9 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
       change: '+8.3%',
       trend: 'up',
       icon: Activity,
-      color: 'text-primary',
-      bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-200',
+      color: 'text-accent',
+      bgColor: 'bg-accent/10',
+      borderColor: 'border-accent/20',
       description: 'Month-over-month platform growth'
     }
   ];
@@ -213,7 +214,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                 ←
               </button>
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
                   <BarChart3 size={24} className="text-white" />
                 </div>
                 <div>
@@ -258,7 +259,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
               <div className="flex items-center space-x-3">
                 <button 
                   onClick={() => setShowMCPAssistant(true)}
-                  className="flex items-center space-x-2 px-4 py-3 bg-gradient-to-r from-primary to-secondary rounded-xl text-white font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="flex items-center space-x-2 px-4 py-3 bg-primary rounded-xl text-white font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   <Brain size={18} />
                   <span>MCP Assistant</span>
@@ -311,12 +312,12 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
         {activeView === 'overview' && (
           <>
             {/* MCP Insights Banner */}
-            <div className="mb-12 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 rounded-2xl border border-primary/20 p-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/20 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
+            <div className="mb-12 bg-primary/10 rounded-2xl border border-primary/20 p-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full -translate-y-32 translate-x-32"></div>
               
               <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between space-y-6 lg:space-y-0">
                 <div className="flex items-center space-x-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
                     <Brain size={32} className="text-white" />
                   </div>
                   <div>
@@ -332,7 +333,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                   </div>
                   <button 
                     onClick={() => setShowMCPAssistant(true)}
-                    className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark rounded-xl text-white font-medium hover:scale-105 transition-all duration-300 shadow-lg"
+                    className="flex items-center space-x-2 px-6 py-3 bg-primary hover:scale-105 rounded-xl text-white font-medium transition-all duration-300 shadow-lg"
                   >
                     <MessageCircle size={18} />
                     <span>Ask MCP Assistant</span>
@@ -350,7 +351,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                       <kpi.icon className={`w-8 h-8 ${kpi.color}`} />
                     </div>
                     <div className={`flex items-center space-x-2 text-sm font-semibold px-3 py-1 rounded-full ${
-                      kpi.trend === 'up' ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'
+                      kpi.trend === 'up' ? 'text-success bg-success/10' : 'text-error bg-error/10'
                     }`}>
                       {kpi.trend === 'up' ? (
                         <ArrowUpRight className="w-4 h-4" />
@@ -374,7 +375,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
               <div className="mb-12 bg-white rounded-2xl border border-light-border p-8 shadow-lg">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8">
                   <div className="flex items-center space-x-4 mb-4 lg:mb-0">
-                    <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center shadow-lg">
                       <Crown size={32} className="text-white" />
                     </div>
                     <div>
@@ -390,7 +391,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                     >
                       Hide Leaderboard
                     </button>
-                    <button className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 rounded-xl text-white font-medium transition-all duration-300 shadow-lg hover:shadow-xl">
+                    <button className="flex items-center space-x-2 px-6 py-3 bg-secondary hover:scale-105 rounded-xl text-white font-medium transition-all duration-300 shadow-lg hover:shadow-xl">
                       <Megaphone size={18} />
                       <span>Share Leaderboard</span>
                     </button>
@@ -398,11 +399,11 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                 </div>
                 
                 {/* Current Noun Auction - Nouns DAO Style */}
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 mb-8 border border-gray-200">
+                <div className="bg-accent rounded-xl p-6 mb-8 border border-light-border">
                   <div className="flex flex-col lg:flex-row items-center gap-8">
                     <div className="w-40 h-40 relative">
                       {generateNounSvg(currentNounIndex)}
-                      <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                      <div className="absolute -top-3 -right-3 w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
                         #{currentNounIndex + 1}
                       </div>
                     </div>
@@ -410,7 +411,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
                         <h3 className="text-2xl font-bold text-text-primary">Current Auction: Noun #{currentNounIndex + 1}</h3>
-                        <div className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 animate-pulse">
+                        <div className="bg-error text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 animate-pulse">
                           <div className="w-2 h-2 bg-white rounded-full"></div>
                           <span>LIVE</span>
                         </div>
@@ -421,26 +422,26 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                       </p>
                       
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                        <div className="bg-white rounded-lg p-3 border border-light-border">
                           <div className="text-sm text-text-muted">Current Bid</div>
                           <div className="text-xl font-bold text-primary">$2,450</div>
                         </div>
-                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                        <div className="bg-white rounded-lg p-3 border border-light-border">
                           <div className="text-sm text-text-muted">Time Left</div>
-                          <div className="text-xl font-bold text-red-500">{formatTime(nounAuctionTimeLeft)}</div>
+                          <div className="text-xl font-bold text-error">{formatTime(nounAuctionTimeLeft)}</div>
                         </div>
-                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                        <div className="bg-white rounded-lg p-3 border border-light-border">
                           <div className="text-sm text-text-muted">Bidders</div>
-                          <div className="text-xl font-bold text-blue-500">12</div>
+                          <div className="text-xl font-bold text-primary">12</div>
                         </div>
-                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                        <div className="bg-white rounded-lg p-3 border border-light-border">
                           <div className="text-sm text-text-muted">Auction #</div>
-                          <div className="text-xl font-bold text-purple-500">{currentNounIndex + 1}</div>
+                          <div className="text-xl font-bold text-secondary">{currentNounIndex + 1}</div>
                         </div>
                       </div>
                       
                       <div className="flex space-x-4">
-                        <button className="px-6 py-3 bg-primary hover:bg-primary-dark rounded-xl text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center space-x-2">
+                        <button className="px-6 py-3 bg-primary hover:scale-105 rounded-xl text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center space-x-2">
                           <DollarSign size={18} />
                           <span>Place Bid</span>
                         </button>
@@ -471,13 +472,13 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                     </thead>
                     <tbody className="divide-y divide-light-border">
                       {leaderboardProjects.map((project, index) => (
-                        <tr key={project.id} className={`${index < 3 ? 'bg-yellow-50' : 'bg-white'} hover:bg-light-hover transition-colors duration-300`}>
+                        <tr key={project.id} className={`${index < 3 ? 'bg-accent/20' : 'bg-white'} hover:bg-light-hover transition-colors duration-300`}>
                           <td className="px-6 py-4">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                              index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
-                              index === 1 ? 'bg-gradient-to-r from-gray-400 to-gray-600' :
-                              index === 2 ? 'bg-gradient-to-r from-amber-600 to-amber-800' :
-                              'bg-gradient-to-r from-blue-500 to-blue-700'
+                              index === 0 ? 'bg-secondary' :
+                              index === 1 ? 'bg-primary' :
+                              index === 2 ? 'bg-accent' :
+                              'bg-primary'
                             }`}>
                               {index + 1}
                             </div>
@@ -485,9 +486,9 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                           <td className="px-6 py-4">
                             <div className="flex items-center space-x-3">
                               <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                                {index === 0 ? <Crown size={20} className="text-yellow-500" /> :
-                                 index === 1 ? <Award size={20} className="text-gray-500" /> :
-                                 index === 2 ? <Medal size={20} className="text-amber-700" /> :
+                                {index === 0 ? <Crown size={20} className="text-secondary" /> :
+                                 index === 1 ? <Award size={20} className="text-primary" /> :
+                                 index === 2 ? <Medal size={20} className="text-accent" /> :
                                  <Lightbulb size={20} className="text-primary" />}
                               </div>
                               <div>
@@ -503,14 +504,14 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="flex items-center space-x-1 text-red-500 font-semibold">
+                            <div className="flex items-center space-x-1 text-error font-semibold">
                               <Heart size={16} className="fill-current" />
                               <span>{project.likes_count}</span>
                             </div>
                           </td>
                           <td className="px-6 py-4 font-semibold text-primary">${project.price}</td>
                           <td className="px-6 py-4">
-                            <button className="px-3 py-1 bg-primary text-white rounded-lg text-sm hover:bg-primary-dark transition-colors duration-300">
+                            <button className="px-3 py-1 bg-primary text-white rounded-lg text-sm hover:scale-105 transition-all duration-300">
                               View
                             </button>
                           </td>
@@ -528,7 +529,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
               <div className="xl:col-span-2 bg-white rounded-2xl border border-light-border p-8 shadow-sm hover:shadow-lg transition-all duration-300">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
                   <div className="flex items-center space-x-4 mb-4 sm:mb-0">
-                    <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                    <div className="w-12 h-12 bg-success rounded-xl flex items-center justify-center">
                       <TrendingUp size={24} className="text-white" />
                     </div>
                     <div>
@@ -566,7 +567,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                         </div>
                       </div>
                       <div className="text-right mt-4 sm:mt-0">
-                        <div className="text-2xl font-bold text-green-600">{fund.return}</div>
+                        <div className="text-2xl font-bold text-success">{fund.return}</div>
                         <div className="text-text-muted text-sm">Return</div>
                       </div>
                     </div>
@@ -577,7 +578,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
               {/* MCP Insights */}
               <div className="bg-white rounded-2xl border border-light-border p-8 shadow-sm hover:shadow-lg transition-all duration-300">
                 <div className="flex items-center space-x-4 mb-8">
-                  <div className="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
                     <Brain size={24} className="text-white" />
                   </div>
                   <div>
@@ -592,10 +593,10 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                       <div 
                         key={insight.id} 
                         className={`p-6 border rounded-xl transition-all duration-300 stagger-item ${
-                          insight.type === 'market' ? 'bg-blue-50 border-blue-200' :
-                          insight.type === 'investment' ? 'bg-green-50 border-green-200' :
-                          insight.type === 'risk' ? 'bg-red-50 border-red-200' :
-                          'bg-purple-50 border-purple-200'
+                          insight.type === 'market' ? 'bg-primary/10 border-primary/20' :
+                          insight.type === 'investment' ? 'bg-success/10 border-success/20' :
+                          insight.type === 'risk' ? 'bg-error/10 border-error/20' :
+                          'bg-secondary/10 border-secondary/20'
                         }`}
                         style={{ animationDelay: `${index * 0.1}s` }}
                       >
@@ -604,9 +605,9 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                           <div className="flex items-center space-x-1 text-xs">
                             <span className="text-text-muted">Confidence:</span>
                             <span className={`font-medium ${
-                              insight.confidence > 0.8 ? 'text-green-600' :
-                              insight.confidence > 0.6 ? 'text-yellow-600' :
-                              'text-red-600'
+                              insight.confidence > 0.8 ? 'text-success' :
+                              insight.confidence > 0.6 ? 'text-warning' :
+                              'text-error'
                             }`}>
                               {Math.round(insight.confidence * 100)}%
                             </span>
@@ -630,7 +631,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                       <p className="text-text-muted text-sm mb-6">Ask the MCP Assistant to generate insights</p>
                       <button 
                         onClick={() => setShowMCPAssistant(true)}
-                        className="px-6 py-3 bg-primary hover:bg-primary-dark rounded-xl text-white font-medium transition-all duration-300"
+                        className="px-6 py-3 bg-primary hover:scale-105 rounded-xl text-white font-medium transition-all duration-300"
                       >
                         Open MCP Assistant
                       </button>
@@ -644,7 +645,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
             <div className="bg-white rounded-2xl border border-light-border p-8 shadow-sm hover:shadow-lg transition-all duration-300">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
                 <div className="flex items-center space-x-4 mb-4 sm:mb-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-success rounded-xl flex items-center justify-center">
                     <Activity size={24} className="text-white" />
                   </div>
                   <div>
@@ -652,20 +653,20 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                     <p className="text-text-secondary">Live platform activity and transactions</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2 text-green-600">
-                  <div className="w-3 h-3 bg-green-600 rounded-full animate-pulse"></div>
+                <div className="flex items-center space-x-2 text-success">
+                  <div className="w-3 h-3 bg-success rounded-full animate-pulse"></div>
                   <span className="text-sm font-medium">Live</span>
                 </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                  { label: 'Active Sessions', value: '1,234', icon: Eye, color: 'text-blue-600' },
-                  { label: 'New Investments', value: '$45K', icon: DollarSign, color: 'text-green-600' },
-                  { label: 'Page Views/min', value: '89', icon: MousePointer, color: 'text-purple-600' },
-                  { label: 'Avg. Session Time', value: '8m 32s', icon: Clock, color: 'text-orange-600' }
+                  { label: 'Active Sessions', value: '1,234', icon: Eye, color: 'text-primary' },
+                  { label: 'New Investments', value: '$45K', icon: DollarSign, color: 'text-success' },
+                  { label: 'Page Views/min', value: '89', icon: MousePointer, color: 'text-secondary' },
+                  { label: 'Avg. Session Time', value: '8m 32s', icon: Clock, color: 'text-accent' }
                 ].map((metric, index) => (
-                  <div key={index} className="text-center p-6 bg-light-card border border-light-border rounded-xl hover:bg-green-50 transition-all duration-300 stagger-item" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <div key={index} className="text-center p-6 bg-light-card border border-light-border rounded-xl hover:bg-success/10 transition-all duration-300 stagger-item" style={{ animationDelay: `${index * 0.1}s` }}>
                     <metric.icon className={`w-8 h-8 ${metric.color} mx-auto mb-3`} />
                     <div className="text-2xl font-bold text-text-primary mb-1">{metric.value}</div>
                     <div className="text-text-secondary text-sm">{metric.label}</div>
@@ -689,7 +690,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
               </div>
               <button 
                 onClick={() => setShowMCPAssistant(true)}
-                className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary rounded-xl text-white font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="flex items-center space-x-2 px-6 py-3 bg-primary rounded-xl text-white font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
               >
                 <Brain size={18} />
                 <span>Ask MCP Assistant</span>
@@ -702,23 +703,23 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                   <div 
                     key={insight.id} 
                     className={`bg-white border rounded-2xl p-8 transition-all duration-300 hover:shadow-lg ${
-                      insight.type === 'market' ? 'border-blue-200' :
-                      insight.type === 'investment' ? 'border-green-200' :
-                      insight.type === 'risk' ? 'border-red-200' :
-                      'border-purple-200'
+                      insight.type === 'market' ? 'border-primary/20' :
+                      insight.type === 'investment' ? 'border-success/20' :
+                      insight.type === 'risk' ? 'border-error/20' :
+                      'border-secondary/20'
                     }`}
                   >
                     <div className="flex items-center space-x-4 mb-6">
                       <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        insight.type === 'market' ? 'bg-blue-100' :
-                        insight.type === 'investment' ? 'bg-green-100' :
-                        insight.type === 'risk' ? 'bg-red-100' :
-                        'bg-purple-100'
+                        insight.type === 'market' ? 'bg-primary/10' :
+                        insight.type === 'investment' ? 'bg-success/10' :
+                        insight.type === 'risk' ? 'bg-error/10' :
+                        'bg-secondary/10'
                       }`}>
-                        {insight.type === 'market' ? <TrendingUp size={24} className="text-blue-600" /> :
-                         insight.type === 'investment' ? <DollarSign size={24} className="text-green-600" /> :
-                         insight.type === 'risk' ? <AlertCircle size={24} className="text-red-600" /> :
-                         <Lightbulb size={24} className="text-purple-600" />}
+                        {insight.type === 'market' ? <TrendingUp size={24} className="text-primary" /> :
+                         insight.type === 'investment' ? <DollarSign size={24} className="text-success" /> :
+                         insight.type === 'risk' ? <AlertCircle size={24} className="text-error" /> :
+                         <Lightbulb size={24} className="text-secondary" />}
                       </div>
                       <div>
                         <h3 className="text-xl font-bold text-text-primary">{insight.title}</h3>
@@ -739,7 +740,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                                 <span className="font-medium text-text-primary">{project.title}</span>
                               </div>
                               <div className="flex items-center space-x-2 text-sm">
-                                <Heart size={14} className="text-red-500" />
+                                <Heart size={14} className="text-error" />
                                 <span>{project.likes_count}</span>
                               </div>
                             </div>
@@ -753,21 +754,21 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                           {insight.data.undervaluedProjects.map((project: any, index: number) => (
                             <div key={index} className="flex items-center justify-between p-3 bg-light-card rounded-lg">
                               <div className="flex items-center space-x-3">
-                                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                                  <Target size={12} className="text-green-600" />
+                                <div className="w-6 h-6 bg-success/10 rounded-full flex items-center justify-center">
+                                  <Target size={12} className="text-success" />
                                 </div>
                                 <span className="font-medium text-text-primary">{project.title}</span>
                               </div>
-                              <div className="text-green-600 font-semibold">${project.price}</div>
+                              <div className="text-success font-semibold">${project.price}</div>
                             </div>
                           ))}
                         </div>
                       )}
 
                       {insight.type === 'risk' && (
-                        <div className="p-4 bg-red-50 rounded-lg">
+                        <div className="p-4 bg-error/10 rounded-lg">
                           <div className="flex items-center space-x-2 mb-2">
-                            <AlertCircle size={16} className="text-red-600" />
+                            <AlertCircle size={16} className="text-error" />
                             <h4 className="font-semibold text-text-primary">Risk Assessment</h4>
                           </div>
                           <p className="text-text-secondary text-sm">
@@ -788,9 +789,9 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                       <div className="flex items-center space-x-2">
                         <span className="text-text-muted">Confidence:</span>
                         <span className={`font-medium ${
-                          insight.confidence > 0.8 ? 'text-green-600' :
-                          insight.confidence > 0.6 ? 'text-yellow-600' :
-                          'text-red-600'
+                          insight.confidence > 0.8 ? 'text-success' :
+                          insight.confidence > 0.6 ? 'text-warning' :
+                          'text-error'
                         }`}>
                           {Math.round(insight.confidence * 100)}%
                         </span>
@@ -808,7 +809,7 @@ const EnhancedAnalytics: React.FC<AnalyticsProps> = ({ onBack }) => {
                 </p>
                 <button 
                   onClick={() => setShowMCPAssistant(true)}
-                  className="px-8 py-4 bg-gradient-to-r from-primary to-secondary rounded-xl text-white font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                  className="px-8 py-4 bg-primary rounded-xl text-white font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
                 >
                   Generate Insights Now
                 </button>

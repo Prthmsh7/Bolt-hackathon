@@ -125,13 +125,13 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
         </button>
 
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 rounded-3xl p-12 mb-16 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/20 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-secondary/20 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
+        <div className="bg-accent rounded-3xl p-12 mb-16 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full -translate-y-32 translate-x-32"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary/20 rounded-full translate-y-24 -translate-x-24"></div>
           
           <div className="relative z-10 text-center max-w-3xl mx-auto">
             <h1 className="text-4xl lg:text-6xl font-black mb-6">
-              About <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">Seedora</span>
+              About <span className="text-primary">Seedora</span>
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               We're on a mission to democratize innovation by protecting intellectual property and connecting developers with investors.
@@ -202,7 +202,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
 
           <div className="bg-white rounded-2xl border border-light-border p-8 shadow-sm mb-8">
             <div className="text-center max-w-3xl mx-auto">
-              <div className="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Target size={32} className="text-white" />
               </div>
               <h3 className="text-2xl font-bold text-text-primary mb-4">Our Mission</h3>
@@ -243,7 +243,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                     alt={member.name}
                     className="w-32 h-32 rounded-2xl mx-auto ring-4 ring-primary/20"
                   />
-                  <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-white px-4 py-1 rounded-full text-sm font-medium">
+                  <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-secondary text-white px-4 py-1 rounded-full text-sm font-medium">
                     {member.role}
                   </div>
                 </div>
@@ -386,7 +386,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                   
                   <button
                     type="submit"
-                    className="w-full py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg"
+                    className="w-full py-3 bg-primary text-white rounded-xl font-medium hover:scale-105 transition-all duration-300 shadow-lg"
                   >
                     Send Message
                   </button>

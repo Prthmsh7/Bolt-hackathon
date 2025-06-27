@@ -58,7 +58,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
   ];
 
   return (
-    <nav className="bg-white border-b border-light-border sticky top-0 z-50 neo-card" style={{ borderRadius: '0px', boxShadow: '0 5px 0 #141414' }}>
+    <nav className="bg-white border-b border-light-border sticky top-0 z-50 neo-card" style={{ borderRadius: '0px', boxShadow: '5px 5px 0 #141414' }}>
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
         <div className="flex items-center justify-between h-16 sm:h-20 lg:h-24">
           {/* Brand */}

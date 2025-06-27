@@ -255,14 +255,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
 
         <div className="p-6">
           {/* Info Banner */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-xl">
             <div className="flex items-start space-x-3">
-              <Info size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+              <Info size={16} className="text-primary mt-0.5 flex-shrink-0" />
               <div className="text-sm">
-                <p className="text-blue-800 font-medium mb-1">
+                <p className="text-text-primary font-medium mb-1">
                   {isLogin ? 'Signing In' : 'Creating Account'}
                 </p>
-                <p className="text-blue-700">
+                <p className="text-text-secondary">
                   {isLogin 
                     ? 'Enter your email and password to access your account.'
                     : 'Join start.dev to protect your IP and discover investment opportunities.'
@@ -333,7 +333,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 </button>
               </div>
               {!isLogin && (
-                <p className="text-xs text-text-muted">
+                <p className="text-xs text-text-muted mt-1">
                   Use at least 6 characters with a mix of letters and numbers
                 </p>
               )}
@@ -341,20 +341,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
 
             {/* Success Message */}
             {success && (
-              <div className="p-4 bg-green-50 border border-green-200 rounded-xl flex items-start space-x-3">
-                <CheckCircle size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
-                <p className="text-green-700 text-sm">{success}</p>
+              <div className="p-4 bg-success/10 border border-success/20 rounded-xl flex items-start space-x-3">
+                <CheckCircle size={16} className="text-success mt-0.5 flex-shrink-0" />
+                <p className="text-text-primary text-sm">{success}</p>
               </div>
             )}
 
             {/* Error Message */}
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start space-x-3">
-                <AlertCircle size={16} className="text-red-600 mt-0.5 flex-shrink-0" />
+              <div className="p-4 bg-error/10 border border-error/20 rounded-xl flex items-start space-x-3">
+                <AlertCircle size={16} className="text-error mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="text-red-700 text-sm font-medium">{error}</p>
+                  <p className="text-text-primary text-sm font-medium">{error}</p>
                   {showHelp && isLogin && (
-                    <div className="mt-2 text-xs text-red-600">
+                    <div className="mt-2 text-xs text-text-secondary">
                       <p>• Make sure you've created an account first</p>
                       <p>• Check your email and password for typos</p>
                       <p>• Confirm your email if required</p>
@@ -396,7 +396,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
           </div>
 
           {/* Help Section */}
-          <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+          <div className="mt-6 p-4 bg-light-bg border border-light-border rounded-xl">
             <h4 className="font-medium text-text-primary mb-2 text-sm">Need Help?</h4>
             <div className="text-xs text-text-muted space-y-1">
               {isLogin ? (

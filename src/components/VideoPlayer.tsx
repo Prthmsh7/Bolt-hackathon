@@ -95,10 +95,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   // Investment tiers
   const investmentTiers = [
-    { name: 'Supporter', min: 50, max: 499, benefits: ['Early access to content', 'Exclusive updates'], color: 'text-blue-400', icon: Star },
-    { name: 'Backer', min: 500, max: 2499, benefits: ['All Supporter benefits', 'Monthly video calls', 'Behind-the-scenes content'], color: 'text-purple-400', icon: Award },
-    { name: 'Partner', min: 2500, max: 9999, benefits: ['All Backer benefits', 'Co-producer credit', 'Input on future content'], color: 'text-pink-400', icon: Sparkles },
-    { name: 'Executive', min: 10000, max: Infinity, benefits: ['All Partner benefits', 'Revenue sharing', 'Direct collaboration opportunities'], color: 'text-yellow-400', icon: Zap }
+    { name: 'Supporter', min: 50, max: 499, benefits: ['Early access to content', 'Exclusive updates'], color: 'text-primary', icon: Star },
+    { name: 'Backer', min: 500, max: 2499, benefits: ['All Supporter benefits', 'Monthly video calls', 'Behind-the-scenes content'], color: 'text-secondary', icon: Award },
+    { name: 'Partner', min: 2500, max: 9999, benefits: ['All Backer benefits', 'Co-producer credit', 'Input on future content'], color: 'text-accent', icon: Sparkles },
+    { name: 'Executive', min: 10000, max: Infinity, benefits: ['All Partner benefits', 'Revenue sharing', 'Direct collaboration opportunities'], color: 'text-primary', icon: Zap }
   ];
 
   // Check CDN status on component mount
@@ -326,15 +326,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             {/* FilCDN + CDN Status Badge */}
             {video.filecoinCID && (
               <div className="absolute top-4 left-4 flex items-center space-x-2">
-                <div className="bg-gradient-to-r from-primary/90 to-secondary/90 backdrop-blur-sm rounded-lg px-3 py-2 flex items-center space-x-2">
+                <div className="bg-primary/90 backdrop-blur-sm rounded-lg px-3 py-2 flex items-center space-x-2">
                   <Database size={16} className="text-white" />
                   <span className="text-white text-sm font-medium">FilCDN</span>
                 </div>
                 {video.cdnEnabled && (
                   <div className={`backdrop-blur-sm rounded-lg px-3 py-2 flex items-center space-x-2 ${
-                    cdnStatus === 'connected' ? 'bg-green-500/90' :
-                    cdnStatus === 'disconnected' ? 'bg-red-500/90' :
-                    'bg-yellow-500/90'
+                    cdnStatus === 'connected' ? 'bg-success/90' :
+                    cdnStatus === 'disconnected' ? 'bg-error/90' :
+                    'bg-warning/90'
                   }`}>
                     {cdnStatus === 'connected' ? (
                       <Wifi size={16} className="text-white" />
@@ -354,7 +354,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             )}
             
             {/* Video Controls Overlay */}
-            <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent transition-all duration-300 ${
+            <div className={`absolute inset-0 bg-black/80 transition-all duration-300 ${
               showControls ? 'opacity-100' : 'opacity-0'
             }`}>
               {/* Center Play Button */}
@@ -486,9 +486,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 )}
                 {video.cdnEnabled && (
                   <div className={`flex items-center space-x-2 px-3 py-1 rounded-lg text-sm font-medium ${
-                    cdnStatus === 'connected' ? 'bg-green-100 text-green-700' :
-                    cdnStatus === 'disconnected' ? 'bg-red-100 text-red-700' :
-                    'bg-yellow-100 text-yellow-700'
+                    cdnStatus === 'connected' ? 'bg-success/20 text-success' :
+                    cdnStatus === 'disconnected' ? 'bg-error/20 text-error' :
+                    'bg-warning/20 text-warning'
                   }`}>
                     {cdnStatus === 'connected' ? (
                       <Wifi size={14} />
@@ -520,7 +520,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <button 
                   onClick={handleDislike}
                   className={`flex items-center space-x-2 px-6 py-3 bg-white border border-light-border hover:bg-primary/20 rounded-xl transition-all duration-300 btn-animate ripple ${
-                    isDisliked ? 'text-red-400 bg-red-400/10' : ''
+                    isDisliked ? 'text-error bg-error/10' : ''
                   }`}
                 >
                   <ThumbsDown size={20} className={isDisliked ? 'fill-current' : ''} />
@@ -566,7 +566,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
             {/* FilCDN Info Panel */}
             {showFilecoinInfo && video.filecoinCID && (
-              <div className="mt-4 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-xl bounce-in">
+              <div className="mt-4 p-4 bg-primary/10 border border-primary/20 rounded-xl bounce-in">
                 <div className="flex items-center space-x-3 mb-3">
                   <Globe size={20} className="text-primary" />
                   <h3 className="font-semibold text-text-primary">FilCDN Storage Details</h3>
@@ -594,12 +594,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   )}
                 </div>
                 {video.cdnEnabled && (
-                  <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="mt-3 p-2 bg-success/10 border border-success/20 rounded-lg">
                     <div className="flex items-center space-x-2">
-                      <Wifi size={16} className="text-green-600" />
-                      <span className="text-green-800 font-medium">CDN Acceleration Enabled</span>
+                      <Wifi size={16} className="text-success" />
+                      <span className="text-text-primary font-medium">CDN Acceleration Enabled</span>
                     </div>
-                    <p className="text-green-700 text-sm mt-1">
+                    <p className="text-text-secondary text-sm mt-1">
                       This video is delivered through a global CDN for optimal performance and reduced latency.
                     </p>
                   </div>
@@ -774,7 +774,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               <h3 className="font-bold text-lg text-text-primary">Up Next</h3>
               <button 
                 onClick={() => setShowUploadModal(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary rounded-xl text-white font-medium hover:scale-105 transition-all duration-300 text-sm ripple shadow-lg"
+                className="flex items-center space-x-2 px-4 py-2 bg-primary rounded-xl text-white font-medium hover:scale-105 transition-all duration-300 text-sm ripple shadow-lg"
               >
                 <Database size={16} />
                 <span>Upload to FilCDN</span>
@@ -804,7 +804,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                       </div>
                     )}
                     {upNextVideo.cdnEnabled && (
-                      <div className="absolute top-2 right-2 bg-green-500/90 backdrop-blur-sm rounded px-2 py-1">
+                      <div className="absolute top-2 right-2 bg-success/90 backdrop-blur-sm rounded px-2 py-1">
                         <Wifi size={10} className="text-white" />
                       </div>
                     )}
@@ -826,7 +826,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                       {upNextVideo.cdnEnabled && (
                         <>
                           <span>•</span>
-                          <span className="text-green-600">CDN</span>
+                          <span className="text-success">CDN</span>
                         </>
                       )}
                     </div>
@@ -849,7 +849,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             <div className="bg-white rounded-2xl p-6 border border-secondary/20 relative overflow-hidden shadow-sm">
               {/* Success notification */}
               {showInvestmentSuccess && (
-                <div className="absolute top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg bounce-in z-10">
+                <div className="absolute top-4 right-4 bg-success text-white px-4 py-2 rounded-lg shadow-lg bounce-in z-10">
                   <div className="flex items-center space-x-2">
                     <Sparkles size={16} />
                     <span className="text-sm font-medium">Investment successful!</span>
@@ -886,21 +886,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center p-3 bg-white border border-light-border rounded-xl card-hover">
                   <div className="flex items-center justify-center mb-2">
-                    <Users size={20} className="text-blue-400" />
+                    <Users size={20} className="text-primary" />
                   </div>
                   <div className="text-lg font-bold text-text-primary">{totalInvestors}</div>
                   <div className="text-xs text-text-muted">Investors</div>
                 </div>
                 <div className="text-center p-3 bg-white border border-light-border rounded-xl card-hover">
                   <div className="flex items-center justify-center mb-2">
-                    <TrendingUp size={20} className="text-green-400" />
+                    <TrendingUp size={20} className="text-success" />
                   </div>
                   <div className="text-lg font-bold text-text-primary">{formatCurrency(totalInvestment / totalInvestors)}</div>
                   <div className="text-xs text-text-muted">Average</div>
                 </div>
                 <div className="text-center p-3 bg-white border border-light-border rounded-xl card-hover">
                   <div className="flex items-center justify-center mb-2">
-                    <Target size={20} className="text-purple-400" />
+                    <Target size={20} className="text-secondary" />
                   </div>
                   <div className="text-lg font-bold text-text-primary">{Math.max(0, Math.round((investmentGoal - totalInvestment) / 1000))}K</div>
                   <div className="text-xs text-text-muted">Remaining</div>

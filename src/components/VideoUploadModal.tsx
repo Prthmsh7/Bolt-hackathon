@@ -418,16 +418,12 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
 
           <div className="p-6 space-y-8">
             {/* FilCDN Status Banner */}
-            <div className={`p-6 bg-gradient-to-r ${
-              isFileCDNEnabled 
-                ? 'from-primary/10 to-secondary/10 border-primary/20' 
-                : 'from-yellow-500/10 to-orange-500/10 border-yellow-500/20'
-            } border rounded-xl`}>
+            <div className={`p-6 bg-primary/10 border border-primary/20 rounded-xl`}>
               <div className="flex items-center space-x-4 mb-4">
                 {isFileCDNEnabled ? (
                   <Globe size={24} className="text-primary" />
                 ) : (
-                  <AlertTriangle size={24} className="text-yellow-500" />
+                  <AlertTriangle size={24} className="text-warning" />
                 )}
                 <h3 className="font-bold text-xl text-text-primary">
                   {isFileCDNEnabled ? 'Powered by FilCDN + Filecoin Network' : 'Demo Mode Active'}
@@ -443,15 +439,15 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
               {isFileCDNEnabled && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div className="flex items-center space-x-2">
-                    <CheckCircle size={16} className="text-green-500" />
+                    <CheckCircle size={16} className="text-success" />
                     <span>Filecoin Storage</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <CheckCircle size={16} className="text-green-500" />
+                    <CheckCircle size={16} className="text-success" />
                     <span>CDN Acceleration</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <CheckCircle size={16} className="text-green-500" />
+                    <CheckCircle size={16} className="text-success" />
                     <span>Global Distribution</span>
                   </div>
                 </div>
@@ -491,8 +487,8 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
 
             {/* Error Message */}
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-                <p className="text-red-600 font-medium">{error}</p>
+              <div className="p-4 bg-error/10 border border-error/20 rounded-xl">
+                <p className="text-error font-medium">{error}</p>
               </div>
             )}
 
@@ -698,7 +694,7 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
                     </button>
                     {thumbnailFile && (
                       <div className="flex items-center space-x-3 text-text-secondary">
-                        <CheckCircle size={20} className="text-green-500" />
+                        <CheckCircle size={20} className="text-success" />
                         <span>{thumbnailFile.name}</span>
                       </div>
                     )}
@@ -729,7 +725,7 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
                 </div>
                 <div className="w-full bg-light-border rounded-full h-3">
                   <div 
-                    className="bg-gradient-to-r from-primary to-secondary h-3 rounded-full transition-all duration-300"
+                    className="bg-primary h-3 rounded-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   ></div>
                 </div>
@@ -748,7 +744,7 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
               <button
                 onClick={handleUpload}
                 disabled={!selectedFile || !title.trim() || !channelName.trim() || isUploading || !isAuthenticated}
-                className="px-10 py-4 bg-gradient-to-r from-primary to-secondary hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 rounded-xl font-bold text-white transition-all duration-300 flex items-center space-x-3 shadow-lg text-lg"
+                className="px-10 py-4 bg-primary hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 rounded-xl font-bold text-white transition-all duration-300 flex items-center space-x-3 shadow-lg text-lg"
               >
                 {isUploading ? (
                   <>

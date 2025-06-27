@@ -227,12 +227,12 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
   return (
     <div className="space-y-8">
       {/* Current Auction - Hero Section */}
-      <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 rounded-3xl border border-primary/20 p-8 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/20 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
+      <div className="bg-accent rounded-3xl border border-light-border p-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full -translate-y-32 translate-x-32"></div>
         
         <div className="relative z-10">
           <div className="flex items-center space-x-4 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center shadow-lg">
               <Gavel size={32} className="text-white" />
             </div>
             <div>
@@ -240,12 +240,12 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
               <p className="text-text-secondary text-lg">Today's featured innovation share</p>
             </div>
             <div className="ml-auto flex items-center space-x-3">
-              <div className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center space-x-2 animate-pulse">
+              <div className="bg-error text-white px-4 py-2 rounded-full text-sm font-bold flex items-center space-x-2 animate-pulse">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
                 <span>LIVE</span>
               </div>
               {currentAuction.is_featured && (
-                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center space-x-2">
+                <div className="bg-secondary text-white px-4 py-2 rounded-full text-sm font-bold flex items-center space-x-2">
                   <Crown size={16} />
                   <span>FEATURED</span>
                 </div>
@@ -259,7 +259,7 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
               <div className="flex items-center space-x-6">
                 <div className="w-32 h-32 relative">
                   {nounSvg}
-                  <div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                  <div className="absolute -top-3 -right-3 w-8 h-8 bg-secondary rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
                     #{currentAuction.nounId}
                   </div>
                 </div>
@@ -289,7 +289,7 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
                     <span>{currentAuction.views_count}</span>
                   </div>
                   <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-sm flex items-center space-x-1">
-                    <Heart size={12} className="fill-current text-red-400" />
+                    <Heart size={12} className="fill-current text-error" />
                     <span>{currentAuction.likes_count}</span>
                   </div>
                 </div>
@@ -320,14 +320,14 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-lg font-bold text-text-primary">Time Remaining</h4>
-                  <Timer className="text-red-500" size={24} />
+                  <Timer className="text-error" size={24} />
                 </div>
-                <div className="text-4xl font-bold text-red-500 mb-2">
+                <div className="text-4xl font-bold text-error mb-2">
                   {formatTime(timeLeft)}
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
-                    className="bg-gradient-to-r from-red-500 to-orange-500 h-2 rounded-full transition-all duration-1000"
+                    className="bg-error h-2 rounded-full transition-all duration-1000"
                     style={{ width: `${Math.max(10, (timeLeft / currentAuction.time_remaining) * 100)}%` }}
                   ></div>
                 </div>
@@ -337,9 +337,9 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-lg font-bold text-text-primary">Current Bid</h4>
-                  <TrendingUp className="text-green-500" size={24} />
+                  <TrendingUp className="text-success" size={24} />
                 </div>
-                <div className="text-4xl font-bold text-green-500 mb-2">
+                <div className="text-4xl font-bold text-success mb-2">
                   {formatCurrency(currentAuction.current_bid)}
                 </div>
                 <div className="flex items-center justify-between text-sm text-text-muted">
@@ -370,7 +370,7 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
                   <button
                     onClick={handleBid}
                     disabled={!bidAmount || parseFloat(bidAmount) < getMinimumBid() || timeLeft <= 0}
-                    className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all duration-300 shadow-lg text-lg flex items-center justify-center space-x-2"
+                    className="w-full py-4 bg-primary text-white rounded-xl font-bold hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all duration-300 shadow-lg text-lg flex items-center justify-center space-x-2"
                   >
                     <Gavel size={20} />
                     <span>Place Bid</span>
@@ -406,7 +406,7 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
       <div className="bg-white rounded-2xl border border-light-border p-8 shadow-sm">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
               <Clock size={24} className="text-white" />
             </div>
             <div>
@@ -446,18 +446,18 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
                   alt={item.title}
                   className="w-full h-40 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute top-3 left-3 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                <div className="absolute top-3 left-3 bg-primary text-white px-2 py-1 rounded-full text-xs font-medium">
                   Starts in {formatTime(item.time_remaining)}
                 </div>
                 {item.is_featured && (
-                  <div className="absolute top-3 right-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
+                  <div className="absolute top-3 right-3 bg-secondary text-white px-2 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
                     <Crown size={10} />
                     <span>FEATURED</span>
                   </div>
                 )}
                 <div className="absolute bottom-3 right-3 flex items-center space-x-2">
                   <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs flex items-center space-x-1">
-                    <Heart size={10} className="fill-current text-red-400" />
+                    <Heart size={10} className="fill-current text-error" />
                     <span>{item.likes_count}</span>
                   </div>
                 </div>
@@ -489,7 +489,7 @@ const AuctionSystem: React.FC<AuctionSystemProps> = ({ onBid, onViewItem }) => {
       <div className="bg-white rounded-2xl border border-light-border p-8 shadow-sm">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-gray-500 to-gray-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
               <Gavel size={24} className="text-white" />
             </div>
             <div>
