@@ -509,8 +509,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               <div className="flex items-center space-x-3">
                 <button 
                   onClick={handleLike}
-                  className={`flex items-center space-x-2 px-6 py-3 bg-white border border-light-border hover:bg-primary/20 rounded-xl transition-all duration-300 btn-animate ripple ${
-                    isLiked ? 'text-primary bg-primary/10' : ''
+                  className={`neo-btn flex items-center space-x-2 px-6 py-3 ${
+                    isLiked ? 'bg-primary text-white' : 'bg-white'
                   }`}
                 >
                   <Heart size={20} className={isLiked ? 'fill-current' : ''} />
@@ -519,8 +519,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 
                 <button 
                   onClick={handleDislike}
-                  className={`flex items-center space-x-2 px-6 py-3 bg-white border border-light-border hover:bg-primary/20 rounded-xl transition-all duration-300 btn-animate ripple ${
-                    isDisliked ? 'text-error bg-error/10' : ''
+                  className={`neo-btn flex items-center space-x-2 px-6 py-3 ${
+                    isDisliked ? 'bg-error text-white' : 'bg-white'
                   }`}
                 >
                   <ThumbsDown size={20} className={isDisliked ? 'fill-current' : ''} />
@@ -529,7 +529,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <div className="relative">
                   <button 
                     onClick={() => setShowShareMenu(!showShareMenu)}
-                    className="flex items-center space-x-2 px-6 py-3 bg-white border border-light-border hover:bg-primary/20 rounded-xl transition-all duration-300 btn-animate ripple"
+                    className="neo-btn flex items-center space-x-2 px-6 py-3 bg-white"
                   >
                     <Share size={20} />
                     <span className="font-medium">Share</span>
@@ -550,15 +550,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 
                 <button 
                   onClick={handleSave}
-                  className={`flex items-center space-x-2 px-6 py-3 bg-white border border-light-border hover:bg-primary/20 rounded-xl transition-all duration-300 btn-animate ripple ${
-                    isSaved ? 'text-secondary bg-secondary/10' : ''
+                  className={`neo-btn flex items-center space-x-2 px-6 py-3 ${
+                    isSaved ? 'bg-secondary text-white' : 'bg-white'
                   }`}
                 >
                   <Bookmark size={20} className={isSaved ? 'fill-current' : ''} />
                   <span className="font-medium">Save</span>
                 </button>
                 
-                <button className="p-3 bg-white border border-light-border hover:bg-primary/20 rounded-xl transition-all duration-300 scale-hover ripple">
+                <button className="neo-btn p-3 bg-white">
                   <MoreHorizontal size={20} />
                 </button>
               </div>
@@ -629,7 +629,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           </div>
 
           {/* Channel Info */}
-          <div className="bg-white rounded-2xl p-6 mb-6 border border-light-border slide-in-right shadow-sm">
+          <div className="neo-card bg-white p-6 mb-6 slide-in-right">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-4">
                 <div className="relative">
@@ -649,10 +649,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               <div className="flex items-center space-x-3">
                 <button 
                   onClick={() => setIsSubscribed(!isSubscribed)}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 btn-animate ripple ${
+                  className={`neo-btn flex items-center space-x-2 px-6 py-3 ${
                     isSubscribed 
-                      ? 'bg-white border border-light-border text-text-secondary hover:bg-light-hover' 
-                      : 'bg-primary text-white hover:scale-105 shadow-lg'
+                      ? 'bg-white text-text-secondary' 
+                      : 'bg-primary text-white'
                   }`}
                 >
                   <Zap size={18} />
@@ -677,7 +677,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           </div>
 
           {/* Comments Section */}
-          <div className="bg-white rounded-2xl p-6 border border-light-border slide-in-left shadow-sm">
+          <div className="neo-card bg-white p-6 slide-in-left">
             <h3 className="font-bold mb-6 text-xl text-text-primary flex items-center space-x-2">
               <Send size={20} className="text-primary" />
               <span>1,234 Comments</span>
@@ -700,7 +700,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   <button className="px-4 py-2 text-text-secondary hover:text-text-primary transition-all duration-300 scale-hover">
                     Cancel
                   </button>
-                  <button className="px-6 py-2 bg-primary rounded-xl text-white font-medium hover:scale-105 transition-all duration-300 ripple">
+                  <button className="neo-btn px-6 py-2 bg-primary text-white">
                     Comment
                   </button>
                 </div>
@@ -769,12 +769,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         {/* Right Sidebar */}
         <div className="lg:w-96 space-y-6 slide-in-right">
           {/* Up Next Section */}
-          <div className="bg-white rounded-2xl p-6 border border-light-border shadow-sm">
+          <div className="neo-card bg-white p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-bold text-lg text-text-primary">Up Next</h3>
               <button 
                 onClick={() => setShowUploadModal(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-primary rounded-xl text-white font-medium hover:scale-105 transition-all duration-300 text-sm ripple shadow-lg"
+                className="neo-btn flex items-center space-x-2 px-4 py-2 bg-primary text-white text-sm"
               >
                 <Database size={16} />
                 <span>Upload to FilCDN</span>
@@ -786,49 +786,51 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               {upNextVideos.map((upNextVideo, index) => (
                 <div 
                   key={upNextVideo.id} 
-                  className="flex space-x-3 cursor-pointer hover:bg-primary/10 p-3 rounded-xl transition-all duration-300 card-hover stagger-item" 
+                  className="neo-card bg-white p-3 cursor-pointer stagger-item" 
                   onClick={() => onVideoSelect(currentVideoIndex + index + 1)}
                 >
-                  <div className="relative flex-shrink-0">
-                    <img 
-                      src={upNextVideo.thumbnail} 
-                      alt={upNextVideo.title}
-                      className="w-40 aspect-video object-cover rounded-lg video-thumbnail"
-                    />
-                    <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-mono backdrop-blur-sm">
-                      {upNextVideo.duration}
-                    </div>
-                    {upNextVideo.filecoinCID && (
-                      <div className="absolute top-2 left-2 bg-primary/90 backdrop-blur-sm rounded px-2 py-1">
-                        <Database size={10} className="text-white" />
+                  <div className="flex space-x-3">
+                    <div className="relative flex-shrink-0">
+                      <img 
+                        src={upNextVideo.thumbnail} 
+                        alt={upNextVideo.title}
+                        className="w-40 aspect-video object-cover rounded-lg video-thumbnail"
+                      />
+                      <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-mono backdrop-blur-sm">
+                        {upNextVideo.duration}
                       </div>
-                    )}
-                    {upNextVideo.cdnEnabled && (
-                      <div className="absolute top-2 right-2 bg-success/90 backdrop-blur-sm rounded px-2 py-1">
-                        <Wifi size={10} className="text-white" />
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm line-clamp-2 mb-2 text-text-primary">{upNextVideo.title}</h4>
-                    <p className="text-text-secondary text-xs mb-1 font-medium">{upNextVideo.channel}</p>
-                    <div className="flex items-center space-x-2 text-text-muted text-xs">
-                      <span>{upNextVideo.views}</span>
-                      <span>•</span>
-                      <span>{upNextVideo.timestamp}</span>
                       {upNextVideo.filecoinCID && (
-                        <>
-                          <span>•</span>
-                          <span className="text-primary">FilCDN</span>
-                        </>
+                        <div className="absolute top-2 left-2 bg-primary/90 backdrop-blur-sm rounded px-2 py-1">
+                          <Database size={10} className="text-white" />
+                        </div>
                       )}
                       {upNextVideo.cdnEnabled && (
-                        <>
-                          <span>•</span>
-                          <span className="text-success">CDN</span>
-                        </>
+                        <div className="absolute top-2 right-2 bg-success/90 backdrop-blur-sm rounded px-2 py-1">
+                          <Wifi size={10} className="text-white" />
+                        </div>
                       )}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-sm line-clamp-2 mb-2 text-text-primary">{upNextVideo.title}</h4>
+                      <p className="text-text-secondary text-xs mb-1 font-medium">{upNextVideo.channel}</p>
+                      <div className="flex items-center space-x-2 text-text-muted text-xs">
+                        <span>{upNextVideo.views}</span>
+                        <span>•</span>
+                        <span>{upNextVideo.timestamp}</span>
+                        {upNextVideo.filecoinCID && (
+                          <>
+                            <span>•</span>
+                            <span className="text-primary">FilCDN</span>
+                          </>
+                        )}
+                        {upNextVideo.cdnEnabled && (
+                          <>
+                            <span>•</span>
+                            <span className="text-success">CDN</span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -846,7 +848,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
           {/* Investment Section */}
           {isInvestmentFocused && (
-            <div className="bg-white rounded-2xl p-6 border border-secondary/20 relative overflow-hidden shadow-sm">
+            <div className="neo-card bg-white relative overflow-hidden">
               {/* Success notification */}
               {showInvestmentSuccess && (
                 <div className="absolute top-4 right-4 bg-success text-white px-4 py-2 rounded-lg shadow-lg bounce-in z-10">
@@ -857,48 +859,50 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </div>
               )}
               
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center pulse-glow">
-                  <DollarSign size={20} className="text-white" />
+              <div className="p-6 border-b border-light-border">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center pulse-glow">
+                    <DollarSign size={20} className="text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-text-primary">Invest in Content</h3>
                 </div>
-                <h3 className="text-xl font-bold text-text-primary">Invest in Content</h3>
-              </div>
-              
-              {/* Investment Progress */}
-              <div className="mb-6">
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-sm text-text-secondary font-medium">Funding Progress</span>
-                  <span className="text-sm font-bold text-secondary">{Math.round(progressPercentage)}%</span>
-                </div>
-                <div className="w-full bg-light-border rounded-full h-3 mb-3 overflow-hidden">
-                  <div 
-                    className="progress-bar h-3 rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: `${Math.min(progressPercentage, 100)}%`, background: '#FF9800' }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-secondary font-bold">{formatCurrency(totalInvestment)}</span>
-                  <span className="text-text-muted">Goal: {formatCurrency(investmentGoal)}</span>
+                
+                {/* Investment Progress */}
+                <div className="mb-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-sm text-text-secondary font-medium">Funding Progress</span>
+                    <span className="text-sm font-bold text-secondary">{Math.round(progressPercentage)}%</span>
+                  </div>
+                  <div className="w-full bg-light-border rounded-full h-3 mb-3 overflow-hidden">
+                    <div 
+                      className="progress-bar h-3 rounded-full transition-all duration-1000 ease-out"
+                      style={{ width: `${Math.min(progressPercentage, 100)}%`, background: '#FF9800' }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-secondary font-bold">{formatCurrency(totalInvestment)}</span>
+                    <span className="text-text-muted">Goal: {formatCurrency(investmentGoal)}</span>
+                  </div>
                 </div>
               </div>
 
               {/* Investment Stats */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center p-3 bg-white border border-light-border rounded-xl card-hover">
+              <div className="grid grid-cols-3 gap-4 p-6 border-b border-light-border">
+                <div className="text-center p-3 neo-card bg-white">
                   <div className="flex items-center justify-center mb-2">
                     <Users size={20} className="text-primary" />
                   </div>
                   <div className="text-lg font-bold text-text-primary">{totalInvestors}</div>
                   <div className="text-xs text-text-muted">Investors</div>
                 </div>
-                <div className="text-center p-3 bg-white border border-light-border rounded-xl card-hover">
+                <div className="text-center p-3 neo-card bg-white">
                   <div className="flex items-center justify-center mb-2">
                     <TrendingUp size={20} className="text-success" />
                   </div>
                   <div className="text-lg font-bold text-text-primary">{formatCurrency(totalInvestment / totalInvestors)}</div>
                   <div className="text-xs text-text-muted">Average</div>
                 </div>
-                <div className="text-center p-3 bg-white border border-light-border rounded-xl card-hover">
+                <div className="text-center p-3 neo-card bg-white">
                   <div className="flex items-center justify-center mb-2">
                     <Target size={20} className="text-secondary" />
                   </div>
@@ -908,21 +912,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               </div>
 
               {/* Investment Tiers */}
-              <div className="mb-6">
+              <div className="p-6 border-b border-light-border">
                 <h4 className="text-sm font-semibold mb-4 text-text-primary">Investment Tiers</h4>
                 <div className="space-y-3">
                   {investmentTiers.map((tier, index) => {
                     const IconComponent = tier.icon;
+                    const tierClass = tier.name.toLowerCase();
+                    
                     return (
                       <div 
                         key={tier.name}
-                        className={`border rounded-xl p-4 cursor-pointer transition-all duration-300 stagger-item ${
-                          selectedInvestmentTier === tier.name 
-                            ? 'border-secondary bg-secondary/10' 
-                            : 'border-light-border hover:border-primary/50 hover:bg-primary/5'
-                        }`}
+                        className={`investment-tier ${tierClass} ${selectedInvestmentTier === tier.name ? 'selected' : ''}`}
                         onClick={() => setSelectedInvestmentTier(tier.name)}
-                        style={{ animationDelay: `${index * 0.1}s`, backgroundColor: selectedInvestmentTier === tier.name ? tier.bgColor : '' }}
+                        style={{ animationDelay: `${index * 0.1}s` }}
                       >
                         <div className="flex justify-between items-center mb-2">
                           <div className="flex items-center space-x-2">
@@ -945,7 +947,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               </div>
 
               {/* Investment Input */}
-              <div className="space-y-4">
+              <div className="p-6">
                 <input
                   type="number"
                   placeholder="Enter amount ($50 minimum)"
@@ -955,7 +957,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   min="50"
                 />
                 {investmentAmount && getInvestmentTier(parseFloat(investmentAmount)) && (
-                  <div className="text-sm text-secondary font-semibold flex items-center space-x-2 bounce-in">
+                  <div className="text-sm text-secondary font-semibold flex items-center space-x-2 mt-3 bounce-in">
                     <Zap size={16} />
                     <span>{getInvestmentTier(parseFloat(investmentAmount))?.name} Tier Selected</span>
                   </div>
@@ -963,15 +965,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <button
                   onClick={handleInvestment}
                   disabled={!investmentAmount || parseFloat(investmentAmount) < 50}
-                  className="w-full py-3 bg-secondary hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 rounded-xl font-semibold text-white transition-all duration-300 btn-animate ripple"
+                  className="neo-btn w-full py-3 bg-secondary text-white font-semibold mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Invest Now
                 </button>
+                
+                <p className="text-xs text-text-muted mt-4 text-center">
+                  * Subject to terms and conditions
+                </p>
               </div>
-              
-              <p className="text-xs text-text-muted mt-4 text-center">
-                * Subject to terms and conditions
-              </p>
             </div>
           )}
         </div>
