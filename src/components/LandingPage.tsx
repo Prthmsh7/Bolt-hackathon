@@ -6,7 +6,16 @@ import {
   TrendingUp, 
   DollarSign, 
   Star, 
-  CheckCircle
+  CheckCircle, 
+  Play,
+  MessageCircle,
+  Sparkles,
+  Crown,
+  Building,
+  Briefcase,
+  PieChart,
+  BarChart3,
+  Activity
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -21,25 +30,25 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   }, []);
 
   return (
-    <div className={`min-h-screen bg-black text-white overflow-hidden transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`min-h-screen bg-yellow-400 text-black overflow-hidden transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="space-y-6">
-                <div className="inline-flex items-center space-x-2 bg-yellow-400/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                  <Star size={16} className="text-yellow-400" />
-                  <span className="text-sm font-medium text-yellow-400">Powered by Blockchain & AI</span>
+                <div className="neo-btn inline-flex items-center space-x-2 bg-white px-4 py-2">
+                  <Sparkles size={16} className="text-black" />
+                  <span className="text-sm font-medium text-black">Powered by Blockchain & AI</span>
                 </div>
                 
                 <h1 className="text-5xl lg:text-7xl font-black leading-tight">
-                  <span className="text-white">
+                  <span className="text-black">
                     Seedora
                   </span>
                 </h1>
                 
-                <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-2xl">
+                <p className="text-xl lg:text-2xl text-black leading-relaxed max-w-2xl">
                   The ultimate platform for developers and investors. Register your IP, showcase your projects, and discover the next big innovation.
                 </p>
               </div>
@@ -47,60 +56,71 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={onGetStarted}
-                  className="flex items-center justify-center space-x-3 px-8 py-4 bg-yellow-400 text-black font-bold text-lg rounded-xl hover:bg-yellow-300 transition-all duration-300"
+                  className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-black text-white font-bold text-lg"
                 >
                   <span>Get Started Free</span>
                   <ArrowRight size={20} />
                 </button>
                 
-                <button className="flex items-center justify-center space-x-3 px-8 py-4 bg-transparent border border-white text-white font-semibold text-lg rounded-xl hover:bg-white/10 transition-all duration-300">
-                  <span>Learn More</span>
+                <button className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-white text-black font-semibold text-lg">
+                  <Play size={20} />
+                  <span>Watch Demo</span>
                 </button>
               </div>
 
-              <div className="flex items-center space-x-8 text-sm text-gray-400">
+              <div className="flex items-center space-x-8 text-sm text-black">
                 <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-yellow-400" />
+                  <CheckCircle size={16} className="text-black" />
                   <span>No credit card required</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-yellow-400" />
+                  <CheckCircle size={16} className="text-black" />
                   <span>Free forever plan</span>
                 </div>
               </div>
             </div>
 
-            <div className="relative hidden lg:block">
-              <div className="bg-white/10 backdrop-blur-sm p-8 rounded-xl border border-white/20">
+            <div className="relative">
+              <div className="neo-card bg-white p-8 text-black">
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold">Platform Stats</h3>
-                    <div className="flex items-center space-x-2 text-yellow-400">
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                    <h3 className="text-xl font-bold">Live Platform Stats</h3>
+                    <div className="flex items-center space-x-2 text-green-600">
+                      <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
                       <span className="text-sm font-medium">Live</span>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-4 bg-white/5 backdrop-blur-sm rounded-lg">
-                      <DollarSign className="mx-auto mb-2 text-yellow-400" size={24} />
-                      <div className="text-2xl font-bold text-white">$2.4M</div>
-                      <div className="text-sm text-gray-400">Total Investment</div>
+                    <div className="text-center p-4 neo-card bg-white">
+                      <DollarSign className="mx-auto mb-2 text-black" size={24} />
+                      <div className="text-2xl font-bold text-black">$2.4M</div>
+                      <div className="text-sm text-gray-600">Total Investment</div>
                     </div>
-                    <div className="text-center p-4 bg-white/5 backdrop-blur-sm rounded-lg">
-                      <Shield className="mx-auto mb-2 text-yellow-400" size={24} />
-                      <div className="text-2xl font-bold text-white">500+</div>
-                      <div className="text-sm text-gray-400">Projects Protected</div>
+                    <div className="text-center p-4 neo-card bg-white">
+                      <Shield className="mx-auto mb-2 text-black" size={24} />
+                      <div className="text-2xl font-bold text-black">500+</div>
+                      <div className="text-sm text-gray-600">Projects Protected</div>
                     </div>
-                    <div className="text-center p-4 bg-white/5 backdrop-blur-sm rounded-lg">
-                      <Github className="mx-auto mb-2 text-yellow-400" size={24} />
-                      <div className="text-2xl font-bold text-white">1.2K</div>
-                      <div className="text-sm text-gray-400">GitHub Repos</div>
+                    <div className="text-center p-4 neo-card bg-white">
+                      <Github className="mx-auto mb-2 text-black" size={24} />
+                      <div className="text-2xl font-bold text-black">1.2K</div>
+                      <div className="text-sm text-gray-600">GitHub Repos</div>
                     </div>
-                    <div className="text-center p-4 bg-white/5 backdrop-blur-sm rounded-lg">
-                      <TrendingUp className="mx-auto mb-2 text-yellow-400" size={24} />
-                      <div className="text-2xl font-bold text-white">94%</div>
-                      <div className="text-sm text-gray-400">Success Rate</div>
+                    <div className="text-center p-4 neo-card bg-white">
+                      <TrendingUp className="mx-auto mb-2 text-black" size={24} />
+                      <div className="text-2xl font-bold text-black">94%</div>
+                      <div className="text-sm text-gray-600">Success Rate</div>
+                    </div>
+                  </div>
+                  
+                  <div className="neo-card bg-white p-4">
+                    <div className="flex items-center space-x-3">
+                      <MessageCircle size={20} className="text-black" />
+                      <div>
+                        <p className="font-semibold text-black">MCP Assistant Active</p>
+                        <p className="text-sm text-gray-600">AI-powered investment insights</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -115,74 +135,126 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-black mb-6">
-              Key Features
+              Everything you need to <span className="text-yellow-500">succeed</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               From IP protection to investment opportunities, Seedora provides all the tools developers and investors need.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-gray-50 p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="w-16 h-16 bg-yellow-100 rounded-xl flex items-center justify-center mb-6">
-                <Shield size={32} className="text-yellow-600" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="neo-card bg-yellow-400 p-8 cursor-pointer group">
+              <div className="w-16 h-16 bg-white border border-black rounded-xl flex items-center justify-center mb-6">
+                <Shield size={32} className="text-black" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">IP Protection</h3>
-              <p className="text-gray-600">Register your projects as intellectual property on the blockchain for permanent protection</p>
+              <h3 className="text-xl font-bold text-black mb-4">IP Protection</h3>
+              <p className="text-black leading-relaxed">Register your projects as intellectual property on the blockchain for permanent protection</p>
             </div>
             
-            <div className="bg-gray-50 p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="w-16 h-16 bg-yellow-100 rounded-xl flex items-center justify-center mb-6">
-                <Github size={32} className="text-yellow-600" />
+            <div className="neo-card bg-yellow-400 p-8 cursor-pointer group">
+              <div className="w-16 h-16 bg-white border border-black rounded-xl flex items-center justify-center mb-6">
+                <Github size={32} className="text-black" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">GitHub Integration</h3>
-              <p className="text-gray-600">Connect your GitHub repositories to showcase your technical expertise and code quality</p>
+              <h3 className="text-xl font-bold text-black mb-4">GitHub Integration</h3>
+              <p className="text-black leading-relaxed">Connect your GitHub repositories to showcase your technical expertise and code quality</p>
             </div>
             
-            <div className="bg-gray-50 p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="w-16 h-16 bg-yellow-100 rounded-xl flex items-center justify-center mb-6">
-                <TrendingUp size={32} className="text-yellow-600" />
+            <div className="neo-card bg-yellow-400 p-8 cursor-pointer group">
+              <div className="w-16 h-16 bg-white border border-black rounded-xl flex items-center justify-center mb-6">
+                <TrendingUp size={32} className="text-black" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Investment Opportunities</h3>
-              <p className="text-gray-600">Discover and invest in innovative projects from talented developers worldwide</p>
+              <h3 className="text-xl font-bold text-black mb-4">Investment Opportunities</h3>
+              <p className="text-black leading-relaxed">Discover and invest in innovative projects from talented developers worldwide</p>
+            </div>
+            
+            <div className="neo-card bg-yellow-400 p-8 cursor-pointer group">
+              <div className="w-16 h-16 bg-white border border-black rounded-xl flex items-center justify-center mb-6">
+                <BarChart3 size={32} className="text-black" />
+              </div>
+              <h3 className="text-xl font-bold text-black mb-4">MCP Analytics</h3>
+              <p className="text-black leading-relaxed">AI-powered insights using Machine Callable Programs for smart investment decisions</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-yellow-400">
+      <section className="py-20 bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl lg:text-5xl font-bold text-black mb-6">
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
             Ready to protect your innovations?
           </h2>
-          <p className="text-xl text-black/80 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
             Join thousands of developers who trust Seedora to protect their intellectual property and connect with investors.
           </p>
           
-          <button
-            onClick={onGetStarted}
-            className="flex items-center justify-center space-x-3 px-8 py-4 bg-black text-white font-bold text-lg rounded-xl mx-auto hover:bg-gray-900 transition-all duration-300"
-          >
-            <span>Start Building Today</span>
-            <ArrowRight size={20} />
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={onGetStarted}
+              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-yellow-400 text-black font-bold text-lg"
+            >
+              <span>Start Building Today</span>
+              <ArrowRight size={20} />
+            </button>
+            
+            <button className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-white text-black font-semibold text-lg">
+              <MessageCircle size={20} />
+              <span>Talk to Sales</span>
+            </button>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-black text-white py-16">
+      <footer className="bg-yellow-400 text-black py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h3 className="text-2xl font-bold mb-4">
-              <span className="text-white">Seedora</span>
-            </h3>
-            <p className="text-gray-400 max-w-md mx-auto mb-8">
-              The ultimate platform for developers and investors to protect IP and discover innovations.
-            </p>
-            <p className="text-gray-500 text-sm">
-              &copy; 2024 Seedora. All rights reserved.
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="space-y-4">
+              <h3 className="text-2xl font-bold">
+                <span className="text-black">Seedora</span>
+              </h3>
+              <p className="text-black/80 leading-relaxed">
+                The ultimate platform for developers and investors to protect IP and discover innovations.
+              </p>
+              <div className="flex items-center space-x-4">
+                <Github size={20} className="text-black/60 hover:text-black cursor-pointer transition-colors" />
+                <MessageCircle size={20} className="text-black/60 hover:text-black cursor-pointer transition-colors" />
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-black/80">
+                <li><a href="#" className="hover:text-black transition-colors">Features</a></li>
+                <li><a href="#" className="hover:text-black transition-colors">Pricing</a></li>
+                <li><a href="#" className="hover:text-black transition-colors">API</a></li>
+                <li><a href="#" className="hover:text-black transition-colors">Documentation</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-black/80">
+                <li><a href="#" className="hover:text-black transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-black transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-black transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-black transition-colors">Contact</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-4">Support</h4>
+              <ul className="space-y-2 text-black/80">
+                <li><a href="#" className="hover:text-black transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-black transition-colors">Community</a></li>
+                <li><a href="#" className="hover:text-black transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-black transition-colors">Terms of Service</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-black/20 mt-12 pt-8 text-center text-black/60">
+            <p>&copy; 2024 Seedora. All rights reserved. Built with ❤️ for developers worldwide.</p>
           </div>
         </div>
       </footer>

@@ -40,6 +40,76 @@ body {
   background: #333333;
 }
 
+/* Neo-brutalism card styles */
+.neo-card {
+  background: #FFFFFF;
+  border: 1px solid #141414;
+  border-radius: 12px;
+  box-shadow: 5px 5px 0 #141414;
+  transition: all 0.2s ease;
+}
+
+.neo-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 #141414;
+}
+
+.neo-card.accent {
+  background: #FFF59D;
+}
+
+.neo-card.secondary {
+  background: #FF9800;
+}
+
+/* Neo-brutalism button styles */
+.neo-btn {
+  background: #FFFFFF;
+  border: 1px solid #141414;
+  border-radius: 8px;
+  box-shadow: 5px 5px 0 #141414;
+  padding: 10px 20px;
+  font-weight: 600;
+  color: #141414;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.neo-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 #141414;
+}
+
+.neo-btn:active {
+  transform: translate(0, 0);
+  box-shadow: 3px 3px 0 #141414;
+}
+
+.neo-btn.primary {
+  background: #141414;
+  color: #FFFFFF;
+}
+
+.neo-btn.secondary {
+  background: #FF9800;
+  color: #FFFFFF;
+}
+
+.neo-btn.accent {
+  background: #FFF59D;
+  color: #141414;
+}
+
+.neo-btn.success {
+  background: #4CAF50;
+  color: #FFFFFF;
+}
+
+.neo-btn.error {
+  background: #f44336;
+  color: #FFFFFF;
+}
+
 /* Enhanced fade in animation */
 .fade-in {
   animation: fadeIn 0.8s ease;
