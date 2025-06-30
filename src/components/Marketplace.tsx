@@ -10,7 +10,6 @@ import {
   Star, 
   User, 
   Building, 
-  MapPin, 
   Calendar, 
   Code, 
   Github, 
@@ -29,11 +28,11 @@ import {
   Lightbulb,
   CheckCircle,
   Clock,
-  MapPin,
   Mail,
   Phone,
   AlertCircle,
-  Database
+  Database,
+  Globe
 } from 'lucide-react';
 import { demoProjects, developerProfiles, searchProjects, searchDevelopers, getDeveloperById, type DemoProject, type DeveloperProfile } from '../data/demoProjects';
 import { supabase } from '../lib/supabase';
