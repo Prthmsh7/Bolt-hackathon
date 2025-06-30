@@ -29,13 +29,16 @@ import {
   Lightbulb,
   CheckCircle,
   Clock,
-  Globe,
+  MapPin,
   Mail,
   Phone,
-  AlertCircle
+  AlertCircle,
+  Database
 } from 'lucide-react';
 import { demoProjects, developerProfiles, searchProjects, searchDevelopers, getDeveloperById, type DemoProject, type DeveloperProfile } from '../data/demoProjects';
 import { supabase } from '../lib/supabase';
+import InvestmentModal from './InvestmentModal';
+import { useAuth } from '../contexts/AuthContext';
 
 interface MarketplaceProps {
   onBack: () => void;
@@ -65,6 +68,7 @@ interface IPRegistration {
 }
 
 const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
+  const { user } = useAuth();
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<'projects' | 'developers'>('projects');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -82,6 +86,8 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   const [realProjects, setRealProjects] = useState<IPRegistration[]>([]);
   const [isLoadingRealProjects, setIsLoadingRealProjects] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showInvestmentModal, setShowInvestmentModal] = useState(false);
+  const [projectToInvest, setProjectToInvest] = useState<any>(null);
 
   const categories = [
     'all', 'AI/ML', 'Blockchain', 'Fintech', 'Healthtech', 'Edtech', 
@@ -196,7 +202,13 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
     // Apply search filter for developers
     if (searchQuery.trim()) {
-      filtered = searchDevelopers(searchQuery);
+      filtered = filtered.filter(developer => 
+        developer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        developer.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        developer.bio.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        developer.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        developer.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
     }
 
     setFilteredDevelopers(filtered);
@@ -210,6 +222,61 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   const handleDeveloperClick = (developer: DeveloperProfile) => {
     setSelectedDeveloper(developer);
     setShowDeveloperModal(true);
+  };
+
+  const handleInvestClick = (project: DemoProject | IPRegistration) => {
+    if (!user) {
+      alert("Please sign in to invest in this project");
+      return;
+    }
+    
+    setProjectToInvest(project);
+    setShowInvestmentModal(true);
+  };
+
+  const handleInvestmentSuccess = (amount: number) => {
+    // Update the project's purchase count in the UI
+    if (projectToInvest) {
+      const updatedProjects = projects.map(p => {
+        if (p.id === projectToInvest.id) {
+          return {
+            ...p,
+            purchase_count: (p.purchase_count || 0) + 1
+          };
+        }
+        return p;
+      });
+      
+      setProjects(updatedProjects);
+      
+      // Also update filtered projects
+      const updatedFilteredProjects = filteredProjects.map(p => {
+        if (p.id === projectToInvest.id) {
+          return {
+            ...p,
+            purchase_count: (p.purchase_count || 0) + 1
+          };
+        }
+        return p;
+      });
+      
+      setFilteredProjects(updatedFilteredProjects);
+      
+      // Update real projects if applicable
+      if (realProjects.some(p => p.id === projectToInvest.id)) {
+        const updatedRealProjects = realProjects.map(p => {
+          if (p.id === projectToInvest.id) {
+            return {
+              ...p,
+              purchase_count: (p.purchase_count || 0) + 1
+            };
+          }
+          return p;
+        });
+        
+        setRealProjects(updatedRealProjects);
+      }
+    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -304,8 +371,15 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
           </div>
         </div>
 
-        <button className="neo-btn w-full py-3 bg-secondary text-white font-medium hover:bg-secondary">
-          View Details
+        <button 
+          className="neo-btn w-full py-3 bg-secondary text-white font-medium hover:bg-secondary"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleInvestClick(project);
+          }}
+        >
+          {'status' in project && project.status === 'pending' ? 
+            'Express Interest' : 'Invest Now'}
         </button>
       </div>
     </div>
@@ -463,7 +537,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
               <div className="neo-card bg-white p-4 text-center">
                 <ShoppingBag size={24} className="mx-auto mb-2 text-success" />
                 <div className="text-2xl font-bold text-text-primary">{selectedProject.purchase_count}</div>
-                <div className="text-sm text-text-muted">Purchases</div>
+                <div className="text-sm text-text-muted">Investments</div>
               </div>
             </div>
 
@@ -572,7 +646,14 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
               </div>
 
               {/* Investment Button */}
-              <button className="neo-btn w-full py-4 bg-secondary text-white font-bold text-lg">
+              <button 
+                className="neo-btn w-full py-4 bg-secondary text-white font-bold text-lg"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleInvestClick(selectedProject);
+                  setShowProjectModal(false);
+                }}
+              >
                 {'status' in selectedProject && selectedProject.status === 'pending' ? 
                   'Express Interest (Pending Approval)' : 'Invest in This Project'}
               </button>
@@ -921,6 +1002,16 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
       {/* Modals */}
       {showProjectModal && renderProjectModal()}
       {showDeveloperModal && renderDeveloperModal()}
+      
+      {/* Investment Modal */}
+      {showInvestmentModal && projectToInvest && (
+        <InvestmentModal
+          isOpen={showInvestmentModal}
+          onClose={() => setShowInvestmentModal(false)}
+          project={projectToInvest}
+          onInvestmentSuccess={handleInvestmentSuccess}
+        />
+      )}
     </div>
   );
 };
