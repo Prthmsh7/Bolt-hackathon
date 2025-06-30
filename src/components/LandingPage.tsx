@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import * as THREE from 'three';
 import { 
   ArrowRight, 
   Rocket,
@@ -19,11 +18,6 @@ import {
   Database,
   Lightbulb
 } from 'lucide-react';
-import Gl from '../gl/index';
-import Type from '../gl/Type';
-import shaders from '../gl/shaders';
-import fontFileUrl from '../assets/fonts/Orbitron-Black.fnt?url';
-import fontAtlasUrl from '../assets/fonts/Orbitron-Black.png?url';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -33,39 +27,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Create the kinetic type
-    const options = {
-      word: 'SEEDORA',
-      color: '#ffffff',
-      fill: '#000000',
-      geometry: new THREE.TorusKnotGeometry(9, 3, 768, 3, 4, 3),
-      position: {
-        texture: [-0.965, -0.4, 0],
-        mesh: [0, 0, 0]
-      },
-      scale: [0.008, 0.04, 1],
-      shaders: {
-        vertex: shaders.vertex,
-        fragment: shaders.fragment
-      },
-      font: {
-        file: fontFileUrl,
-        atlas: fontAtlasUrl
-      }
-    };
-
-    const type = new Type();
-    type.init(options);
-    
     setIsLoaded(true);
-
-    // Cleanup function
-    return () => {
-      // Remove all objects from the scene
-      while(Gl.scene.children.length > 0) { 
-        Gl.scene.remove(Gl.scene.children[0]); 
-      }
-    };
   }, []);
 
   const features = [
@@ -100,6 +62,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
   return (
     <div className={`min-h-screen bg-black text-white overflow-hidden transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+      {/* CSS Endless Knot Background */}
+      <div className="endless-knot-container">
+        <div className="endless-knot">
+          <div className="knot-text">SEEDORA</div>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
@@ -184,11 +153,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               </div>
             </div>
           </div>
-        </div>
-        
-        {/* WebGL container for the 3D effect */}
-        <div className="absolute inset-0 z-0">
-          <div id="webgl" className="w-full h-full"></div>
         </div>
       </section>
 

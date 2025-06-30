@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import './three-global.js' // Import this first to ensure THREE is globally available
 import App from './App.tsx'
 import './index.css'
 import { AuthProvider } from './contexts/AuthContext.tsx'
