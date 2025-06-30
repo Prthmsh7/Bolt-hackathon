@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Upload, 
   FileText, 
@@ -69,8 +69,31 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
     ipfsHash: string;
     ipfsUrl: string;
   } | null>(null);
+  const [pinataStatus, setPinataStatus] = useState<'idle' | 'checking' | 'ready' | 'error'>('idle');
 
   const pinataService = new PinataService();
+
+  // Check Pinata service status on component mount
+  useEffect(() => {
+    checkPinataStatus();
+  }, []);
+
+  const checkPinataStatus = async () => {
+    setPinataStatus('checking');
+    try {
+      // Create a small test object to verify Pinata is working
+      const testObject = { test: true, timestamp: new Date().toISOString() };
+      
+      // Try to upload to IPFS
+      await pinataService.uploadJSON(testObject);
+      
+      // If we get here, Pinata is working
+      setPinataStatus('ready');
+    } catch (err) {
+      console.error('Pinata service check failed:', err);
+      setPinataStatus('error');
+    }
+  };
 
   const categories = [
     'Fintech',
@@ -191,7 +214,7 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
         walletAddress,
         userId: user.id,
         registeredAt: new Date().toISOString(),
-        platform: 'start.dev',
+        platform: 'seedora',
       };
 
       const metadataHash = await pinataService.uploadJSON(metadata);
@@ -199,6 +222,33 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
       
       console.log('Metadata uploaded, hash:', metadataHash);
       console.log('IPFS URL:', ipfsUrl);
+
+      // Verify the IPFS hash is valid
+      const pinStatus = await pinataService.checkPinStatus(metadataHash);
+      console.log('Pin status:', pinStatus);
+      
+      if (!pinStatus.isValid) {
+        throw new Error('IPFS upload failed: Pin status check failed');
+      }
+
+      // Update user profile with wallet address if not already set
+      if (walletAddress) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: user.id,
+            wallet_address: walletAddress,
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'id'
+          });
+
+        if (profileError) {
+          console.warn('Profile update warning:', profileError);
+        } else {
+          console.log('Profile updated with wallet address');
+        }
+      }
 
       // Prepare data for database insertion with explicit column mapping
       const dbData = {
@@ -393,7 +443,29 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
         </p>
       </div>
 
-      {!pinataService.isConfigured() && (
+      {/* Pinata Status */}
+      {pinataStatus === 'checking' && (
+        <div className="flex items-center space-x-2 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <Loader2 size={20} className="text-blue-600 animate-spin flex-shrink-0" />
+          <p className="text-blue-700 text-sm">
+            Checking IPFS connection status...
+          </p>
+        </div>
+      )}
+
+      {pinataStatus === 'error' && (
+        <div className="flex items-center space-x-2 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+          <AlertCircle size={20} className="text-yellow-600 flex-shrink-0" />
+          <div>
+            <p className="text-yellow-700 text-sm font-medium">IPFS connection issue detected</p>
+            <p className="text-yellow-600 text-xs mt-1">
+              Using demo mode for IPFS storage. Your data will be simulated but not actually stored on IPFS.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {pinataStatus === 'ready' && !pinataService.isConfigured() && (
         <div className="flex items-center space-x-2 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
           <AlertCircle size={20} className="text-yellow-600 flex-shrink-0" />
           <p className="text-yellow-700 text-sm">
@@ -737,13 +809,18 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || pinataStatus === 'checking'}
           className="w-full py-4 bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-white font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
         >
           {loading ? (
             <>
               <Loader2 size={20} className="animate-spin" />
               <span>Registering Project...</span>
+            </>
+          ) : pinataStatus === 'checking' ? (
+            <>
+              <Loader2 size={20} className="animate-spin" />
+              <span>Checking IPFS Connection...</span>
             </>
           ) : (
             <>
