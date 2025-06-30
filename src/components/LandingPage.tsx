@@ -47,6 +47,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
     type.init(options);
     
     setIsLoaded(true);
+
+    // Cleanup function
+    return () => {
+      // Remove all objects from the scene
+      while(Gl.scene.children.length > 0) { 
+        Gl.scene.remove(Gl.scene.children[0]); 
+      }
+    };
   }, []);
 
   return (

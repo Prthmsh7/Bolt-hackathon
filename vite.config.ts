@@ -27,4 +27,14 @@ export default defineConfig({
       util: 'util',
     },
   },
+  build: {
+    rollupOptions: {
+      external: ['three'],
+      output: {
+        globals: {
+          three: 'THREE'
+        }
+      }
+    }
+  }
 })
