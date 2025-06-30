@@ -127,7 +127,8 @@ const createMockClient = () => {
         ip_registrations: [],
         marketplace_items: [],
         project_likes: [],
-        project_purchases: []
+        project_purchases: [],
+        videos: []
       };
       
       return {
@@ -144,7 +145,10 @@ const createMockClient = () => {
               };
             },
             limit: (n: number) => ({ data: (storage[table] || []).slice(0, n), error: null }),
-            order: () => ({ data: storage[table] || [], error: null }),
+            order: (column: string, { ascending }: { ascending: boolean }) => ({
+              data: storage[table] || [],
+              error: null
+            }),
             data: storage[table] || [],
             error: null,
             single: () => ({ data: (storage[table] || [])[0] || null, error: null })
@@ -254,6 +258,17 @@ const createMockClient = () => {
               }
               
               return { data: null, error: null };
+            }
+          };
+        },
+        // Add support for channel method
+        channel: (channelName: string) => {
+          return {
+            on: (event: string, filter: any, callback: Function) => {
+              // This is a mock implementation that doesn't actually listen for changes
+              return {
+                subscribe: () => ({})
+              };
             }
           };
         }
