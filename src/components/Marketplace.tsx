@@ -31,15 +31,22 @@ import {
   Clock,
   Globe,
   Mail,
-  Phone
+  Phone,
+  Wallet,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import { demoProjects, developerProfiles, searchProjects, searchDevelopers, getDeveloperById, type DemoProject, type DeveloperProfile } from '../data/demoProjects';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+import { WalletConnect } from './WalletConnect';
 
 interface MarketplaceProps {
   onBack: () => void;
 }
 
 const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
+  const { user } = useAuth();
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<'projects' | 'developers'>('projects');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -54,6 +61,14 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   const [selectedDeveloper, setSelectedDeveloper] = useState<DeveloperProfile | null>(null);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showDeveloperModal, setShowDeveloperModal] = useState(false);
+  const [walletConnected, setWalletConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState('');
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [investmentAmount, setInvestmentAmount] = useState('');
+  const [isInvesting, setIsInvesting] = useState(false);
+  const [investmentSuccess, setInvestmentSuccess] = useState(false);
+  const [investmentError, setInvestmentError] = useState('');
+  const [userPurchases, setUserPurchases] = useState<any[]>([]);
 
   const categories = [
     'all', 'AI/ML', 'Blockchain', 'Fintech', 'Healthtech', 'Edtech', 
@@ -62,7 +77,46 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
   useEffect(() => {
     setIsLoaded(true);
-  }, []);
+    checkWalletConnection();
+    if (user) {
+      fetchUserPurchases();
+    }
+  }, [user]);
+
+  // Check if wallet is already connected
+  const checkWalletConnection = () => {
+    const savedWalletState = localStorage.getItem('walletConnection');
+    if (savedWalletState) {
+      try {
+        const { connected, address } = JSON.parse(savedWalletState);
+        setWalletConnected(connected);
+        setWalletAddress(address);
+      } catch (error) {
+        console.error('Error loading wallet state:', error);
+      }
+    }
+  };
+
+  // Fetch user's previous purchases
+  const fetchUserPurchases = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('project_purchases')
+        .select('*, marketplace_item:marketplace_item_id(*)')
+        .eq('buyer_id', user.id);
+      
+      if (error) {
+        console.error('Error fetching purchases:', error);
+        return;
+      }
+      
+      setUserPurchases(data || []);
+    } catch (error) {
+      console.error('Error in purchase fetch:', error);
+    }
+  };
 
   // Filter and search logic for projects
   useEffect(() => {
@@ -112,6 +166,9 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   const handleProjectClick = (project: DemoProject) => {
     setSelectedProject(project);
     setShowProjectModal(true);
+    setInvestmentAmount('');
+    setInvestmentSuccess(false);
+    setInvestmentError('');
   };
 
   const handleDeveloperClick = (developer: DeveloperProfile) => {
@@ -136,6 +193,131 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
     });
   };
 
+  const handleWalletConnection = (connected: boolean, address: string = '') => {
+    setWalletConnected(connected);
+    setWalletAddress(address);
+    
+    // Save wallet state to localStorage
+    if (connected && address) {
+      localStorage.setItem('walletConnection', JSON.stringify({ connected, address }));
+      
+      // Update user profile with wallet address if logged in
+      if (user) {
+        updateUserProfile(address);
+      }
+    } else {
+      localStorage.removeItem('walletConnection');
+    }
+    
+    setShowWalletModal(false);
+  };
+
+  const updateUserProfile = async (address: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          wallet_address: address,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'id'
+        });
+
+      if (error) {
+        console.error('Error updating profile with wallet address:', error);
+      } else {
+        console.log('Profile updated with wallet address');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  };
+
+  const handleInvestment = async () => {
+    if (!selectedProject) return;
+    if (!user) {
+      setInvestmentError('You must be signed in to invest in projects');
+      return;
+    }
+    if (!walletConnected) {
+      setShowWalletModal(true);
+      return;
+    }
+    
+    const amount = parseFloat(investmentAmount);
+    if (isNaN(amount) || amount <= 0) {
+      setInvestmentError('Please enter a valid investment amount');
+      return;
+    }
+    
+    setIsInvesting(true);
+    setInvestmentError('');
+    
+    try {
+      // Generate a mock transaction hash
+      const txHash = `0x${Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+      
+      // Record the purchase in the database
+      const { data, error } = await supabase
+        .from('project_purchases')
+        .insert({
+          buyer_id: user.id,
+          marketplace_item_id: selectedProject.id,
+          purchase_price: amount,
+          transaction_hash: txHash,
+          status: 'completed',
+          created_at: new Date().toISOString(),
+          completed_at: new Date().toISOString()
+        })
+        .select();
+      
+      if (error) {
+        throw new Error(`Database error: ${error.message}`);
+      }
+      
+      // Update purchase count for the marketplace item
+      await supabase
+        .from('marketplace_items')
+        .update({ 
+          purchase_count: selectedProject.purchase_count + 1,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', selectedProject.id);
+      
+      // Update local state
+      setInvestmentSuccess(true);
+      
+      // Refresh user purchases
+      fetchUserPurchases();
+      
+      // Update the selected project in state
+      setSelectedProject({
+        ...selectedProject,
+        purchase_count: selectedProject.purchase_count + 1
+      });
+      
+      // Update the projects list
+      setProjects(projects.map(p => 
+        p.id === selectedProject.id 
+          ? { ...p, purchase_count: p.purchase_count + 1 } 
+          : p
+      ));
+      
+    } catch (error) {
+      console.error('Investment error:', error);
+      setInvestmentError(error instanceof Error ? error.message : 'Investment failed. Please try again.');
+    } finally {
+      setIsInvesting(false);
+    }
+  };
+
+  const isProjectPurchased = (projectId: string) => {
+    return userPurchases.some(purchase => 
+      purchase.marketplace_item && purchase.marketplace_item.id === projectId
+    );
+  };
+
   const renderProjectCard = (project: DemoProject, index: number) => (
     <div 
       key={project.id} 
@@ -155,6 +337,12 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
             <span className="bg-secondary text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
               <Crown size={12} />
               <span>FEATURED</span>
+            </span>
+          )}
+          {isProjectPurchased(project.id) && (
+            <span className="bg-success text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 ml-2">
+              <CheckCircle size={12} />
+              <span>OWNED</span>
             </span>
           )}
         </div>
@@ -206,7 +394,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         </div>
 
         <button className="neo-btn w-full py-3 bg-secondary text-white font-medium hover:bg-secondary">
-          View Details
+          {isProjectPurchased(project.id) ? 'View Details' : 'Invest Now'}
         </button>
       </div>
     </div>
@@ -287,6 +475,8 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
   const renderProjectModal = () => {
     if (!selectedProject) return null;
+    
+    const isPurchased = isProjectPurchased(selectedProject.id);
 
     return (
       <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -321,6 +511,16 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 <span className="neo-btn bg-secondary text-white px-3 py-1 text-sm font-bold flex items-center space-x-1">
                   <Crown size={14} />
                   <span>FEATURED</span>
+                </span>
+              </div>
+            )}
+            
+            {/* Purchased badge */}
+            {isPurchased && (
+              <div className="absolute top-4 left-4 ml-32">
+                <span className="neo-btn bg-success text-white px-3 py-1 text-sm font-bold flex items-center space-x-1">
+                  <CheckCircle size={14} />
+                  <span>OWNED</span>
                 </span>
               </div>
             )}
@@ -447,10 +647,123 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 )}
               </div>
 
-              {/* Investment Button */}
-              <button className="neo-btn w-full py-4 bg-secondary text-white font-bold text-lg">
-                Invest in This Project
-              </button>
+              {/* Investment Section */}
+              {!isPurchased ? (
+                <div className="neo-card bg-white p-6">
+                  <h4 className="font-semibold text-text-primary mb-4">Invest in This Project</h4>
+                  
+                  {!user && (
+                    <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl mb-4">
+                      <p className="text-text-primary">Please sign in to invest in this project.</p>
+                    </div>
+                  )}
+                  
+                  {user && !walletConnected && (
+                    <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl mb-4">
+                      <p className="text-text-primary mb-2">Connect your wallet to invest in this project.</p>
+                      <button 
+                        onClick={() => setShowWalletModal(true)}
+                        className="px-4 py-2 bg-primary text-white rounded-lg text-sm"
+                      >
+                        Connect Wallet
+                      </button>
+                    </div>
+                  )}
+                  
+                  {investmentSuccess && (
+                    <div className="p-4 bg-success/10 border border-success/20 rounded-xl mb-4">
+                      <div className="flex items-center space-x-3">
+                        <CheckCircle size={20} className="text-success" />
+                        <div>
+                          <p className="text-text-primary font-medium">Investment Successful!</p>
+                          <p className="text-text-secondary text-sm">You have successfully invested in this project.</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {investmentError && (
+                    <div className="p-4 bg-error/10 border border-error/20 rounded-xl mb-4">
+                      <div className="flex items-center space-x-3">
+                        <AlertCircle size={20} className="text-error" />
+                        <p className="text-error">{investmentError}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-text-secondary mb-2">
+                        Investment Amount
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-text-muted">$</span>
+                        <input
+                          type="number"
+                          value={investmentAmount}
+                          onChange={(e) => setInvestmentAmount(e.target.value)}
+                          placeholder="Enter amount"
+                          className="w-full pl-10 pr-4 py-3 border border-light-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-text-primary"
+                          disabled={!user || !walletConnected || isInvesting || investmentSuccess}
+                        />
+                      </div>
+                      <p className="text-xs text-text-muted mt-1">
+                        Minimum investment: {formatCurrency(selectedProject.price / 10)}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-text-secondary">Available Shares:</span>
+                      <span className="font-semibold text-text-primary">
+                        {selectedProject.shares_available}/{selectedProject.total_shares}
+                      </span>
+                    </div>
+                    
+                    <button
+                      onClick={handleInvestment}
+                      disabled={!user || !walletConnected || isInvesting || investmentSuccess || !investmentAmount}
+                      className="neo-btn w-full py-4 bg-secondary text-white font-bold text-lg disabled:opacity-50"
+                    >
+                      {isInvesting ? (
+                        <div className="flex items-center justify-center space-x-2">
+                          <Loader2 size={20} className="animate-spin" />
+                          <span>Processing...</span>
+                        </div>
+                      ) : investmentSuccess ? (
+                        <div className="flex items-center justify-center space-x-2">
+                          <CheckCircle size={20} />
+                          <span>Investment Complete</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center space-x-2">
+                          <DollarSign size={20} />
+                          <span>Invest Now</span>
+                        </div>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="neo-card bg-white p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <CheckCircle size={24} className="text-success" />
+                    <h4 className="font-semibold text-text-primary">You Own This Project</h4>
+                  </div>
+                  
+                  <p className="text-text-secondary mb-6">
+                    You have successfully invested in this project. You can access all project resources and updates.
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button className="neo-btn py-3 bg-primary text-white font-medium">
+                      Access Resources
+                    </button>
+                    <button className="neo-btn py-3 bg-white text-text-primary font-medium">
+                      Contact Developer
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -562,7 +875,18 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 <h3 className="text-xl font-bold text-text-primary mb-4">Projects</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {selectedDeveloper.projects.map((project, index) => (
-                    <div key={index} className="neo-card bg-white p-4">
+                    <div 
+                      key={index} 
+                      className="neo-card bg-white p-4 cursor-pointer hover:shadow-lg transition-all duration-300"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowDeveloperModal(false);
+                        const fullProject = projects.find(p => p.id === project.id);
+                        if (fullProject) {
+                          handleProjectClick(fullProject);
+                        }
+                      }}
+                    >
                       <h4 className="font-semibold text-text-primary mb-2">{project.title}</h4>
                       <p className="text-text-secondary text-sm mb-3 line-clamp-2">{project.description}</p>
                       <div className="flex items-center justify-between">
@@ -595,6 +919,32 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderWalletModal = () => {
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="neo-card bg-white w-full max-w-md">
+          <div className="flex items-center justify-between p-6 border-b border-light-border">
+            <h2 className="text-xl font-bold text-text-primary">Connect Your Wallet</h2>
+            <button 
+              onClick={() => setShowWalletModal(false)}
+              className="p-2 hover:bg-light-hover rounded-lg transition-all duration-300"
+            >
+              <X size={20} className="text-text-secondary" />
+            </button>
+          </div>
+          
+          <div className="p-6">
+            <p className="text-text-secondary mb-6">
+              Connect your wallet to invest in projects and protect your intellectual property.
+            </p>
+            
+            <WalletConnect onWalletConnection={handleWalletConnection} />
           </div>
         </div>
       </div>
@@ -723,6 +1073,62 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* My Investments Section */}
+        {user && userPurchases.length > 0 && activeTab === 'projects' && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-text-primary">My Investments</h2>
+              <span className="text-text-secondary">{userPurchases.length} project{userPurchases.length !== 1 ? 's' : ''}</span>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {userPurchases.map((purchase) => {
+                const project = purchase.marketplace_item;
+                if (!project) return null;
+                
+                return (
+                  <div 
+                    key={purchase.id} 
+                    className="bg-white rounded-2xl border border-success/30 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer card-hover"
+                    onClick={() => handleProjectClick(project)}
+                  >
+                    <div className="relative">
+                      <img 
+                        src={project.thumbnail_url} 
+                        alt={project.title}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="absolute top-3 right-3">
+                        <span className="bg-success text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
+                          <CheckCircle size={12} />
+                          <span>OWNED</span>
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6">
+                      <h4 className="font-semibold text-lg text-text-primary mb-2">
+                        {project.title}
+                      </h4>
+                      
+                      <div className="flex items-center justify-between mb-4 text-sm">
+                        <span className="text-text-secondary">{project.category}</span>
+                        <span className="text-success font-medium">
+                          {formatCurrency(purchase.purchase_price)}
+                        </span>
+                      </div>
+                      
+                      <div className="text-xs text-text-muted">
+                        Purchased on {formatDate(purchase.created_at)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        
         {activeTab === 'projects' ? (
           <div className={`grid gap-6 ${
             viewMode === 'grid' 
@@ -776,6 +1182,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
       {/* Modals */}
       {showProjectModal && renderProjectModal()}
       {showDeveloperModal && renderDeveloperModal()}
+      {showWalletModal && renderWalletModal()}
     </div>
   );
 };

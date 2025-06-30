@@ -57,11 +57,29 @@ export function WalletConnect({ onWalletConnection }: WalletConnectProps) {
     }
   };
 
+  const simulateWallet = () => {
+    // For demo purposes, generate a fake Algorand address
+    const fakeAddress = 'ALGO' + Array.from({length: 54}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+    setAddress(fakeAddress);
+    onWalletConnection(true, fakeAddress);
+  };
+
   if (error) {
     return (
       <div className="flex items-center space-x-2 p-4 bg-error/10 border border-error/20 rounded-xl">
         <AlertCircle size={20} className="text-error flex-shrink-0" />
-        <p className="text-error text-sm">{error}</p>
+        <div>
+          <p className="text-error text-sm font-medium">{error}</p>
+          <p className="text-error/80 text-xs mt-1">
+            You can use the demo wallet for testing purposes.
+          </p>
+          <button
+            onClick={simulateWallet}
+            className="mt-2 px-3 py-1.5 bg-primary text-white text-xs rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            Use Demo Wallet
+          </button>
+        </div>
       </div>
     );
   }
@@ -100,27 +118,37 @@ export function WalletConnect({ onWalletConnection }: WalletConnectProps) {
         </div>
         <h3 className="text-xl font-semibold text-text-primary mb-2">Connect Your Wallet</h3>
         <p className="text-text-secondary mb-6">
-          Connect your Algorand wallet to register your intellectual property on the blockchain.
+          Connect your Algorand wallet to invest in projects and protect your intellectual property.
         </p>
-        <button
-          onClick={connectWallet}
-          disabled={connecting}
-          className="w-full py-3 bg-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-white font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
-        >
-          {connecting ? (
-            <>
-              <Loader2 size={20} className="animate-spin" />
-              <span>Connecting...</span>
-            </>
-          ) : (
-            <>
-              <Wallet size={20} />
-              <span>Connect Pera Wallet</span>
-            </>
-          )}
-        </button>
+        <div className="space-y-3">
+          <button
+            onClick={connectWallet}
+            disabled={connecting}
+            className="w-full py-3 bg-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-white font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+          >
+            {connecting ? (
+              <>
+                <Loader2 size={20} className="animate-spin" />
+                <span>Connecting...</span>
+              </>
+            ) : (
+              <>
+                <Wallet size={20} />
+                <span>Connect Pera Wallet</span>
+              </>
+            )}
+          </button>
+          
+          <button
+            onClick={simulateWallet}
+            className="w-full py-3 bg-white border border-primary text-primary rounded-xl font-medium transition-all duration-300 flex items-center justify-center space-x-2"
+          >
+            <Wallet size={20} />
+            <span>Use Demo Wallet</span>
+          </button>
+        </div>
         <p className="text-text-muted text-xs mt-3">
-          Make sure you have Pera Wallet installed and set up
+          No wallet? Use the demo option for testing
         </p>
       </div>
     </div>
