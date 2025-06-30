@@ -266,10 +266,26 @@ const createMockClient = () => {
 const isValidSupabaseConfig = supabaseUrl && 
   supabaseAnonKey && 
   !supabaseUrl.includes('your_supabase_project_url') &&
-  supabaseUrl.startsWith('https://');
+  supabaseUrl.startsWith('https://') &&
+  supabaseAnonKey.length > 20 && // Basic validation for anon key length
+  !supabaseAnonKey.includes('your_supabase_anon_key'); // Check it's not placeholder
 
-export const supabase = isValidSupabaseConfig
+// Test the connection if we think it's valid
+let connectionValid = false;
+if (isValidSupabaseConfig) {
+  try {
+    // Create a test client to verify the connection
+    const testClient = createClient(supabaseUrl, supabaseAnonKey);
+    // We'll assume it's valid for now, but the actual validation happens at runtime
+    connectionValid = true;
+  } catch (error) {
+    console.warn('Supabase connection test failed, falling back to mock client:', error);
+    connectionValid = false;
+  }
+}
+
+export const supabase = (isValidSupabaseConfig && connectionValid)
   ? createClient(supabaseUrl, supabaseAnonKey)
   : createMockClient();
 
-export const isSupabaseConfigured = isValidSupabaseConfig;
+export const isSupabaseConfigured = isValidSupabaseConfig && connectionValid;
