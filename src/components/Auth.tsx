@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle, Info, Settings } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle, Info, Settings, HelpCircle } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 interface AuthModalProps {
@@ -18,6 +18,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showHelp, setShowHelp] = useState(false);
+  const [showTestCredentials, setShowTestCredentials] = useState(false);
 
   const resetForm = () => {
     setEmail('');
@@ -27,6 +28,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
     setSuccess('');
     setShowPassword(false);
     setShowHelp(false);
+    setShowTestCredentials(false);
   };
 
   const handleClose = () => {
@@ -63,6 +65,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
     }
 
     return true;
+  };
+
+  const useTestCredentials = () => {
+    setEmail('test@example.com');
+    setPassword('test123');
+    if (!isLogin) {
+      setFullName('Test User');
+    }
+    setShowTestCredentials(false);
   };
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -103,6 +114,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             
             setError('No account found with these credentials. Please check your email and password, or create a new account if you haven\'t signed up yet.');
             setShowHelp(true);
+            setShowTestCredentials(true);
             
           } else if (error.message.includes('Email not confirmed')) {
             setError('Please check your email and click the confirmation link before signing in.');
@@ -115,6 +127,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             
           } else {
             setError(`Sign in failed: ${error.message}`);
+            setShowHelp(true);
           }
           return;
         }
@@ -194,7 +207,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             
           } else {
             // User is immediately signed in (email confirmation disabled)
-            setSuccess('Account created and signed in successfully! Welcome to start.dev!');
+            setSuccess('Account created and signed in successfully! Welcome to Seedora!');
             
             // Create user profile
             try {
@@ -228,6 +241,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
     } catch (error: any) {
       console.error('Auth error:', error);
       setError('An unexpected error occurred. Please try again.');
+      setShowHelp(true);
     } finally {
       setIsLoading(false);
     }
@@ -238,6 +252,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
     setError('');
     setSuccess('');
     setShowHelp(false);
+    setShowTestCredentials(false);
     setPassword('');
   };
 
@@ -245,7 +260,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="neo-card bg-white w-full max-w-md">
+      <div className="neo-card bg-white w-full max-w-md max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-light-border">
           <h2 className="text-xl font-bold text-text-primary">
@@ -289,12 +304,38 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 <p className="text-text-secondary">
                   {isLogin 
                     ? 'Enter your email and password to access your account.'
-                    : 'Join start.dev to protect your IP and discover investment opportunities.'
+                    : 'Join Seedora to protect your IP and discover investment opportunities.'
                   }
                 </p>
               </div>
             </div>
           </div>
+
+          {/* Test Credentials Helper */}
+          {showTestCredentials && isLogin && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+              <div className="flex items-start space-x-3">
+                <HelpCircle size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm flex-1">
+                  <p className="text-blue-900 font-medium mb-2">
+                    First time here? Try creating an account first!
+                  </p>
+                  <p className="text-blue-700 mb-3">
+                    If you want to test with demo credentials, you can use:
+                  </p>
+                  <button
+                    onClick={useTestCredentials}
+                    className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Use Test Credentials
+                  </button>
+                  <p className="text-blue-600 text-xs mt-2">
+                    Email: test@example.com | Password: test123
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleAuth} className="space-y-4">
             {!isLogin && (
@@ -379,12 +420,22 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                   <p className="text-text-primary text-sm font-medium">{error}</p>
                   {showHelp && isLogin && (
                     <div className="mt-3 p-3 bg-white/50 rounded-lg">
-                      <p className="text-xs text-text-secondary font-medium mb-2">Troubleshooting Steps:</p>
+                      <p className="text-xs text-text-secondary font-medium mb-2">Quick Solutions:</p>
                       <div className="text-xs text-text-secondary space-y-1">
-                        <p>• <strong>New user?</strong> Click "Create one here" to sign up first</p>
+                        <p>• <strong>New user?</strong> Click "Create one here" below to sign up first</p>
                         <p>• <strong>Check spelling:</strong> Verify your email and password for typos</p>
-                        <p>• <strong>Email confirmation:</strong> Check if you need to verify your email</p>
-                        <p>• <strong>Different project?</strong> Make sure you're using the right Supabase project</p>
+                        <p>• <strong>Try test account:</strong> Use the "Use Test Credentials" button above</p>
+                        <p>• <strong>Database empty?</strong> Create a new account to get started</p>
+                      </div>
+                    </div>
+                  )}
+                  {showHelp && !isLogin && (
+                    <div className="mt-3 p-3 bg-white/50 rounded-lg">
+                      <p className="text-xs text-text-secondary font-medium mb-2">Signup Tips:</p>
+                      <div className="text-xs text-text-secondary space-y-1">
+                        <p>• <strong>Email exists?</strong> Try signing in instead</p>
+                        <p>• <strong>Password strength:</strong> Use at least 6 characters</p>
+                        <p>• <strong>Email verification:</strong> Check your inbox after signup</p>
                       </div>
                     </div>
                   )}
@@ -433,7 +484,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
           {/* Help Section */}
           <div className="mt-6 p-4 bg-light-bg border border-light-border rounded-xl">
             <h4 className="font-medium text-text-primary mb-2 text-sm">
-              {!isSupabaseConfigured ? 'Setup Required' : 'Need Help?'}
+              {!isSupabaseConfigured ? 'Setup Required' : 'Getting Started'}
             </h4>
             <div className="text-xs text-text-muted space-y-1">
               {!isSupabaseConfigured ? (
@@ -444,15 +495,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 </>
               ) : isLogin ? (
                 <>
-                  <p>• <strong>New user?</strong> Click "Create one here" to sign up</p>
+                  <p>• <strong>First time?</strong> Create an account first, then sign in</p>
+                  <p>• <strong>Testing?</strong> Use the test credentials button when it appears</p>
                   <p>• <strong>Forgot password?</strong> Contact support for assistance</p>
-                  <p>• <strong>Email not confirmed?</strong> Check your inbox and spam folder</p>
+                  <p>• <strong>Email issues?</strong> Check your inbox and spam folder</p>
                 </>
               ) : (
                 <>
                   <p>• <strong>Already registered?</strong> Click "Sign in instead"</p>
                   <p>• <strong>Email confirmation:</strong> You may need to verify your email</p>
                   <p>• <strong>Password requirements:</strong> Minimum 6 characters</p>
+                  <p>• <strong>Getting started:</strong> Create your account to begin protecting your IP</p>
                 </>
               )}
             </div>
