@@ -67,6 +67,7 @@ interface IPProject {
   likes_count?: number;
   views_count?: number;
   purchase_count?: number;
+  thumbnail_url?: string;
 }
 
 interface DeveloperProfile {
@@ -78,6 +79,7 @@ interface DeveloperProfile {
   total_likes: number;
   total_views: number;
   projects: IPProject[];
+  avatar_url?: string;
 }
 
 const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
@@ -94,6 +96,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   const [showInvestmentModal, setShowInvestmentModal] = useState(false);
   const [investmentAmount, setInvestmentAmount] = useState('');
   const [investing, setInvesting] = useState(false);
+  const [marketplaceItems, setMarketplaceItems] = useState<any[]>([]);
 
   const categories = [
     'all', 'AI/ML', 'Blockchain', 'Fintech', 'Healthtech', 'Edtech', 
@@ -102,8 +105,27 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
   useEffect(() => {
     fetchIPProjects();
+    fetchMarketplaceItems();
     fetchDevelopers();
   }, []);
+
+  const fetchMarketplaceItems = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('marketplace_items')
+        .select('*')
+        .eq('status', 'active');
+
+      if (error) {
+        console.error('Error fetching marketplace items:', error);
+        return;
+      }
+
+      setMarketplaceItems(data || []);
+    } catch (error) {
+      console.error('Error in fetchMarketplaceItems:', error);
+    }
+  };
 
   const fetchIPProjects = async () => {
     try {
@@ -116,7 +138,6 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
           *,
           profiles!inner(email)
         `)
-        .eq('status', 'approved')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -157,7 +178,8 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         user_id: project.user_id,
         likes_count: Math.floor(Math.random() * 200) + 10,
         views_count: Math.floor(Math.random() * 1000) + 100,
-        purchase_count: Math.floor(Math.random() * 10)
+        purchase_count: Math.floor(Math.random() * 10),
+        thumbnail_url: `https://images.pexels.com/photos/${3183150 + Math.floor(Math.random() * 10000)}/pexels-photo-${3183150 + Math.floor(Math.random() * 10000)}.jpeg?auto=compress&cs=tinysrgb&w=600&h=300&dpr=2`
       })) || [];
 
       // Combine with demo projects for a richer marketplace
@@ -196,8 +218,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         .select(`
           *,
           ip_registrations(*)
-        `)
-        .not('ip_registrations', 'is', null);
+        `);
 
       if (error) {
         console.error('Error fetching developers:', error);
@@ -221,8 +242,13 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         return;
       }
 
+      // Filter profiles that have IP registrations
+      const developersWithProjects = profiles?.filter(profile => 
+        profile.ip_registrations && profile.ip_registrations.length > 0
+      );
+
       // Transform the data
-      const transformedDevelopers = profiles?.map(profile => ({
+      const transformedDevelopers = developersWithProjects?.map(profile => ({
         id: profile.id,
         name: profile.email?.split('@')[0] || 'Developer',
         email: profile.email || '',
@@ -266,6 +292,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
           project_count: dev.projects.length,
           total_likes: dev.total_likes,
           total_views: dev.total_views,
+          avatar_url: dev.avatar_url,
           projects: dev.projects.map(p => ({
             ...p,
             user_id: dev.id,
@@ -310,12 +337,51 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         return;
       }
 
+      // First, check if there's a marketplace item for this project
+      let marketplaceItemId = selectedProject.id;
+      
+      // If the project is from ip_registrations, find or create a marketplace item
+      const existingItem = marketplaceItems.find(item => 
+        item.ip_registration_id === selectedProject.id
+      );
+      
+      if (!existingItem) {
+        // Create a marketplace item for this IP registration
+        const { data: newItem, error: createError } = await supabase
+          .from('marketplace_items')
+          .insert({
+            ip_registration_id: selectedProject.id,
+            title: selectedProject.title,
+            description: selectedProject.description,
+            price: amount,
+            category: selectedProject.category,
+            founder_name: selectedProject.founder_name,
+            company_name: selectedProject.company_name,
+            demo_link: selectedProject.demo_link,
+            presentation_video: selectedProject.presentation_video,
+            ipfs_url: selectedProject.ipfs_url,
+            thumbnail_url: selectedProject.thumbnail_url || 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=600&h=300&dpr=2',
+            status: 'active'
+          })
+          .select()
+          .single();
+          
+        if (createError) {
+          console.error('Error creating marketplace item:', createError);
+          throw new Error('Failed to create marketplace item');
+        }
+        
+        marketplaceItemId = newItem.id;
+      } else {
+        marketplaceItemId = existingItem.id;
+      }
+
       // Create investment record
       const { data, error } = await supabase
         .from('project_purchases')
         .insert({
           buyer_id: user.id,
-          marketplace_item_id: selectedProject.id,
+          marketplace_item_id: marketplaceItemId,
           purchase_price: amount,
           status: 'completed',
           completed_at: new Date().toISOString()
@@ -335,6 +401,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
       
       // Refresh projects to update purchase count
       fetchIPProjects();
+      fetchMarketplaceItems();
     } catch (error) {
       console.error('Investment failed:', error);
       alert('Investment failed. Please try again.');
@@ -525,7 +592,15 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
     <div key={developer.id} className="bg-white rounded-2xl border border-light-border p-6 hover:shadow-lg transition-all duration-300">
       <div className="flex items-start space-x-4 mb-4">
         <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
-          <User size={32} className="text-primary" />
+          {developer.avatar_url ? (
+            <img 
+              src={developer.avatar_url} 
+              alt={developer.name}
+              className="w-full h-full object-cover rounded-2xl"
+            />
+          ) : (
+            <User size={32} className="text-primary" />
+          )}
         </div>
         <div className="flex-1">
           <h3 className="font-bold text-lg text-text-primary mb-1">{developer.name}</h3>
