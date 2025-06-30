@@ -1,90 +1,56 @@
 import React, { useState, useEffect } from 'react';
+import * as THREE from 'three';
 import { 
   ArrowRight, 
-  Shield, 
-  Zap, 
-  Users, 
-  TrendingUp, 
-  Code, 
-  DollarSign, 
-  Star, 
-  CheckCircle, 
-  Play,
-  Github,
-  Globe,
-  Database,
-  Lightbulb,
-  Award,
-  Target,
   Rocket,
-  Heart,
-  Eye,
+  Play,
+  CheckCircle,
   MessageCircle,
-  Sparkles,
-  Crown,
-  Building,
-  Briefcase,
-  PieChart,
-  BarChart3,
-  Activity
+  Sparkles
 } from 'lucide-react';
-import EndlessEffect from './EndlessEffect';
+import Gl from '../gl/index';
+import Type from '../gl/Type';
+import shaders from '../gl/shaders';
+import fontFile from '../assets/fonts/Orbitron-Black.fnt';
+import fontAtlas from '../assets/fonts/Orbitron-Black.png';
 
 interface LandingPageProps {
   onGetStarted: () => void;
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
-  const [activeFeature, setActiveFeature] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    // Create the kinetic type
+    const options = {
+      word: 'SEEDORA',
+      color: '#ffffff',
+      fill: '#000000',
+      geometry: new THREE.TorusKnotGeometry(9, 3, 768, 3, 4, 3),
+      position: {
+        texture: [-0.965, -0.4, 0],
+        mesh: [0, 0, 0]
+      },
+      scale: [0.008, 0.04, 1],
+      shaders: {
+        vertex: shaders.vertex,
+        fragment: shaders.fragment
+      },
+      font: {
+        file: fontFile,
+        atlas: fontAtlas
+      }
+    };
+
+    const type = new Type();
+    type.init(options);
+    
     setIsLoaded(true);
   }, []);
 
-  const features = [
-    {
-      icon: Shield,
-      title: 'IP Protection',
-      description: 'Register your projects as intellectual property on the blockchain for permanent protection',
-      color: 'text-primary',
-      bgColor: 'bg-accent'
-    },
-    {
-      icon: Github,
-      title: 'GitHub Integration',
-      description: 'Connect your GitHub repositories to showcase your technical expertise and code quality',
-      color: 'text-primary',
-      bgColor: 'bg-secondary'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Investment Opportunities',
-      description: 'Discover and invest in innovative projects from talented developers worldwide',
-      color: 'text-primary',
-      bgColor: 'bg-accent'
-    },
-    {
-      icon: BarChart3,
-      title: 'MCP Analytics',
-      description: 'AI-powered insights using Machine Callable Programs for smart investment decisions',
-      color: 'text-primary',
-      bgColor: 'bg-secondary'
-    }
-  ];
-
-  const stats = [
-    { number: '500+', label: 'Registered Projects', icon: Code },
-    { number: '$2.4M', label: 'Total Investment', icon: DollarSign },
-    { number: '1,200+', label: 'Active Users', icon: Users },
-    { number: '94%', label: 'Success Rate', icon: Target }
-  ];
-
   return (
     <div className={`min-h-screen bg-black text-white overflow-hidden transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
-      {/* Endless Effect Background */}
-      <EndlessEffect word="SEEDORA" color="#ffffff" backgroundColor="#000000" />
-
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
@@ -147,9 +113,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    {stats.map((stat, index) => (
+                    {[
+                      { number: '500+', label: 'Registered Projects' },
+                      { number: '$2.4M', label: 'Total Investment' },
+                      { number: '1,200+', label: 'Active Users' },
+                      { number: '94%', label: 'Success Rate' }
+                    ].map((stat, index) => (
                       <div key={index} className="text-center p-4 neo-card bg-white/5 backdrop-blur-sm">
-                        <stat.icon size={24} className="mx-auto mb-2 text-white" />
                         <div className="text-2xl font-bold text-white">{stat.number}</div>
                         <div className="text-sm text-gray-400">{stat.label}</div>
                       </div>
@@ -170,122 +140,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
-              Everything you need to <span className="text-primary">succeed</span>
-            </h2>
-            <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-              From IP protection to investment opportunities, Seedora provides all the tools developers and investors need.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className={`neo-card ${feature.bgColor} p-8 cursor-pointer group ${
-                  activeFeature === index ? 'transform translate-x-[-2px] translate-y-[-2px]' : ''
-                }`}
-                onMouseEnter={() => setActiveFeature(index)}
-              >
-                <div className={`w-16 h-16 bg-white border border-light-border rounded-xl flex items-center justify-center mb-6`}>
-                  <feature.icon size={32} className={feature.color} />
-                </div>
-                <h3 className="text-xl font-bold text-text-primary mb-4">{feature.title}</h3>
-                <p className="text-text-secondary leading-relaxed">{feature.description}</p>
-              </div>
-            ))}
-          </div>
+        
+        {/* WebGL container for the 3D effect */}
+        <div className="absolute inset-0 z-0">
+          <div id="webgl" className="w-full h-full"></div>
         </div>
       </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-primary">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
-            Ready to protect your innovations?
-          </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of developers who trust Seedora to protect their intellectual property and connect with investors.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={onGetStarted}
-              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-white text-primary font-bold text-lg"
-            >
-              <Rocket size={24} />
-              <span>Start Building Today</span>
-              <ArrowRight size={20} />
-            </button>
-            
-            <button className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-secondary text-white font-semibold text-lg">
-              <MessageCircle size={20} />
-              <span>Talk to Sales</span>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-black text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="space-y-4">
-              <h3 className="text-2xl font-bold">
-                <span className="text-white">Seedora</span>
-              </h3>
-              <p className="text-white/80 leading-relaxed">
-                The ultimate platform for developers and investors to protect IP and discover innovations.
-              </p>
-              <div className="flex items-center space-x-4">
-                <Github size={20} className="text-white/60 hover:text-white cursor-pointer transition-colors" />
-                <Globe size={20} className="text-white/60 hover:text-white cursor-pointer transition-colors" />
-                <MessageCircle size={20} className="text-white/60 hover:text-white cursor-pointer transition-colors" />
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-white/80">
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-white/80">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-white/80">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Community</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-white/20 mt-12 pt-8 text-center text-white/60">
-            <p>&copy; 2024 Seedora. All rights reserved. Built with ❤️ for developers worldwide.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

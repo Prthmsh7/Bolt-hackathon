@@ -1,23 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import Dashboard from './components/Dashboard';
-import Marketplace from './components/Marketplace';
-import InvestmentStream from './components/InvestmentStream';
-import UserProfile from './components/UserProfile';
-import EnhancedAnalytics from './components/EnhancedAnalytics';
-import AuthModal from './components/Auth';
-import MCPAssistantButton from './components/MCPAssistantButton';
 import LandingPage from './components/LandingPage';
-import AboutPage from './components/AboutPage';
+import AuthModal from './components/Auth';
 import { supabase } from './lib/supabase';
 
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
-  const [currentPage, setCurrentPage] = useState<'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'about'>('dashboard');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [mcpInsights, setMcpInsights] = useState<any[]>([]);
 
   // Page load animation
   useEffect(() => {
@@ -45,10 +35,6 @@ function App() {
     }
   };
 
-  const handleNavigation = (page: 'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'about') => {
-    setCurrentPage(page);
-  };
-
   const handleGetStarted = () => {
     setShowAuthModal(true);
   };
@@ -57,28 +43,6 @@ function App() {
     setShowAuthModal(false);
     setShowLanding(false);
     checkAuthStatus();
-  };
-
-  const handleInsightGenerated = (insight: any) => {
-    setMcpInsights(prev => [insight, ...prev]);
-  };
-
-  const renderCurrentPage = () => {
-    switch (currentPage) {
-      case 'marketplace':
-        return <Marketplace onBack={() => setCurrentPage('dashboard')} />;
-      case 'investment-stream':
-        return <InvestmentStream onBack={() => setCurrentPage('dashboard')} />;
-      case 'user-profile':
-        return <UserProfile onBack={() => setCurrentPage('dashboard')} />;
-      case 'analytics':
-        return <EnhancedAnalytics onBack={() => setCurrentPage('dashboard')} />;
-      case 'about':
-        return <AboutPage onBack={() => setCurrentPage('dashboard')} />;
-      case 'dashboard':
-      default:
-        return <Dashboard onNavigate={handleNavigation} />;
-    }
   };
 
   // Show landing page if user is not authenticated
@@ -97,26 +61,19 @@ function App() {
     );
   }
 
-  // Show main application if user is authenticated
+  // Show a simple message for now since we're focusing on the landing page
   return (
-    <div className={`min-h-screen bg-light-bg text-text-primary transition-all duration-1000 ${isLoaded ? 'fade-in' : 'opacity-0'}`}>
-      <Navbar 
-        onNavigate={handleNavigation} 
-        currentPage={currentPage}
-        user={user}
-        onShowAuth={() => setShowAuthModal(true)}
-      />
-      {renderCurrentPage()}
-      
-      {/* Authentication Modal */}
-      <AuthModal 
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onAuthSuccess={handleAuthSuccess}
-      />
-
-      {/* MCP Assistant Button (floating) */}
-      <MCPAssistantButton onInsightGenerated={handleInsightGenerated} />
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="text-center text-white">
+        <h1 className="text-4xl font-bold mb-4">Welcome to Seedora</h1>
+        <p className="text-xl">You are now logged in.</p>
+        <button 
+          onClick={() => supabase.auth.signOut()}
+          className="mt-8 px-6 py-3 bg-white text-black rounded-xl font-medium"
+        >
+          Sign Out
+        </button>
+      </div>
     </div>
   );
 }
