@@ -24,5 +24,5 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   db: { schema: 'public' }
 });
 
-// Export configuration status
-export const isSupabaseConfigured = true;
+// Export configuration status - use the actual validation result
+export const isSupabaseConfigured = isValidConfig;
