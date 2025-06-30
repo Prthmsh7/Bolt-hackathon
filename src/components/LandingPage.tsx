@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ArrowRight, 
   Shield, 
@@ -28,6 +28,7 @@ import {
   BarChart3,
   Activity
 } from 'lucide-react';
+import EndlessEffect from './EndlessEffect';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -35,6 +36,11 @@ interface LandingPageProps {
 
 const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   const [activeFeature, setActiveFeature] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
 
   const features = [
     {
@@ -74,82 +80,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
     { number: '94%', label: 'Success Rate', icon: Target }
   ];
 
-  const testimonials = [
-    {
-      name: 'Sarah Johnson',
-      role: 'AI Engineer',
-      company: 'DataMind AI',
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2',
-      quote: 'Seedora helped me protect my AI platform and connect with investors. The GitHub integration showcased my technical skills perfectly.',
-      rating: 5
-    },
-    {
-      name: 'James Park',
-      role: 'Blockchain Developer',
-      company: 'SecureChain Labs',
-      avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2',
-      quote: 'The IP registration process was seamless, and the MCP analytics gave me insights I never had before. Highly recommended!',
-      rating: 5
-    },
-    {
-      name: 'Emma Davis',
-      role: 'FinTech Founder',
-      company: 'PayFlow Technologies',
-      avatar: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2',
-      quote: 'Found amazing investment opportunities through Seedora. The platform makes it easy to discover and evaluate innovative projects.',
-      rating: 5
-    }
-  ];
-
-  const pricingPlans = [
-    {
-      name: 'Developer',
-      price: 'Free',
-      description: 'Perfect for individual developers',
-      features: [
-        'Register up to 3 projects',
-        'Basic IP protection',
-        'GitHub integration',
-        'Community access'
-      ],
-      popular: false,
-      color: 'border-light-border'
-    },
-    {
-      name: 'Professional',
-      price: '$29/month',
-      description: 'For serious entrepreneurs',
-      features: [
-        'Unlimited project registration',
-        'Advanced IP protection',
-        'Priority support',
-        'MCP analytics access',
-        'Investment matching'
-      ],
-      popular: true,
-      color: 'border-primary'
-    },
-    {
-      name: 'Enterprise',
-      price: 'Custom',
-      description: 'For large organizations',
-      features: [
-        'Everything in Professional',
-        'Custom integrations',
-        'Dedicated support',
-        'White-label options',
-        'Advanced analytics'
-      ],
-      popular: false,
-      color: 'border-light-border'
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-light-bg">
+    <div className={`min-h-screen bg-black text-white overflow-hidden transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+      {/* Endless Effect Background */}
+      <EndlessEffect word="SEEDORA" color="#ffffff" backgroundColor="#000000" />
+
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-accent min-h-screen flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <section className="relative min-h-screen flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="space-y-6">
@@ -159,12 +97,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 </div>
                 
                 <h1 className="text-5xl lg:text-7xl font-black leading-tight">
-                  <span className="text-primary">
+                  <span className="text-white">
                     Seedora
                   </span>
                 </h1>
                 
-                <p className="text-xl lg:text-2xl text-text-secondary leading-relaxed max-w-2xl">
+                <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-2xl">
                   The ultimate platform for developers and investors. Register your IP, showcase your projects, and discover the next big innovation.
                 </p>
               </div>
@@ -172,58 +110,58 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={onGetStarted}
-                  className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-primary text-white font-bold text-lg"
+                  className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-white text-black font-bold text-lg"
                 >
                   <Rocket size={24} />
                   <span>Get Started Free</span>
                   <ArrowRight size={20} />
                 </button>
                 
-                <button className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-white text-text-primary font-semibold text-lg">
+                <button className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-transparent border border-white text-white font-semibold text-lg">
                   <Play size={20} />
                   <span>Watch Demo</span>
                 </button>
               </div>
 
-              <div className="flex items-center space-x-8 text-sm text-text-muted">
+              <div className="flex items-center space-x-8 text-sm text-gray-400">
                 <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-success" />
+                  <CheckCircle size={16} className="text-green-500" />
                   <span>No credit card required</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-success" />
+                  <CheckCircle size={16} className="text-green-500" />
                   <span>Free forever plan</span>
                 </div>
               </div>
             </div>
 
             <div className="relative">
-              <div className="neo-card bg-white p-8">
+              <div className="neo-card bg-white/10 backdrop-blur-sm p-8 text-white">
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-text-primary">Live Platform Stats</h3>
-                    <div className="flex items-center space-x-2 text-success">
-                      <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                    <h3 className="text-xl font-bold">Live Platform Stats</h3>
+                    <div className="flex items-center space-x-2 text-green-400">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                       <span className="text-sm font-medium">Live</span>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     {stats.map((stat, index) => (
-                      <div key={index} className="text-center p-4 neo-card bg-accent">
-                        <stat.icon size={24} className="mx-auto mb-2 text-primary" />
-                        <div className="text-2xl font-bold text-text-primary">{stat.number}</div>
-                        <div className="text-sm text-text-muted">{stat.label}</div>
+                      <div key={index} className="text-center p-4 neo-card bg-white/5 backdrop-blur-sm">
+                        <stat.icon size={24} className="mx-auto mb-2 text-white" />
+                        <div className="text-2xl font-bold text-white">{stat.number}</div>
+                        <div className="text-sm text-gray-400">{stat.label}</div>
                       </div>
                     ))}
                   </div>
                   
-                  <div className="neo-card bg-accent p-4">
+                  <div className="neo-card bg-white/5 backdrop-blur-sm p-4">
                     <div className="flex items-center space-x-3">
-                      <MessageCircle size={20} className="text-primary" />
+                      <MessageCircle size={20} className="text-white" />
                       <div>
-                        <p className="font-semibold text-text-primary">MCP Assistant Active</p>
-                        <p className="text-sm text-text-secondary">AI-powered investment insights</p>
+                        <p className="font-semibold text-white">MCP Assistant Active</p>
+                        <p className="text-sm text-gray-300">AI-powered investment insights</p>
                       </div>
                     </div>
                   </div>
@@ -266,147 +204,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-20 bg-light-bg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
-              How <span className="text-primary">Seedora</span> works
-            </h2>
-            <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-              Get started in minutes with our simple three-step process
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center group">
-              <div className="neo-btn w-20 h-20 bg-primary flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">1</span>
-              </div>
-              <h3 className="text-xl font-bold text-text-primary mb-4">Register & Connect</h3>
-              <p className="text-text-secondary leading-relaxed">
-                Sign up for free and connect your GitHub profile to showcase your technical expertise and repositories.
-              </p>
-            </div>
-
-            <div className="text-center group">
-              <div className="neo-btn w-20 h-20 bg-secondary flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-white">2</span>
-              </div>
-              <h3 className="text-xl font-bold text-text-primary mb-4">Protect Your IP</h3>
-              <p className="text-text-secondary leading-relaxed">
-                Register your projects as intellectual property on the blockchain for permanent, tamper-proof protection.
-              </p>
-            </div>
-
-            <div className="text-center group">
-              <div className="neo-btn w-20 h-20 bg-accent flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-primary">3</span>
-              </div>
-              <h3 className="text-xl font-bold text-text-primary mb-4">Invest & Grow</h3>
-              <p className="text-text-secondary leading-relaxed">
-                Discover investment opportunities or attract investors to your projects using our AI-powered matching system.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
-              Loved by <span className="text-primary">developers</span> worldwide
-            </h2>
-            <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-              See what our community has to say about their experience with Seedora
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="neo-card bg-white p-8">
-                <div className="flex items-center space-x-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} size={16} className="text-warning fill-current" />
-                  ))}
-                </div>
-                
-                <p className="text-text-secondary mb-6 leading-relaxed">"{testimonial.quote}"</p>
-                
-                <div className="flex items-center space-x-4">
-                  <img 
-                    src={testimonial.avatar} 
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full border-2 border-primary"
-                  />
-                  <div>
-                    <h4 className="font-semibold text-text-primary">{testimonial.name}</h4>
-                    <p className="text-sm text-text-muted">{testimonial.role} at {testimonial.company}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section className="py-20 bg-light-bg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-text-primary mb-6">
-              Simple, <span className="text-primary">transparent</span> pricing
-            </h2>
-            <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-              Choose the plan that's right for you. Start free and upgrade as you grow.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {pricingPlans.map((plan, index) => (
-              <div key={index} className={`relative neo-card bg-white p-8 border-2 ${plan.color} ${plan.popular ? 'transform translate-x-[-4px] translate-y-[-4px]' : ''}`}>
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="neo-btn bg-secondary text-white px-4 py-2 text-sm font-bold flex items-center space-x-2">
-                      <Crown size={16} />
-                      <span>Most Popular</span>
-                    </div>
-                  </div>
-                )}
-                
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-text-primary mb-2">{plan.name}</h3>
-                  <p className="text-text-muted mb-4">{plan.description}</p>
-                  <div className="text-4xl font-bold text-text-primary">{plan.price}</div>
-                </div>
-
-                <ul className="space-y-4 mb-8">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center space-x-3">
-                      <CheckCircle size={16} className="text-success flex-shrink-0" />
-                      <span className="text-text-secondary">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <button
-                  onClick={onGetStarted}
-                  className={`neo-btn w-full py-3 font-semibold ${
-                    plan.popular
-                      ? 'bg-primary text-white'
-                      : 'bg-white border border-light-border text-text-primary'
-                  }`}
-                >
-                  Get Started
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="py-20 bg-primary">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -436,7 +233,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-primary text-white py-16">
+      <footer className="bg-black text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="space-y-4">
