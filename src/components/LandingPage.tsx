@@ -145,6 +145,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
     }
   ];
 
+  const handleGetStartedClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onGetStarted) {
+      onGetStarted();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-light-bg">
       {/* Hero Section */}
@@ -171,7 +178,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
-                  onClick={onGetStarted}
+                  onClick={handleGetStartedClick}
                   className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-primary text-white font-bold text-lg"
                 >
                   <Rocket size={24} />
@@ -392,7 +399,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 </ul>
 
                 <button
-                  onClick={onGetStarted}
+                  onClick={handleGetStartedClick}
                   className={`neo-btn w-full py-3 font-semibold ${
                     plan.popular
                       ? 'bg-primary text-white'
@@ -419,7 +426,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={onGetStarted}
+              onClick={handleGetStartedClick}
               className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-white text-primary font-bold text-lg"
             >
               <Rocket size={24} />
@@ -488,7 +495,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             <p>&copy; 2024 Seedster. All rights reserved. Built with ❤️ for developers worldwide.</p>
           </div>
         </div>
-      </footer>
+      </section>
     </div>
   );
 };
