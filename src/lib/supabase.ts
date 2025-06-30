@@ -15,8 +15,7 @@ const isValidConfig =
   supabaseUrl && 
   supabaseAnonKey && 
   !supabaseUrl.includes('your-project-id') &&
-  supabaseUrl.startsWith('https://') &&
-  supabaseUrl.includes('.supabase.co');
+  supabaseUrl.startsWith('https://');
 
 console.log('Is valid Supabase config:', isValidConfig);
 

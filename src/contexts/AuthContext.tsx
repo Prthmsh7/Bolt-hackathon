@@ -27,7 +27,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   useEffect(() => {
     console.log('AuthProvider initialized, isSupabaseConfigured:', isSupabaseConfigured);
     
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseConfigured || !supabase) {
       console.warn('Supabase is not configured properly. Auth functionality will be limited.');
       setLoading(false);
       return;
@@ -98,7 +98,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   }, []);
 
   const signOut = async () => {
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseConfigured || !supabase) {
       console.warn('Supabase not configured, sign out operation simulated');
       setUser(null);
       setSession(null);
