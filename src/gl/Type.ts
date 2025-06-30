@@ -53,7 +53,7 @@ export default class Type extends THREE.Object3D {
       this.fontGeometry = createGeometry({
         font,
         text: this.opts.word,
-      });
+      }, THREE);
 
       // Load texture containing font glyphs
       this.loader = new THREE.TextureLoader();
@@ -65,7 +65,7 @@ export default class Type extends THREE.Object3D {
             transparent: true,
             negate: false,
             color: this.opts.color
-          })
+          }, THREE)
         );
 
         this.createRenderTarget();
