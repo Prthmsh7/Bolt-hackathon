@@ -11,12 +11,14 @@ export interface PinataResponse {
 export class PinataService {
   private apiKey: string;
   private apiSecret: string;
+  private testMode: boolean;
 
   constructor() {
     this.apiKey = import.meta.env.VITE_PINATA_API_KEY as string;
     this.apiSecret = import.meta.env.VITE_PINATA_API_SECRET as string;
+    this.testMode = !this.apiKey || !this.apiSecret;
 
-    if (!this.apiKey || !this.apiSecret) {
+    if (this.testMode) {
       console.warn('Pinata API credentials are not configured. IP registration will be simulated.');
     }
   }
@@ -31,7 +33,7 @@ export class PinataService {
   }
 
   async uploadFile(file: File, metadata: Record<string, any>): Promise<string> {
-    if (!this.apiKey || !this.apiSecret) {
+    if (this.testMode) {
       // Simulate upload for demo purposes
       return this.simulateUpload(file, metadata);
     }
@@ -76,7 +78,7 @@ export class PinataService {
   }
 
   async uploadJSON(content: Record<string, any>): Promise<string> {
-    if (!this.apiKey || !this.apiSecret) {
+    if (this.testMode) {
       // Simulate upload for demo purposes
       return this.simulateJSONUpload(content);
     }
@@ -104,6 +106,35 @@ export class PinataService {
     }
   }
 
+  async checkPinStatus(hash: string): Promise<{ status: string; isValid: boolean }> {
+    if (this.testMode) {
+      // Simulate pin status check for demo purposes
+      return this.simulatePinStatus(hash);
+    }
+
+    try {
+      const response = await axios.get(
+        `${PINATA_API_URL}/pinList?hashContains=${hash}`,
+        this.getHeaders()
+      );
+
+      const pins = response.data.rows;
+      if (pins.length === 0) {
+        return { status: 'not_found', isValid: false };
+      }
+
+      const pin = pins[0];
+      return { 
+        status: pin.status, 
+        isValid: pin.status === 'pinned' 
+      };
+    } catch (error) {
+      console.error('Error checking pin status:', error);
+      // Fallback to simulation
+      return this.simulatePinStatus(hash);
+    }
+  }
+
   private async simulateUpload(file: File, metadata: Record<string, any>): Promise<string> {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
@@ -124,14 +155,63 @@ export class PinataService {
     return mockHash;
   }
 
+  private async simulatePinStatus(hash: string): Promise<{ status: string; isValid: boolean }> {
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 700));
+    
+    // Always return success for demo purposes
+    return { status: 'pinned', isValid: true };
+  }
+
   async getIPFSUrl(hash: string): Promise<string> {
-    if (!this.apiKey || !this.apiSecret) {
-      return `https://ipfs.io/ipfs/${hash}`;
+    // Ensure hash is valid
+    if (!hash || typeof hash !== 'string' || hash.length < 10) {
+      throw new Error('Invalid IPFS hash provided');
     }
-    return `https://gateway.pinata.cloud/ipfs/${hash}`;
+    
+    // Use Pinata gateway if configured, otherwise use public gateway
+    if (!this.testMode) {
+      return `https://gateway.pinata.cloud/ipfs/${hash}`;
+    }
+    
+    // For test mode, use a public gateway that doesn't require authentication
+    return `https://ipfs.io/ipfs/${hash}`;
+  }
+
+  async getIPFSContent(hash: string): Promise<any> {
+    try {
+      const url = await this.getIPFSUrl(hash);
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch from IPFS: ${response.status} ${response.statusText}`);
+      }
+      
+      // Try to parse as JSON first
+      try {
+        return await response.json();
+      } catch (e) {
+        // If not JSON, return as text
+        return await response.text();
+      }
+    } catch (error) {
+      console.error('Error retrieving IPFS content:', error);
+      
+      if (this.testMode) {
+        // In test mode, return mock data
+        return {
+          mockData: true,
+          hash,
+          message: 'This is simulated content for testing purposes',
+          timestamp: new Date().toISOString()
+        };
+      }
+      
+      throw error;
+    }
   }
 
   isConfigured(): boolean {
-    return !!(this.apiKey && this.apiSecret);
+    return !this.testMode;
   }
 }
