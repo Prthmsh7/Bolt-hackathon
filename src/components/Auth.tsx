@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle, Info } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { X, Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle, Info, Settings } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -68,6 +68,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Check if Supabase is configured
+    if (!isSupabaseConfigured) {
+      setError('Authentication service is not configured. Please check your environment variables and ensure Supabase is properly set up.');
+      setShowHelp(true);
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
@@ -94,7 +101,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
               error.message.includes('invalid_credentials') ||
               error.message.includes('Invalid email or password')) {
             
-            setError('Invalid email or password. Please check your credentials and try again.');
+            setError('No account found with these credentials. Please check your email and password, or create a new account if you haven\'t signed up yet.');
             setShowHelp(true);
             
           } else if (error.message.includes('Email not confirmed')) {
@@ -192,12 +199,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             // Create user profile
             try {
               const { error: profileError } = await supabase
-                .from('user_profiles')
+                .from('profiles')
                 .upsert({
                   id: data.user.id,
                   email: email.trim().toLowerCase(),
-                  full_name: fullName.trim(),
-                  subscription_status: 'free'
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
                 }, {
                   onConflict: 'id'
                 });
@@ -254,6 +261,23 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
         </div>
 
         <div className="p-6">
+          {/* Configuration Warning */}
+          {!isSupabaseConfigured && (
+            <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl">
+              <div className="flex items-start space-x-3">
+                <Settings size={16} className="text-error mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="text-text-primary font-medium mb-1">
+                    Authentication Not Configured
+                  </p>
+                  <p className="text-text-secondary">
+                    Supabase environment variables are missing or invalid. Please configure your .env file with valid Supabase credentials.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Info Banner */}
           <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-xl">
             <div className="flex items-start space-x-3">
@@ -286,7 +310,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                   placeholder="Enter your full name"
                   className="w-full px-4 py-3 bg-white border border-light-border rounded-xl focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-primary placeholder-text-muted transition-all duration-300"
                   required={!isLogin}
-                  disabled={isLoading}
+                  disabled={isLoading || !isSupabaseConfigured}
                 />
               </div>
             )}
@@ -303,7 +327,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 placeholder="Enter your email"
                 className="w-full px-4 py-3 bg-white border border-light-border rounded-xl focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-primary placeholder-text-muted transition-all duration-300"
                 required
-                disabled={isLoading}
+                disabled={isLoading || !isSupabaseConfigured}
               />
             </div>
 
@@ -321,13 +345,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                   className="w-full px-4 py-3 pr-12 bg-white border border-light-border rounded-xl focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-primary placeholder-text-muted transition-all duration-300"
                   required
                   minLength={6}
-                  disabled={isLoading}
+                  disabled={isLoading || !isSupabaseConfigured}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
-                  disabled={isLoading}
+                  disabled={isLoading || !isSupabaseConfigured}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -354,10 +378,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 <div className="flex-1">
                   <p className="text-text-primary text-sm font-medium">{error}</p>
                   {showHelp && isLogin && (
-                    <div className="mt-2 text-xs text-text-secondary">
-                      <p>• Make sure you've created an account first</p>
-                      <p>• Check your email and password for typos</p>
-                      <p>• Confirm your email if required</p>
+                    <div className="mt-3 p-3 bg-white/50 rounded-lg">
+                      <p className="text-xs text-text-secondary font-medium mb-2">Troubleshooting Steps:</p>
+                      <div className="text-xs text-text-secondary space-y-1">
+                        <p>• <strong>New user?</strong> Click "Create one here" to sign up first</p>
+                        <p>• <strong>Check spelling:</strong> Verify your email and password for typos</p>
+                        <p>• <strong>Email confirmation:</strong> Check if you need to verify your email</p>
+                        <p>• <strong>Different project?</strong> Make sure you're using the right Supabase project</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -367,8 +395,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading}
-              className="neo-btn w-full py-3 bg-primary text-white font-semibold flex items-center justify-center space-x-2"
+              disabled={isLoading || !isSupabaseConfigured}
+              className="neo-btn w-full py-3 bg-primary text-white font-semibold flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -376,30 +404,45 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                   <span>{isLogin ? 'Signing In...' : 'Creating Account...'}</span>
                 </>
               ) : (
-                <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
+                <span>
+                  {!isSupabaseConfigured 
+                    ? 'Configure Supabase First' 
+                    : (isLogin ? 'Sign In' : 'Create Account')
+                  }
+                </span>
               )}
             </button>
           </form>
 
           {/* Toggle Auth Mode */}
-          <div className="mt-6 text-center">
-            <p className="text-text-secondary text-sm">
-              {isLogin ? "Don't have an account?" : "Already have an account?"}
-              <button
-                onClick={handleToggleMode}
-                disabled={isLoading}
-                className="ml-2 text-primary hover:text-primary-dark font-medium transition-colors disabled:opacity-50"
-              >
-                {isLogin ? 'Create one here' : 'Sign in instead'}
-              </button>
-            </p>
-          </div>
+          {isSupabaseConfigured && (
+            <div className="mt-6 text-center">
+              <p className="text-text-secondary text-sm">
+                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                <button
+                  onClick={handleToggleMode}
+                  disabled={isLoading}
+                  className="ml-2 text-primary hover:text-primary-dark font-medium transition-colors disabled:opacity-50"
+                >
+                  {isLogin ? 'Create one here' : 'Sign in instead'}
+                </button>
+              </p>
+            </div>
+          )}
 
           {/* Help Section */}
           <div className="mt-6 p-4 bg-light-bg border border-light-border rounded-xl">
-            <h4 className="font-medium text-text-primary mb-2 text-sm">Need Help?</h4>
+            <h4 className="font-medium text-text-primary mb-2 text-sm">
+              {!isSupabaseConfigured ? 'Setup Required' : 'Need Help?'}
+            </h4>
             <div className="text-xs text-text-muted space-y-1">
-              {isLogin ? (
+              {!isSupabaseConfigured ? (
+                <>
+                  <p>• <strong>Missing .env file:</strong> Copy .env.example to .env</p>
+                  <p>• <strong>Invalid URLs:</strong> Replace placeholder values with real Supabase credentials</p>
+                  <p>• <strong>Project setup:</strong> Ensure your Supabase project has authentication enabled</p>
+                </>
+              ) : isLogin ? (
                 <>
                   <p>• <strong>New user?</strong> Click "Create one here" to sign up</p>
                   <p>• <strong>Forgot password?</strong> Contact support for assistance</p>
