@@ -30,7 +30,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
   }, []);
 
   return (
-    <div className={`min-h-screen bg-yellow-400 text-black overflow-hidden transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`min-h-screen bg-yellow-200 text-black overflow-hidden transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
@@ -143,7 +143,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="neo-card bg-yellow-400 p-8 cursor-pointer group">
+            <div className="neo-card bg-yellow-200 p-8 cursor-pointer group">
               <div className="w-16 h-16 bg-white border border-black rounded-xl flex items-center justify-center mb-6">
                 <Shield size={32} className="text-black" />
               </div>
@@ -151,7 +151,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               <p className="text-black leading-relaxed">Register your projects as intellectual property on the blockchain for permanent protection</p>
             </div>
             
-            <div className="neo-card bg-yellow-400 p-8 cursor-pointer group">
+            <div className="neo-card bg-yellow-200 p-8 cursor-pointer group">
               <div className="w-16 h-16 bg-white border border-black rounded-xl flex items-center justify-center mb-6">
                 <Github size={32} className="text-black" />
               </div>
@@ -159,7 +159,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               <p className="text-black leading-relaxed">Connect your GitHub repositories to showcase your technical expertise and code quality</p>
             </div>
             
-            <div className="neo-card bg-yellow-400 p-8 cursor-pointer group">
+            <div className="neo-card bg-yellow-200 p-8 cursor-pointer group">
               <div className="w-16 h-16 bg-white border border-black rounded-xl flex items-center justify-center mb-6">
                 <TrendingUp size={32} className="text-black" />
               </div>
@@ -167,7 +167,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               <p className="text-black leading-relaxed">Discover and invest in innovative projects from talented developers worldwide</p>
             </div>
             
-            <div className="neo-card bg-yellow-400 p-8 cursor-pointer group">
+            <div className="neo-card bg-yellow-200 p-8 cursor-pointer group">
               <div className="w-16 h-16 bg-white border border-black rounded-xl flex items-center justify-center mb-6">
                 <BarChart3 size={32} className="text-black" />
               </div>
@@ -191,7 +191,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={onGetStarted}
-              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-yellow-400 text-black font-bold text-lg"
+              className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-yellow-200 text-black font-bold text-lg"
             >
               <span>Start Building Today</span>
               <ArrowRight size={20} />
@@ -206,7 +206,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-yellow-400 text-black py-16">
+      <footer className="bg-yellow-200 text-black py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="space-y-4">
