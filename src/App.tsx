@@ -9,7 +9,6 @@ import EnhancedAnalytics from './components/EnhancedAnalytics';
 import AboutPage from './components/AboutPage';
 import Navbar from './components/Navbar';
 import MCPAssistantButton from './components/MCPAssistantButton';
-import SystemTestButton from './components/SystemTestButton';
 import { supabase } from './lib/supabase';
 
 function App() {
@@ -75,9 +74,6 @@ function App() {
           onClose={() => setShowAuthModal(false)}
           onAuthSuccess={handleAuthSuccess}
         />
-
-        {/* System Test Button (available on landing page too) */}
-        <SystemTestButton />
       </div>
     );
   }
@@ -112,7 +108,6 @@ function App() {
 
       {/* Floating Action Buttons */}
       <MCPAssistantButton />
-      <SystemTestButton />
     </div>
   );
 }
