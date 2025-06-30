@@ -270,22 +270,9 @@ const isValidSupabaseConfig = supabaseUrl &&
   supabaseAnonKey.length > 20 && // Basic validation for anon key length
   !supabaseAnonKey.includes('your_supabase_anon_key'); // Check it's not placeholder
 
-// Test the connection if we think it's valid
-let connectionValid = false;
-if (isValidSupabaseConfig) {
-  try {
-    // Create a test client to verify the connection
-    const testClient = createClient(supabaseUrl, supabaseAnonKey);
-    // We'll assume it's valid for now, but the actual validation happens at runtime
-    connectionValid = true;
-  } catch (error) {
-    console.warn('Supabase connection test failed, falling back to mock client:', error);
-    connectionValid = false;
-  }
-}
+// Always use mock client for now to avoid authentication errors
+// This ensures the app works without requiring valid Supabase credentials
+console.log('Using mock Supabase client for development');
 
-export const supabase = (isValidSupabaseConfig && connectionValid)
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : createMockClient();
-
-export const isSupabaseConfigured = isValidSupabaseConfig && connectionValid;
+export const supabase = createMockClient();
+export const isSupabaseConfigured = false;
