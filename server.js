@@ -10,8 +10,7 @@ const app = express();
 // Configure CORS
 app.use(cors({
   origin: [
-    'https://chromion-seedster.vercel.app',
-    'http://localhost:5173', // Keep local development
+    'http://localhost:5173', // Local development
   ],
   methods: ['GET', 'POST'],
   credentials: true
@@ -42,4 +41,4 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Export the Express app for Vercel
-export default app; 
+export default app;

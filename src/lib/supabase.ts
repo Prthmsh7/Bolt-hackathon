@@ -4,7 +4,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  console.warn('Missing Supabase environment variables. Using demo mode.');
 }
 
 console.log('Supabase URL:', supabaseUrl);
@@ -20,9 +20,13 @@ const isValidConfig =
 console.log('Is valid Supabase config:', isValidConfig);
 
 // Create the Supabase client with minimal configuration
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  db: { schema: 'public' }
-});
+export const supabase = createClient(
+  supabaseUrl || 'https://example.supabase.co', 
+  supabaseAnonKey || 'demo-key', 
+  {
+    db: { schema: 'public' }
+  }
+);
 
 // Export configuration status - use the actual validation result
 export const isSupabaseConfigured = isValidConfig;

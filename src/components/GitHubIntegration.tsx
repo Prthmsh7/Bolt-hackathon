@@ -130,7 +130,7 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
       }
 
       // Real GitHub OAuth flow
-      const redirectUri = encodeURIComponent(`https://chromion-seedster.vercel.app/auth/github/callback`);
+      const redirectUri = encodeURIComponent(`http://localhost:5173/auth/github/callback`);
       const scope = encodeURIComponent('repo,user:email');
       const state = Math.random().toString(36).substring(7);
       

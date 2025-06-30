@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function GitHubCallback() {
+  const navigate = useNavigate();
+  
   useEffect(() => {
     const handleCallback = async () => {
       try {
@@ -33,7 +35,7 @@ export default function GitHubCallback() {
         }
 
         // Exchange code for access token
-        const response = await fetch('https://chromion-seedster.vercel.app/api/github/callback', {
+        const response = await fetch('http://localhost:3000/api/github/callback', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -66,7 +68,7 @@ export default function GitHubCallback() {
     };
 
     handleCallback();
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -76,4 +78,4 @@ export default function GitHubCallback() {
       </div>
     </div>
   );
-} 
+}
