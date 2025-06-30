@@ -31,12 +31,37 @@ import {
   Clock,
   Globe,
   Mail,
-  Phone
+  Phone,
+  AlertCircle
 } from 'lucide-react';
 import { demoProjects, developerProfiles, searchProjects, searchDevelopers, getDeveloperById, type DemoProject, type DeveloperProfile } from '../data/demoProjects';
+import { supabase } from '../lib/supabase';
 
 interface MarketplaceProps {
   onBack: () => void;
+}
+
+interface IPRegistration {
+  id: string;
+  title: string;
+  description: string;
+  founder_name: string;
+  company_name: string;
+  category: string;
+  price: number;
+  likes_count: number;
+  views_count: number;
+  purchase_count: number;
+  is_featured: boolean;
+  demo_link?: string;
+  presentation_video?: string;
+  thumbnail_url: string;
+  project_type: string;
+  business_model: string;
+  developers: string;
+  created_at: string;
+  status: string;
+  ipfs_url: string;
 }
 
 const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
@@ -54,6 +79,9 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   const [selectedDeveloper, setSelectedDeveloper] = useState<DeveloperProfile | null>(null);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showDeveloperModal, setShowDeveloperModal] = useState(false);
+  const [realProjects, setRealProjects] = useState<IPRegistration[]>([]);
+  const [isLoadingRealProjects, setIsLoadingRealProjects] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const categories = [
     'all', 'AI/ML', 'Blockchain', 'Fintech', 'Healthtech', 'Edtech', 
@@ -62,7 +90,66 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
   useEffect(() => {
     setIsLoaded(true);
+    fetchRealProjects();
   }, []);
+
+  const fetchRealProjects = async () => {
+    if (!supabase) {
+      console.warn('Supabase not configured, using demo data only');
+      return;
+    }
+
+    setIsLoadingRealProjects(true);
+    try {
+      // Fetch marketplace items
+      const { data: marketplaceData, error: marketplaceError } = await supabase
+        .from('marketplace_items')
+        .select('*');
+
+      if (marketplaceError) {
+        console.error('Error fetching marketplace items:', marketplaceError);
+        setError('Failed to load marketplace items. Using demo data instead.');
+      } else if (marketplaceData && marketplaceData.length > 0) {
+        console.log('Fetched marketplace items:', marketplaceData);
+        
+        // Map marketplace items to the expected format
+        const mappedProjects: IPRegistration[] = marketplaceData.map(item => ({
+          id: item.id,
+          title: item.title,
+          description: item.description || '',
+          founder_name: item.founder_name,
+          company_name: item.company_name || '',
+          category: item.category,
+          price: item.price,
+          likes_count: item.likes_count || 0,
+          views_count: item.views_count || 0,
+          purchase_count: item.purchase_count || 0,
+          is_featured: item.is_featured || false,
+          demo_link: item.demo_link,
+          presentation_video: item.presentation_video,
+          thumbnail_url: item.thumbnail_url || 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=400&h=225&dpr=2',
+          project_type: item.project_type || 'Web Application',
+          business_model: item.business_model || 'SaaS',
+          developers: item.developers || 'Team members',
+          created_at: item.created_at,
+          status: item.status || 'pending',
+          ipfs_url: item.ipfs_url
+        }));
+
+        setRealProjects(mappedProjects);
+        
+        // Combine real projects with demo projects
+        const combinedProjects = [...mappedProjects, ...demoProjects];
+        setProjects(combinedProjects);
+        setFilteredProjects(combinedProjects);
+      }
+    } catch (err) {
+      console.error('Error in fetchRealProjects:', err);
+      setError('An error occurred while fetching projects. Using demo data instead.');
+    } finally {
+      setIsLoadingRealProjects(false);
+    }
+  };
 
   // Filter and search logic for projects
   useEffect(() => {
@@ -70,7 +157,13 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
     // Apply search filter
     if (searchQuery.trim()) {
-      filtered = searchProjects(searchQuery);
+      filtered = filtered.filter(project => 
+        project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        project.founder_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        project.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (project.company_name && project.company_name.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
     }
 
     // Apply category filter
@@ -109,8 +202,8 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
     setFilteredDevelopers(filtered);
   }, [searchQuery, developers]);
 
-  const handleProjectClick = (project: DemoProject) => {
-    setSelectedProject(project);
+  const handleProjectClick = (project: DemoProject | IPRegistration) => {
+    setSelectedProject(project as DemoProject);
     setShowProjectModal(true);
   };
 
@@ -136,7 +229,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
     });
   };
 
-  const renderProjectCard = (project: DemoProject, index: number) => (
+  const renderProjectCard = (project: DemoProject | IPRegistration, index: number) => (
     <div 
       key={project.id} 
       className="bg-white rounded-2xl border border-light-border overflow-hidden hover:border-primary/50 hover:shadow-xl transition-all duration-300 cursor-pointer card-hover stagger-item group" 
@@ -155,6 +248,12 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
             <span className="bg-secondary text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
               <Crown size={12} />
               <span>FEATURED</span>
+            </span>
+          )}
+          {'status' in project && project.status === 'pending' && (
+            <span className="bg-warning text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1">
+              <Clock size={12} />
+              <span>PENDING</span>
             </span>
           )}
         </div>
@@ -324,6 +423,16 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                 </span>
               </div>
             )}
+            
+            {/* Status badge */}
+            {'status' in selectedProject && selectedProject.status === 'pending' && (
+              <div className="absolute top-4 left-4 ml-24">
+                <span className="neo-btn bg-warning text-white px-3 py-1 text-sm font-bold flex items-center space-x-1">
+                  <Clock size={14} />
+                  <span>PENDING</span>
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Content */}
@@ -380,7 +489,10 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                     </div>
                     <div className="flex justify-between items-center pb-2 border-b border-light-border">
                       <span className="text-text-secondary">Status:</span>
-                      <span className="text-success font-medium">{selectedProject.status}</span>
+                      <span className={'status' in selectedProject && selectedProject.status === 'pending' ? 
+                        "text-warning font-medium" : "text-success font-medium"}>
+                        {'status' in selectedProject ? selectedProject.status : 'active'}
+                      </span>
                     </div>
                     <div className="flex justify-between items-center pb-2 border-b border-light-border">
                       <span className="text-text-secondary">Created:</span>
@@ -445,11 +557,24 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                     <ExternalLink size={16} />
                   </a>
                 )}
+                {'ipfs_url' in selectedProject && selectedProject.ipfs_url && (
+                  <a
+                    href={selectedProject.ipfs_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="neo-btn flex items-center space-x-2 px-6 py-3 bg-secondary text-white"
+                  >
+                    <Database size={18} />
+                    <span>View on IPFS</span>
+                    <ExternalLink size={16} />
+                  </a>
+                )}
               </div>
 
               {/* Investment Button */}
               <button className="neo-btn w-full py-4 bg-secondary text-white font-bold text-lg">
-                Invest in This Project
+                {'status' in selectedProject && selectedProject.status === 'pending' ? 
+                  'Express Interest (Pending Approval)' : 'Invest in This Project'}
               </button>
             </div>
           </div>
@@ -723,6 +848,26 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Error message */}
+        {error && (
+          <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl">
+            <div className="flex items-center space-x-2">
+              <AlertCircle size={20} className="text-error" />
+              <p className="text-error">{error}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Loading indicator */}
+        {isLoadingRealProjects && (
+          <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-xl">
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-primary"></div>
+              <p className="text-primary">Loading projects...</p>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'projects' ? (
           <div className={`grid gap-6 ${
             viewMode === 'grid' 
@@ -779,5 +924,26 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
     </div>
   );
 };
+
+function Database(props: any) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+    </svg>
+  );
+}
 
 export default Marketplace;
