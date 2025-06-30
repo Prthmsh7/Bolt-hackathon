@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle, Info, Settings, HelpCircle } from 'lucide-react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { X, Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle, Info } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -15,10 +15,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
   const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
-  const [showTestCredentials, setShowTestCredentials] = useState(false);
 
   const resetForm = () => {
     setEmail('');
@@ -28,7 +27,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
     setSuccess('');
     setShowPassword(false);
     setShowHelp(false);
-    setShowTestCredentials(false);
   };
 
   const handleClose = () => {
@@ -67,25 +65,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
     return true;
   };
 
-  const useTestCredentials = () => {
-    setEmail('test@example.com');
-    setPassword('test123');
-    if (!isLogin) {
-      setFullName('Test User');
-    }
-    setShowTestCredentials(false);
-  };
-
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Check if Supabase is configured
-    if (!isSupabaseConfigured) {
-      setError('Authentication service is not configured. Please check your environment variables and ensure Supabase is properly set up.');
-      setShowHelp(true);
-      return;
-    }
-
     if (!validateForm()) {
       return;
     }
@@ -98,41 +80,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
       if (isLogin) {
         // Sign in
         console.log('Attempting sign in for:', email);
-        
-        // For demo purposes, allow test credentials to work without actual Supabase auth
-        if (email === 'test@example.com' && password === 'test123') {
-          console.log('Using demo credentials');
-          setSuccess('Successfully signed in with demo account!');
-          
-          // Create a mock user session
-          const mockUser = {
-            id: 'demo-user-id',
-            email: 'test@example.com',
-            user_metadata: {
-              full_name: 'Test User'
-            }
-          };
-          
-          // Store in localStorage to simulate a session
-          localStorage.setItem('supabase.auth.token', JSON.stringify({
-            currentSession: {
-              user: mockUser,
-              access_token: 'demo-token',
-              refresh_token: 'demo-refresh-token',
-              expires_at: Date.now() + 3600000 // 1 hour from now
-            }
-          }));
-          
-          // Small delay to show success message
-          setTimeout(() => {
-            if (onAuthSuccess) {
-              onAuthSuccess();
-            }
-            handleClose();
-          }, 1500);
-          
-          return;
-        }
         
         const { data, error } = await supabase.auth.signInWithPassword({
           email: email.trim().toLowerCase(),
@@ -147,9 +94,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
               error.message.includes('invalid_credentials') ||
               error.message.includes('Invalid email or password')) {
             
-            setError('No account found with these credentials. Please check your email and password, or create a new account if you haven\'t signed up yet.');
+            setError('Invalid email or password. Please check your credentials and try again.');
             setShowHelp(true);
-            setShowTestCredentials(true);
             
           } else if (error.message.includes('Email not confirmed')) {
             setError('Please check your email and click the confirmation link before signing in.');
@@ -162,7 +108,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             
           } else {
             setError(`Sign in failed: ${error.message}`);
-            setShowHelp(true);
           }
           return;
         }
@@ -183,41 +128,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
       } else {
         // Sign up
         console.log('Attempting sign up for:', email);
-        
-        // For demo purposes, allow test credentials to work without actual Supabase auth
-        if (email === 'test@example.com' && password === 'test123') {
-          console.log('Using demo credentials for signup');
-          setSuccess('Account created successfully with demo credentials!');
-          
-          // Create a mock user session
-          const mockUser = {
-            id: 'demo-user-id',
-            email: 'test@example.com',
-            user_metadata: {
-              full_name: fullName.trim() || 'Test User'
-            }
-          };
-          
-          // Store in localStorage to simulate a session
-          localStorage.setItem('supabase.auth.token', JSON.stringify({
-            currentSession: {
-              user: mockUser,
-              access_token: 'demo-token',
-              refresh_token: 'demo-refresh-token',
-              expires_at: Date.now() + 3600000 // 1 hour from now
-            }
-          }));
-          
-          // Small delay to show success message
-          setTimeout(() => {
-            if (onAuthSuccess) {
-              onAuthSuccess();
-            }
-            handleClose();
-          }, 1500);
-          
-          return;
-        }
         
         const { data, error } = await supabase.auth.signUp({
           email: email.trim().toLowerCase(),
@@ -277,19 +187,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             
           } else {
             // User is immediately signed in (email confirmation disabled)
-            setSuccess('Account created and signed in successfully! Welcome to Seedora!');
+            setSuccess('Account created and signed in successfully! Welcome to Seedster!');
             
             // Create user profile
             try {
               const { error: profileError } = await supabase
                 .from('profiles')
-                .upsert({
+                .insert({
                   id: data.user.id,
                   email: email.trim().toLowerCase(),
-                  created_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString()
-                }, {
-                  onConflict: 'id'
+                  created_at: new Date().toISOString()
                 });
 
               if (profileError) {
@@ -311,7 +218,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
     } catch (error: any) {
       console.error('Auth error:', error);
       setError('An unexpected error occurred. Please try again.');
-      setShowHelp(true);
     } finally {
       setIsLoading(false);
     }
@@ -322,7 +228,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
     setError('');
     setSuccess('');
     setShowHelp(false);
-    setShowTestCredentials(false);
     setPassword('');
   };
 
@@ -330,7 +235,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="neo-card bg-white w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="neo-card bg-white w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-light-border">
           <h2 className="text-xl font-bold text-text-primary">
@@ -346,23 +251,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
         </div>
 
         <div className="p-6">
-          {/* Configuration Warning */}
-          {!isSupabaseConfigured && (
-            <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl">
-              <div className="flex items-start space-x-3">
-                <Settings size={16} className="text-error mt-0.5 flex-shrink-0" />
-                <div className="text-sm">
-                  <p className="text-text-primary font-medium mb-1">
-                    Authentication Not Configured
-                  </p>
-                  <p className="text-text-secondary">
-                    Supabase environment variables are missing or invalid. Please configure your .env file with valid Supabase credentials.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Info Banner */}
           <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-xl">
             <div className="flex items-start space-x-3">
@@ -374,38 +262,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 <p className="text-text-secondary">
                   {isLogin 
                     ? 'Enter your email and password to access your account.'
-                    : 'Join Seedora to protect your IP and discover investment opportunities.'
+                    : 'Join Seedster to protect your IP and discover investment opportunities.'
                   }
                 </p>
               </div>
             </div>
           </div>
-
-          {/* Test Credentials Helper */}
-          {showTestCredentials && isLogin && (
-            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-              <div className="flex items-start space-x-3">
-                <HelpCircle size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
-                <div className="text-sm flex-1">
-                  <p className="text-blue-900 font-medium mb-2">
-                    First time here? Try creating an account first!
-                  </p>
-                  <p className="text-blue-700 mb-3">
-                    If you want to test with demo credentials, you can use:
-                  </p>
-                  <button
-                    onClick={useTestCredentials}
-                    className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Use Test Credentials
-                  </button>
-                  <p className="text-blue-600 text-xs mt-2">
-                    Email: test@example.com | Password: test123
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
 
           <form onSubmit={handleAuth} className="space-y-4">
             {!isLogin && (
@@ -421,7 +283,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                   placeholder="Enter your full name"
                   className="w-full px-4 py-3 bg-white border border-light-border rounded-xl focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-primary placeholder-text-muted transition-all duration-300"
                   required={!isLogin}
-                  disabled={isLoading || !isSupabaseConfigured}
+                  disabled={isLoading}
                 />
               </div>
             )}
@@ -438,7 +300,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 placeholder="Enter your email"
                 className="w-full px-4 py-3 bg-white border border-light-border rounded-xl focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-primary placeholder-text-muted transition-all duration-300"
                 required
-                disabled={isLoading || !isSupabaseConfigured}
+                disabled={isLoading}
               />
             </div>
 
@@ -456,13 +318,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                   className="w-full px-4 py-3 pr-12 bg-white border border-light-border rounded-xl focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-primary placeholder-text-muted transition-all duration-300"
                   required
                   minLength={6}
-                  disabled={isLoading || !isSupabaseConfigured}
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
-                  disabled={isLoading || !isSupabaseConfigured}
+                  disabled={isLoading}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -489,24 +351,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                 <div className="flex-1">
                   <p className="text-text-primary text-sm font-medium">{error}</p>
                   {showHelp && isLogin && (
-                    <div className="mt-3 p-3 bg-white/50 rounded-lg">
-                      <p className="text-xs text-text-secondary font-medium mb-2">Quick Solutions:</p>
-                      <div className="text-xs text-text-secondary space-y-1">
-                        <p>• <strong>New user?</strong> Click "Create one here" below to sign up first</p>
-                        <p>• <strong>Check spelling:</strong> Verify your email and password for typos</p>
-                        <p>• <strong>Try test account:</strong> Use the "Use Test Credentials" button above</p>
-                        <p>• <strong>Database empty?</strong> Create a new account to get started</p>
-                      </div>
-                    </div>
-                  )}
-                  {showHelp && !isLogin && (
-                    <div className="mt-3 p-3 bg-white/50 rounded-lg">
-                      <p className="text-xs text-text-secondary font-medium mb-2">Signup Tips:</p>
-                      <div className="text-xs text-text-secondary space-y-1">
-                        <p>• <strong>Email exists?</strong> Try signing in instead</p>
-                        <p>• <strong>Password strength:</strong> Use at least 6 characters</p>
-                        <p>• <strong>Email verification:</strong> Check your inbox after signup</p>
-                      </div>
+                    <div className="mt-2 text-xs text-text-secondary">
+                      <p>• Make sure you've created an account first</p>
+                      <p>• Check your email and password for typos</p>
+                      <p>• Confirm your email if required</p>
                     </div>
                   )}
                 </div>
@@ -516,8 +364,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading || !isSupabaseConfigured}
-              className="neo-btn w-full py-3 bg-primary text-white font-semibold flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
+              className="neo-btn w-full py-3 bg-primary text-white font-semibold flex items-center justify-center space-x-2"
             >
               {isLoading ? (
                 <>
@@ -525,57 +373,40 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
                   <span>{isLogin ? 'Signing In...' : 'Creating Account...'}</span>
                 </>
               ) : (
-                <span>
-                  {!isSupabaseConfigured 
-                    ? 'Configure Supabase First' 
-                    : (isLogin ? 'Sign In' : 'Create Account')
-                  }
-                </span>
+                <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
               )}
             </button>
           </form>
 
           {/* Toggle Auth Mode */}
-          {isSupabaseConfigured && (
-            <div className="mt-6 text-center">
-              <p className="text-text-secondary text-sm">
-                {isLogin ? "Don't have an account?" : "Already have an account?"}
-                <button
-                  onClick={handleToggleMode}
-                  disabled={isLoading}
-                  className="ml-2 text-primary hover:text-primary-dark font-medium transition-colors disabled:opacity-50"
-                >
-                  {isLogin ? 'Create one here' : 'Sign in instead'}
-                </button>
-              </p>
-            </div>
-          )}
+          <div className="mt-6 text-center">
+            <p className="text-text-secondary text-sm">
+              {isLogin ? "Don't have an account?" : "Already have an account?"}
+              <button
+                onClick={handleToggleMode}
+                disabled={isLoading}
+                className="ml-2 text-primary hover:text-primary-dark font-medium transition-colors disabled:opacity-50"
+              >
+                {isLogin ? 'Create one here' : 'Sign in instead'}
+              </button>
+            </p>
+          </div>
 
           {/* Help Section */}
           <div className="mt-6 p-4 bg-light-bg border border-light-border rounded-xl">
-            <h4 className="font-medium text-text-primary mb-2 text-sm">
-              {!isSupabaseConfigured ? 'Setup Required' : 'Getting Started'}
-            </h4>
+            <h4 className="font-medium text-text-primary mb-2 text-sm">Need Help?</h4>
             <div className="text-xs text-text-muted space-y-1">
-              {!isSupabaseConfigured ? (
+              {isLogin ? (
                 <>
-                  <p>• <strong>Missing .env file:</strong> Copy .env.example to .env</p>
-                  <p>• <strong>Invalid URLs:</strong> Replace placeholder values with real Supabase credentials</p>
-                  <p>• <strong>Project setup:</strong> Ensure your Supabase project has authentication enabled</p>
-                </>
-              ) : isLogin ? (
-                <>
-                  <p>• <strong>First time?</strong> Create an account first, then sign in</p>
-                  <p>• <strong>Testing?</strong> Use the test credentials button when it appears</p>
+                  <p>• <strong>New user?</strong> Click "Create one here" to sign up</p>
                   <p>• <strong>Forgot password?</strong> Contact support for assistance</p>
-                  <p>• <strong>Email issues?</strong> Check your inbox and spam folder</p>
+                  <p>• <strong>Email not confirmed?</strong> Check your inbox and spam folder</p>
                 </>
               ) : (
                 <>
                   <p>• <strong>Already registered?</strong> Click "Sign in instead"</p>
                   <p>• <strong>Email confirmation:</strong> You may need to verify your email</p>
                   <p>• <strong>Password requirements:</strong> Minimum 6 characters</p>
-                  <p>• <strong>Getting started:</strong> Create your account to begin protecting your IP</p>
                 </>
               )}
             </div>

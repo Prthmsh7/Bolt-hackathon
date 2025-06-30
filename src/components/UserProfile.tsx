@@ -35,8 +35,6 @@ import {
   Users,
   Lightbulb,
   Upload,
-  Video,
-  Link,
   Building,
   CheckCircle,
   Clock,
@@ -53,8 +51,7 @@ import {
   RefreshCw,
   List,
   Grid,
-  Github,
-  Loader2
+  Github
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -72,7 +69,6 @@ interface IPRegistration {
   description: string;
   category: string;
   ipfs_url: string;
-  ipfs_hash: string;
   created_at: string;
   status: string;
   project_type: string;
@@ -83,7 +79,7 @@ interface IPRegistration {
   github_repo?: string;
 }
 
-interface GitHubRepo {
+interface GitHubRepoProps {
   id: number;
   name: string;
   full_name: string;
@@ -97,6 +93,15 @@ interface GitHubRepo {
   updated_at: string;
   topics: string[];
   private: boolean;
+  size: number;
+  default_branch: string;
+  open_issues_count: number;
+  has_issues: boolean;
+  has_projects: boolean;
+  has_wiki: boolean;
+  archived: boolean;
+  disabled: boolean;
+  pushed_at: string;
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
@@ -109,9 +114,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
   const [loadingIPs, setLoadingIPs] = useState(false);
   const [showIPForm, setShowIPForm] = useState(false);
   const [projectsView, setProjectsView] = useState<'list' | 'form'>('list');
-  const [selectedRepos, setSelectedRepos] = useState<GitHubRepo[]>([]);
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [selectedRepos, setSelectedRepos] = useState<GitHubRepoProps[]>([]);
 
   const [profileData, setProfileData] = useState({
     name: user?.email?.split('@')[0] || 'User',
@@ -148,42 +151,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
     }
   }, []);
 
-  // Fetch user profile and IP registrations when user is available
   useEffect(() => {
     if (user) {
-      fetchUserProfile();
       fetchIPRegistrations();
     }
   }, [user]);
-
-  const fetchUserProfile = async () => {
-    if (!user) return;
-    
-    setLoadingProfile(true);
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        // If profile doesn't exist, we'll create one later
-      } else if (data) {
-        setUserProfile(data);
-        // Update wallet address if it exists in profile
-        if (data.wallet_address) {
-          setWalletAddress(data.wallet_address);
-          setWalletConnected(true);
-        }
-      }
-    } catch (error) {
-      console.error('Error in profile fetch:', error);
-    } finally {
-      setLoadingProfile(false);
-    }
-  };
 
   const fetchIPRegistrations = async () => {
     if (!user) return;
@@ -192,9 +164,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
     try {
       const { data, error } = await supabase
         .from('ip_registrations')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .select('*');
 
       if (error) throw error;
       setIPRegistrations(data || []);
@@ -205,38 +175,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
     }
   };
 
-  const handleWalletConnection = async (connected: boolean, address: string = '') => {
+  const handleWalletConnection = (connected: boolean, address: string = '') => {
     setWalletConnected(connected);
     setWalletAddress(address);
     
     // Save wallet state to localStorage
     if (connected && address) {
       localStorage.setItem('walletConnection', JSON.stringify({ connected, address }));
-      
-      // Update user profile with wallet address
-      if (user) {
-        try {
-          const { error } = await supabase
-            .from('profiles')
-            .upsert({
-              id: user.id,
-              wallet_address: address,
-              updated_at: new Date().toISOString()
-            }, {
-              onConflict: 'id'
-            });
-
-          if (error) {
-            console.error('Error updating profile with wallet address:', error);
-          } else {
-            console.log('Profile updated with wallet address');
-            // Refresh profile data
-            fetchUserProfile();
-          }
-        } catch (error) {
-          console.error('Error updating profile:', error);
-        }
-      }
     } else {
       localStorage.removeItem('walletConnection');
     }
@@ -261,7 +206,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
     fetchIPRegistrations();
   };
 
-  const handleRepoSelected = (repo: GitHubRepo) => {
+  const handleRepoSelected = (repo: GitHubRepoProps) => {
     // Check if repo is already selected
     if (selectedRepos.some(r => r.id === repo.id)) {
       setSelectedRepos(selectedRepos.filter(r => r.id !== repo.id));
@@ -392,7 +337,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
           <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
             <User size={32} className="text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-text-primary mb-4">Welcome to Seedora!</h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-4">Welcome to Seedster!</h2>
           <p className="text-text-secondary text-lg mb-8 max-w-2xl mx-auto">
             Choose your role to get started. You can switch between roles anytime using the toggle above.
           </p>
@@ -674,15 +619,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
                       </div>
                     </div>
                     <div className="px-6 py-3 bg-light-card border-t border-light-border">
-                      <div className="flex items-center justify-between">
-                        <p className="text-text-muted text-xs">
-                          Registered {new Date(project.created_at).toLocaleDateString()}
-                        </p>
-                        <div className="flex items-center space-x-2 text-xs">
-                          <span className="text-text-muted">IPFS:</span>
-                          <span className="font-mono text-primary">{project.ipfs_hash.slice(0, 8)}...</span>
-                        </div>
-                      </div>
+                      <p className="text-text-muted text-xs">
+                        Registered {new Date(project.created_at).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -830,25 +769,16 @@ const UserProfile: React.FC<UserProfileProps> = ({ onBack }) => {
           <span>Back to Dashboard</span>
         </button>
 
-        {loadingProfile ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 size={32} className="animate-spin text-primary" />
-            <span className="ml-3 text-text-secondary">Loading profile...</span>
-          </div>
-        ) : (
-          <>
-            {renderHeader()}
+        {renderHeader()}
 
-            <div className="space-y-8">
-              {activeView === 'overview' && renderOverview()}
-              {activeView === 'developer' && renderDeveloperView()}
-              {activeView === 'investor' && renderInvestorView()}
-              {activeView === 'wallet' && renderWalletView()}
-              {activeView === 'github' && renderGitHubView()}
-              {activeView === 'settings' && renderSettingsView()}
-            </div>
-          </>
-        )}
+        <div className="space-y-8">
+          {activeView === 'overview' && renderOverview()}
+          {activeView === 'developer' && renderDeveloperView()}
+          {activeView === 'investor' && renderInvestorView()}
+          {activeView === 'wallet' && renderWalletView()}
+          {activeView === 'github' && renderGitHubView()}
+          {activeView === 'settings' && renderSettingsView()}
+        </div>
       </div>
     </div>
   );

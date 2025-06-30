@@ -57,18 +57,12 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
       
       if (user) {
         // Get user profile for channel name
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile } = await supabase
           .from('profiles')
-          .select('username, full_name')
-          .eq('id', user.id)
-          .single();
+          .select('username, full_name');
         
-        if (profileError) {
-          console.error('Profile fetch error:', profileError);
-        }
-        
-        if (profile && !channelName) {
-          setChannelName(profile.username || profile.full_name || 'My Channel');
+        if (profile && profile.length > 0 && !channelName) {
+          setChannelName(profile[0].username || profile[0].full_name || 'My Channel');
         }
       }
     } catch (error) {
@@ -312,9 +306,7 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
       // Insert video record into database
       const { data: insertedVideo, error: insertError } = await supabase
         .from('videos')
-        .insert(videoData)
-        .select()
-        .single();
+        .insert(videoData);
 
       if (insertError) {
         console.error('Database insert error:', insertError);
@@ -330,16 +322,16 @@ const VideoUploadModal: React.FC<VideoUploadModalProps> = ({
 
       // Create video object for the UI
       const newVideo = {
-        id: insertedVideo.id,
-        title: insertedVideo.title,
-        channel: insertedVideo.channel_name,
+        id: videoData.user_id,
+        title: videoData.title,
+        channel: videoData.channel_name,
         views: '0 views',
         timestamp: 'Just now',
-        duration: insertedVideo.duration,
-        thumbnail: insertedVideo.thumbnail_url,
-        videoUrl: insertedVideo.video_url,
+        duration: videoData.duration,
+        thumbnail: videoData.thumbnail_url,
+        videoUrl: videoData.video_url,
         channelAvatar: 'https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=2',
-        description: insertedVideo.description || '',
+        description: videoData.description || '',
         likes: '0',
         subscribers: '1K',
         filecoinCID: videoUploadResult.cid,

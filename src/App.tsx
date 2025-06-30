@@ -1,24 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LandingPage from './components/LandingPage';
-import AuthModal from './components/Auth';
+import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import Marketplace from './components/Marketplace';
 import InvestmentStream from './components/InvestmentStream';
 import UserProfile from './components/UserProfile';
 import EnhancedAnalytics from './components/EnhancedAnalytics';
-import AboutPage from './components/AboutPage';
-import Navbar from './components/Navbar';
+import ChainlinkDashboard from './components/ChainlinkDashboard';
+import DeFiDashboard from './components/DeFiDashboard';
+import TokenizationDashboard from './components/TokenizationDashboard';
+import CrossChainDashboard from './components/CrossChainDashboard';
+import AIAgentsDashboard from './components/AIAgentsDashboard';
+import AvalancheDashboard from './components/AvalancheDashboard';
+import AuthModal from './components/Auth';
 import MCPAssistantButton from './components/MCPAssistantButton';
-import GitHubCallback from './components/GitHubCallback';
+import LandingPage from './components/LandingPage';
+import AboutPage from './components/AboutPage';
 import { supabase } from './lib/supabase';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import GitHubCallback from './pages/auth/github/callback';
 
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'chainlink' | 'defi' | 'tokenization' | 'cross-chain' | 'ai-agents' | 'avalanche' | 'about'>('dashboard');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [currentPage, setCurrentPage] = useState<'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'about'>('dashboard');
+  const [mcpInsights, setMcpInsights] = useState<any[]>([]);
 
   // Page load animation
   useEffect(() => {
@@ -46,6 +53,10 @@ function App() {
     }
   };
 
+  const handleNavigation = (page: 'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'chainlink' | 'defi' | 'tokenization' | 'cross-chain' | 'ai-agents' | 'avalanche' | 'about') => {
+    setCurrentPage(page);
+  };
+
   const handleGetStarted = () => {
     setShowAuthModal(true);
   };
@@ -56,76 +67,83 @@ function App() {
     checkAuthStatus();
   };
 
-  const handleNavigate = (page: 'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'about') => {
-    setCurrentPage(page);
+  const handleInsightGenerated = (insight: any) => {
+    setMcpInsights(prev => [insight, ...prev]);
   };
 
-  const handleShowAuth = () => {
-    setShowAuthModal(true);
+  const renderCurrentPage = () => {
+    switch (currentPage) {
+      case 'marketplace':
+        return <Marketplace onBack={() => setCurrentPage('dashboard')} />;
+      case 'investment-stream':
+        return <InvestmentStream onBack={() => setCurrentPage('dashboard')} />;
+      case 'user-profile':
+        return <UserProfile onBack={() => setCurrentPage('dashboard')} />;
+      case 'analytics':
+        return <EnhancedAnalytics onBack={() => setCurrentPage('dashboard')} />;
+      case 'chainlink':
+        return <ChainlinkDashboard onBack={() => setCurrentPage('dashboard')} />;
+      case 'defi':
+        return <DeFiDashboard onBack={() => setCurrentPage('dashboard')} />;
+      case 'tokenization':
+        return <TokenizationDashboard onBack={() => setCurrentPage('dashboard')} />;
+      case 'cross-chain':
+        return <CrossChainDashboard onBack={() => setCurrentPage('dashboard')} />;
+      case 'ai-agents':
+        return <AIAgentsDashboard onBack={() => setCurrentPage('dashboard')} />;
+      case 'avalanche':
+        return <AvalancheDashboard onBack={() => setCurrentPage('dashboard')} />;
+      case 'about':
+        return <AboutPage onBack={() => setCurrentPage('dashboard')} />;
+      case 'dashboard':
+      default:
+        return <Dashboard onNavigate={handleNavigation} />;
+    }
   };
 
   // Show landing page if user is not authenticated
   if (showLanding && !user) {
     return (
-      <Router>
-        <Routes>
-          <Route path="/auth/github/callback" element={<GitHubCallback />} />
-          <Route path="*" element={
-            <div className={`transition-all duration-1000 ${isLoaded ? 'fade-in' : 'opacity-0'}`}>
-              <LandingPage onGetStarted={handleGetStarted} />
-              
-              {/* Authentication Modal */}
-              <AuthModal 
-                isOpen={showAuthModal}
-                onClose={() => setShowAuthModal(false)}
-                onAuthSuccess={handleAuthSuccess}
-              />
-            </div>
-          } />
-        </Routes>
-      </Router>
+      <div className={`transition-all duration-1000 ${isLoaded ? 'fade-in' : 'opacity-0'}`}>
+        <LandingPage onGetStarted={handleGetStarted} />
+        
+        {/* Authentication Modal */}
+        <AuthModal 
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onAuthSuccess={handleAuthSuccess}
+        />
+      </div>
     );
   }
 
-  // Show main application
+  // Show main application if user is authenticated
   return (
     <Router>
-      <div className={`min-h-screen bg-light-bg transition-all duration-1000 ${isLoaded ? 'fade-in' : 'opacity-0'}`}>
-        <Routes>
-          <Route path="/auth/github/callback" element={<GitHubCallback />} />
-          <Route path="*" element={
-            <>
-              {/* Navigation */}
-              <Navbar 
-                onNavigate={handleNavigate}
-                currentPage={currentPage}
-                user={user}
-                onShowAuth={handleShowAuth}
-              />
+      <Routes>
+        <Route path="/auth/github/callback" element={<GitHubCallback />} />
+        <Route path="/" element={
+          <div className={`min-h-screen bg-light-bg text-text-primary transition-all duration-1000 ${isLoaded ? 'fade-in' : 'opacity-0'}`}>
+            <Navbar 
+              onNavigate={handleNavigation} 
+              currentPage={currentPage}
+              user={user}
+              onShowAuth={() => setShowAuthModal(true)}
+            />
+            {renderCurrentPage()}
+            
+            {/* Authentication Modal */}
+            <AuthModal 
+              isOpen={showAuthModal}
+              onClose={() => setShowAuthModal(false)}
+              onAuthSuccess={handleAuthSuccess}
+            />
 
-              {/* Main Content */}
-              <main>
-                {currentPage === 'dashboard' && <Dashboard onNavigate={handleNavigate} />}
-                {currentPage === 'marketplace' && <Marketplace onBack={() => handleNavigate('dashboard')} />}
-                {currentPage === 'investment-stream' && <InvestmentStream onBack={() => handleNavigate('dashboard')} />}
-                {currentPage === 'user-profile' && <UserProfile onBack={() => handleNavigate('dashboard')} />}
-                {currentPage === 'analytics' && <EnhancedAnalytics onBack={() => handleNavigate('dashboard')} />}
-                {currentPage === 'about' && <AboutPage onBack={() => handleNavigate('dashboard')} />}
-              </main>
-
-              {/* Authentication Modal */}
-              <AuthModal 
-                isOpen={showAuthModal}
-                onClose={() => setShowAuthModal(false)}
-                onAuthSuccess={handleAuthSuccess}
-              />
-
-              {/* Floating Action Buttons */}
-              <MCPAssistantButton />
-            </>
-          } />
-        </Routes>
-      </div>
+            {/* MCP Assistant Button (floating) */}
+            <MCPAssistantButton onInsightGenerated={handleInsightGenerated} />
+          </div>
+        } />
+      </Routes>
     </Router>
   );
 }

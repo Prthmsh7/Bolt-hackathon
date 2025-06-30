@@ -262,7 +262,7 @@ class FilCDNClient {
 const filcdnConfig: FilCDNConfig = {
   apiKey: import.meta.env.VITE_FILCDN_API_KEY || 'demo-key',
   baseUrl: import.meta.env.VITE_FILCDN_BASE_URL || 'https://api.filcdn.io/v1',
-  enabled: import.meta.env.VITE_FILCDN_ENABLED === 'true',
+  enabled: import.meta.env.VITE_FILCDN_ENABLED === 'true' || false,
 };
 
 export const filcdnClient = new FilCDNClient(filcdnConfig);
@@ -274,7 +274,7 @@ export const generateVideoMetadata = (file: File, duration?: number) => ({
   type: file.type,
   duration: duration || 0,
   uploadedAt: new Date().toISOString(),
-  platform: 'start.dev',
+  platform: 'seedster.dev',
   quality: getVideoQuality(file),
 });
 

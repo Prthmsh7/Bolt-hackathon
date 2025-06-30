@@ -16,8 +16,7 @@ export default defineConfig({
     }),
   ],
   define: {
-    'process.env': {},
-    global: 'globalThis',
+    'process.env': process.env,
   },
   resolve: {
     alias: {
@@ -26,4 +25,30 @@ export default defineConfig({
       util: 'util',
     },
   },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: true,
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+        },
+      },
+    },
+  },
+  server: {
+    port: 5173,
+    strictPort: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  }
 })

@@ -14,12 +14,18 @@ import {
   Shield,
   CreditCard,
   HelpCircle,
-  BarChart3
+  BarChart3,
+  Network,
+  Coins,
+  Layers,
+  Globe,
+  Brain,
+  Mountain
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface NavbarProps {
-  onNavigate: (page: 'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'about') => void;
+  onNavigate: (page: 'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'chainlink' | 'defi' | 'tokenization' | 'cross-chain' | 'ai-agents' | 'avalanche' | 'about') => void;
   currentPage: string;
   user?: any;
   onShowAuth: () => void;
@@ -34,11 +40,17 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
     { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
     { id: 'investment-stream', label: 'Investment Stream', icon: TrendingUp },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    { id: 'chainlink', label: 'Chainlink', icon: Network },
+    { id: 'defi', label: 'DeFi', icon: Coins },
+    { id: 'tokenization', label: 'Tokenization', icon: Layers },
+    { id: 'cross-chain', label: 'Cross-Chain', icon: Globe },
+    { id: 'ai-agents', label: 'AI Agents', icon: Brain },
+    { id: 'avalanche', label: 'Avalanche', icon: Mountain },
     { id: 'about', label: 'About', icon: Info },
   ];
 
   const handleNavClick = (pageId: string) => {
-    onNavigate(pageId as 'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'about');
+    onNavigate(pageId as 'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'chainlink' | 'defi' | 'tokenization' | 'cross-chain' | 'ai-agents' | 'avalanche' | 'about');
     setIsMenuOpen(false);
   };
 
@@ -66,7 +78,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
             <div className="flex items-center group cursor-pointer" onClick={() => handleNavClick('dashboard')}>
               <div className="relative">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-primary">
-                  Seedora
+                  Seedster
                 </h1>
                 <div className="absolute -bottom-1 sm:-bottom-1.5 lg:-bottom-2 left-0 w-full h-1 sm:h-1.5 lg:h-2 bg-secondary rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
               </div>
@@ -93,7 +105,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
           <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-3">
             {/* Desktop Navigation Items */}
             <div className="hidden lg:flex items-center space-x-1 xl:space-x-3">
-              {navigationItems.map((item) => (
+              {navigationItems.slice(0, 5).map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
@@ -169,7 +181,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage, user, onShowAu
                     {/* Footer */}
                     <div className="p-4 lg:p-6 border-t border-light-border text-center">
                       <p className="text-xs lg:text-sm text-text-muted">
-                        Seedora Platform • Version 2.1.0
+                        Seedster Platform • Version 2.1.0
                       </p>
                     </div>
                   </div>

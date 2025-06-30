@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Upload, 
   FileText, 
@@ -24,6 +24,7 @@ import {
 import { PinataService } from '../services/pinata.service';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { PostgrestError } from '@supabase/supabase-js';
 
 interface IPRegistrationProps {
   walletAddress: string;
@@ -69,31 +70,8 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
     ipfsHash: string;
     ipfsUrl: string;
   } | null>(null);
-  const [pinataStatus, setPinataStatus] = useState<'idle' | 'checking' | 'ready' | 'error'>('idle');
 
   const pinataService = new PinataService();
-
-  // Check Pinata service status on component mount
-  useEffect(() => {
-    checkPinataStatus();
-  }, []);
-
-  const checkPinataStatus = async () => {
-    setPinataStatus('checking');
-    try {
-      // Create a small test object to verify Pinata is working
-      const testObject = { test: true, timestamp: new Date().toISOString() };
-      
-      // Try to upload to IPFS
-      await pinataService.uploadJSON(testObject);
-      
-      // If we get here, Pinata is working
-      setPinataStatus('ready');
-    } catch (err) {
-      console.error('Pinata service check failed:', err);
-      setPinataStatus('error');
-    }
-  };
 
   const categories = [
     'Fintech',
@@ -214,7 +192,7 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
         walletAddress,
         userId: user.id,
         registeredAt: new Date().toISOString(),
-        platform: 'seedora',
+        platform: 'start.dev',
       };
 
       const metadataHash = await pinataService.uploadJSON(metadata);
@@ -222,33 +200,6 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
       
       console.log('Metadata uploaded, hash:', metadataHash);
       console.log('IPFS URL:', ipfsUrl);
-
-      // Verify the IPFS hash is valid
-      const pinStatus = await pinataService.checkPinStatus(metadataHash);
-      console.log('Pin status:', pinStatus);
-      
-      if (!pinStatus.isValid) {
-        throw new Error('IPFS upload failed: Pin status check failed');
-      }
-
-      // Update user profile with wallet address if not already set
-      if (walletAddress) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: user.id,
-            wallet_address: walletAddress,
-            updated_at: new Date().toISOString()
-          }, {
-            onConflict: 'id'
-          });
-
-        if (profileError) {
-          console.warn('Profile update warning:', profileError);
-        } else {
-          console.log('Profile updated with wallet address');
-        }
-      }
 
       // Prepare data for database insertion with explicit column mapping
       const dbData = {
@@ -275,73 +226,33 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
 
       console.log('Inserting data into database:', dbData);
 
-      // First, let's verify the table structure
-      const { data: tableInfo, error: tableError } = await supabase
-        .from('ip_registrations')
-        .select('*')
-        .limit(0);
-
-      if (tableError) {
-        console.error('Table structure check failed:', tableError);
-        throw new Error(`Database table error: ${tableError.message}`);
-      }
-
-      console.log('Table structure verified, proceeding with insert...');
-
       // Save to Supabase with explicit column selection
       const { data: insertedData, error: dbError } = await supabase
         .from('ip_registrations')
-        .insert([dbData])
-        .select(`
-          id,
-          user_id,
-          title,
-          description,
-          founder_name,
-          company_name,
-          category,
-          wallet_address,
-          ipfs_hash,
-          ipfs_url,
-          document_hash,
-          project_type,
-          business_model,
-          project_summary,
-          developers,
-          demo_link,
-          presentation_video,
-          github_repo,
-          status,
-          created_at,
-          updated_at
-        `)
-        .single();
+        .insert([dbData]);
 
       if (dbError) {
         console.error('Database error details:', dbError);
-        console.error('Error code:', dbError.code);
-        console.error('Error message:', dbError.message);
-        console.error('Error details:', dbError.details);
-        console.error('Error hint:', dbError.hint);
         
-        // Provide more specific error messages based on error codes
-        if (dbError.code === '23505') {
+        // Handle database error
+        const errorMessage = dbError.message;
+        
+        if (errorMessage.includes('duplicate key')) {
           throw new Error('A project with this title already exists. Please choose a different title.');
-        } else if (dbError.code === '23502') {
+        } else if (errorMessage.includes('violates not-null constraint')) {
           throw new Error('Missing required field. Please check all required fields are filled.');
-        } else if (dbError.code === '42501') {
+        } else if (errorMessage.includes('permission denied')) {
           throw new Error('Permission denied. Please make sure you are signed in properly.');
-        } else if (dbError.code === '42703') {
-          // Column does not exist error
-          if (dbError.message.includes('github_repo')) {
+        } else if (errorMessage.includes('column') && errorMessage.includes('does not exist')) {
+          if (errorMessage.includes('github_repo')) {
             throw new Error('Database schema issue with github_repo column. Please contact support.');
           } else {
-            throw new Error(`Database column error: ${dbError.message}`);
+            throw new Error(`Database column error: ${errorMessage}`);
           }
-        } else if (dbError.message.includes('relation') && dbError.message.includes('does not exist')) {
+        } else if (errorMessage.includes('relation') && errorMessage.includes('does not exist')) {
           throw new Error('Database table not found. Please contact support.');
         } else {
-          throw new Error(`Database error: ${dbError.message}\n\nIf this problem persists, please contact support with the error details.`);
+          throw new Error(`Database error: ${errorMessage}\n\nIf this problem persists, please contact support with the error details.`);
         }
       }
 
@@ -379,10 +290,11 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
       console.error('Error registering IP:', err);
       let errorMessage = 'Failed to register IP. Please try again.';
       
+      // Type guard for Error objects
       if (err instanceof Error) {
         errorMessage = err.message;
-      } else if (typeof err === 'object' && err !== null && 'message' in err) {
-        errorMessage = String(err.message);
+      } else if (err && typeof err === 'object' && 'message' in err && typeof (err as { message: string }).message === 'string') {
+        errorMessage = (err as { message: string }).message;
       }
       
       setError(errorMessage);
@@ -443,29 +355,7 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
         </p>
       </div>
 
-      {/* Pinata Status */}
-      {pinataStatus === 'checking' && (
-        <div className="flex items-center space-x-2 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-          <Loader2 size={20} className="text-blue-600 animate-spin flex-shrink-0" />
-          <p className="text-blue-700 text-sm">
-            Checking IPFS connection status...
-          </p>
-        </div>
-      )}
-
-      {pinataStatus === 'error' && (
-        <div className="flex items-center space-x-2 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-          <AlertCircle size={20} className="text-yellow-600 flex-shrink-0" />
-          <div>
-            <p className="text-yellow-700 text-sm font-medium">IPFS connection issue detected</p>
-            <p className="text-yellow-600 text-xs mt-1">
-              Using demo mode for IPFS storage. Your data will be simulated but not actually stored on IPFS.
-            </p>
-          </div>
-        </div>
-      )}
-
-      {pinataStatus === 'ready' && !pinataService.isConfigured() && (
+      {!pinataService.isConfigured() && (
         <div className="flex items-center space-x-2 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
           <AlertCircle size={20} className="text-yellow-600 flex-shrink-0" />
           <p className="text-yellow-700 text-sm">
@@ -809,18 +699,13 @@ export function IPRegistration({ walletAddress, onSuccess, selectedRepos = [] }:
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={loading || pinataStatus === 'checking'}
+          disabled={loading}
           className="w-full py-4 bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-white font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
         >
           {loading ? (
             <>
               <Loader2 size={20} className="animate-spin" />
               <span>Registering Project...</span>
-            </>
-          ) : pinataStatus === 'checking' ? (
-            <>
-              <Loader2 size={20} className="animate-spin" />
-              <span>Checking IPFS Connection...</span>
             </>
           ) : (
             <>

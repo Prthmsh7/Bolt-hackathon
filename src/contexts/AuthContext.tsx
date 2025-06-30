@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -18,45 +19,57 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for demo user in localStorage
-    const checkDemoUser = () => {
-      try {
-        const storedAuth = localStorage.getItem('supabase.auth.token');
-        if (storedAuth) {
-          const session = JSON.parse(storedAuth).currentSession;
-          if (session && session.user) {
-            return session.user;
-          }
-        }
-        return null;
-      } catch (e) {
-        console.error('Error checking demo user:', e);
-        return null;
-      }
-    };
+    console.log('AuthProvider initialized, isSupabaseConfigured:', isSupabaseConfigured);
+    
+    if (!isSupabaseConfigured) {
+      console.warn('Supabase is not configured properly. Auth functionality will be limited.');
+      setLoading(false);
+      return;
+    }
 
+    // Get initial session
     const getInitialSession = async () => {
       try {
-        // First check for demo user
-        const demoUser = checkDemoUser();
-        if (demoUser) {
-          setUser(demoUser);
+        console.log('Getting initial user session...');
+        
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (error) {
+          console.error('Error getting user:', error);
+          setUser(null);
+          setSession(null);
           setLoading(false);
           return;
         }
 
-        // If no demo user, check Supabase
-        if (isSupabaseConfigured) {
-          const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          console.log('Found existing user');
           setUser(user);
+          // Since we don't have direct access to session, we'll create a basic session object
+          setSession({
+            user,
+            access_token: '', // This will be handled by Supabase internally
+            refresh_token: '',
+            expires_in: -1,
+            expires_at: -1,
+            token_type: 'bearer'
+          });
+        } else {
+          console.log('No existing user found');
+          setUser(null);
+          setSession(null);
         }
+        
       } catch (error) {
-        console.error('Error getting initial session:', error);
+        console.error('Unexpected error getting initial session:', error);
+        setUser(null);
+        setSession(null);
       } finally {
         setLoading(false);
       }
@@ -65,41 +78,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     getInitialSession();
 
     // Listen for auth changes
-    if (isSupabaseConfigured) {
+    try {
+      console.log('Setting up auth state change listener...');
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, session) => {
+        async (_event, session) => {
+          console.log('Auth state changed:', _event, session ? 'Session exists' : 'No session');
+          setSession(session);
           setUser(session?.user ?? null);
           setLoading(false);
         }
       );
 
-      return () => subscription.unsubscribe();
+      return () => {
+        console.log('Cleaning up auth subscription');
+        subscription.unsubscribe();
+      };
+    } catch (error) {
+      console.error('Error setting up auth listener:', error);
+      setLoading(false);
+      return () => {}; // Return empty cleanup function
     }
   }, []);
 
   const signOut = async () => {
+    if (!isSupabaseConfigured) {
+      console.warn('Supabase not configured, sign out operation simulated');
+      setUser(null);
+      setSession(null);
+      return;
+    }
+    
     try {
-      // Check for demo user
-      const isDemoUser = user?.id === 'demo-user-id';
-      
-      if (isDemoUser) {
-        // Just remove from localStorage for demo users
-        localStorage.removeItem('supabase.auth.token');
+      console.log('Signing out user...');
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out:', error);
+      } else {
+        console.log('User signed out successfully');
         setUser(null);
-        return;
-      }
-      
-      // Otherwise use Supabase
-      if (isSupabaseConfigured) {
-        await supabase.auth.signOut();
+        setSession(null);
       }
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('Unexpected error signing out:', error);
     }
   };
 
   const value = {
     user,
+    session,
     loading,
     signOut
   };
@@ -110,3 +136,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   );
 };
+
+export default AuthProvider;

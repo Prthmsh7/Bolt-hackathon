@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Github, 
   ExternalLink, 
@@ -29,7 +29,7 @@ import {
   Building
 } from 'lucide-react';
 
-interface GitHubRepo {
+interface GitHubRepoProps {
   id: number;
   name: string;
   full_name: string;
@@ -72,8 +72,8 @@ interface GitHubUser {
 }
 
 interface GitHubIntegrationProps {
-  onRepoSelected?: (repo: GitHubRepo) => void;
-  selectedRepos?: GitHubRepo[];
+  onRepoSelected?: (repo: GitHubRepoProps) => void;
+  selectedRepos?: GitHubRepoProps[];
   maxRepos?: number;
 }
 
@@ -85,14 +85,13 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [githubUser, setGithubUser] = useState<GitHubUser | null>(null);
-  const [repositories, setRepositories] = useState<GitHubRepo[]>([]);
+  const [repositories, setRepositories] = useState<GitHubRepoProps[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'stars' | 'updated' | 'created' | 'name'>('stars');
   const [filterBy, setFilterBy] = useState<'all' | 'public' | 'private'>('all');
   const [showSettings, setShowSettings] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [callbackUrl, setCallbackUrl] = useState<string>('');
 
   // Check if GitHub is already connected
   useEffect(() => {
@@ -112,10 +111,6 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
         localStorage.removeItem('github_token');
       }
     }
-
-    // Set the callback URL based on the current origin
-    const origin = window.location.origin;
-    setCallbackUrl(`${origin}/auth/github/callback`);
   }, []);
 
   // GitHub OAuth flow
@@ -126,7 +121,7 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
     try {
       // For demo purposes, we'll simulate the OAuth flow
       // In a real app, you'd redirect to GitHub OAuth
-      const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
+      const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || '';
       
       if (!clientId) {
         // Fallback to demo mode with mock data
@@ -135,17 +130,21 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
       }
 
       // Real GitHub OAuth flow
-      const redirectUri = callbackUrl;
-      const scope = 'repo,user:email';
+      const redirectUri = encodeURIComponent(`https://chromion-seedster.vercel.app/auth/github/callback`);
+      const scope = encodeURIComponent('repo,user:email');
       const state = Math.random().toString(36).substring(7);
       
       localStorage.setItem('github_oauth_state', state);
       
-      const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+      const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}&response_type=code`;
       
       // Open popup for OAuth
       const popup = window.open(authUrl, 'github-oauth', 'width=600,height=700');
       
+      if (!popup) {
+        throw new Error('Failed to open the GitHub authorization popup. Please allow popups for this site.');
+      }
+
       // Listen for popup completion
       const checkClosed = setInterval(() => {
         if (popup?.closed) {
@@ -157,11 +156,14 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
             setAccessToken(token);
             fetchGitHubData(token);
           } else {
-            setError('GitHub authentication was cancelled or failed');
+            setError('GitHub authentication was cancelled or failed. Please try again.');
             setIsLoading(false);
           }
         }
-      }, 1000);
+      }, 500); // Check more frequently
+
+      // Cleanup interval if component unmounts
+      return () => clearInterval(checkClosed);
 
     } catch (error) {
       console.error('GitHub connection error:', error);
@@ -193,7 +195,7 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
         hireable: true
       };
 
-      const mockRepos: GitHubRepo[] = [
+      const mockRepos: GitHubRepoProps[] = [
         {
           id: 1,
           name: 'ai-analytics-platform',
@@ -367,46 +369,98 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
       // Fetch user data
       const userResponse = await fetch('https://api.github.com/user', {
         headers: {
-          'Authorization': `token ${token}`,
+          'Authorization': `Bearer ${token}`,
           'Accept': 'application/vnd.github.v3+json'
         }
       });
 
       if (!userResponse.ok) {
-        throw new Error('Failed to fetch user data');
+        const errorData = await userResponse.json();
+        throw new Error(`Failed to fetch user data: ${errorData.message}`);
       }
 
       const userData = await userResponse.json();
+      console.log('GitHub User Data:', userData);
 
       // Fetch repositories
       const reposResponse = await fetch('https://api.github.com/user/repos?sort=updated&per_page=100', {
         headers: {
-          'Authorization': `token ${token}`,
+          'Authorization': `Bearer ${token}`,
           'Accept': 'application/vnd.github.v3+json'
         }
       });
 
       if (!reposResponse.ok) {
-        throw new Error('Failed to fetch repositories');
+        const errorData = await reposResponse.json();
+        throw new Error(`Failed to fetch repositories: ${errorData.message}`);
       }
 
       const reposData = await reposResponse.json();
+      console.log('GitHub Repos Data:', reposData);
 
-      setGithubUser(userData);
-      setRepositories(reposData);
+      // Map the response to match our interface
+      const mappedUserData: GitHubUser = {
+        login: userData.login,
+        name: userData.name || userData.login,
+        bio: userData.bio || '',
+        avatar_url: userData.avatar_url,
+        html_url: userData.html_url,
+        public_repos: userData.public_repos,
+        followers: userData.followers,
+        following: userData.following,
+        created_at: userData.created_at,
+        location: userData.location || '',
+        company: userData.company || '',
+        blog: userData.blog || '',
+        twitter_username: userData.twitter_username || '',
+        hireable: userData.hireable || false
+      };
+
+      const mappedReposData: GitHubRepoProps[] = reposData.map((repo: any) => ({
+        id: repo.id,
+        name: repo.name,
+        full_name: repo.full_name,
+        description: repo.description || '',
+        html_url: repo.html_url,
+        language: repo.language || 'Unknown',
+        stargazers_count: repo.stargazers_count,
+        forks_count: repo.forks_count,
+        watchers_count: repo.watchers_count,
+        created_at: repo.created_at,
+        updated_at: repo.updated_at,
+        topics: repo.topics || [],
+        private: repo.private,
+        size: repo.size,
+        default_branch: repo.default_branch,
+        open_issues_count: repo.open_issues_count,
+        has_issues: repo.has_issues,
+        has_projects: repo.has_projects,
+        has_wiki: repo.has_wiki,
+        archived: repo.archived,
+        disabled: repo.disabled,
+        pushed_at: repo.pushed_at
+      }));
+
+      setGithubUser(mappedUserData);
+      setRepositories(mappedReposData);
       setIsConnected(true);
 
       // Save connection data
       localStorage.setItem('github_connection', JSON.stringify({
-        user: userData,
-        repos: reposData,
+        user: mappedUserData,
+        repos: mappedReposData,
         connectedAt: new Date().toISOString()
       }));
       localStorage.setItem('github_token', token);
 
     } catch (error) {
       console.error('Error fetching GitHub data:', error);
-      setError('Failed to fetch GitHub data');
+      setError(error instanceof Error ? error.message : 'Failed to fetch GitHub data');
+      setIsConnected(false);
+      setGithubUser(null);
+      setRepositories([]);
+      localStorage.removeItem('github_connection');
+      localStorage.removeItem('github_token');
     } finally {
       setIsLoading(false);
     }
@@ -520,7 +574,7 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
         
         <h3 className="text-2xl font-bold text-text-primary mb-4">Connect Your GitHub</h3>
         <p className="text-text-secondary mb-8 max-w-md mx-auto">
-          Link your GitHub profile to showcase your repositories and enhance your developer credibility on the platform.
+          Link your GitHub profile to showcase your technical expertise and repositories on the platform.
         </p>
 
         {error && (
@@ -531,34 +585,6 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
             </div>
           </div>
         )}
-
-        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-          <div className="flex items-start space-x-3">
-            <Globe size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="text-sm flex-1">
-              <p className="text-blue-900 font-medium mb-2">
-                GitHub OAuth Callback URL
-              </p>
-              <div className="flex items-center space-x-2 mb-2">
-                <code className="bg-white p-2 rounded border border-blue-200 text-blue-800 font-mono text-xs flex-1 overflow-x-auto">
-                  {callbackUrl}
-                </code>
-                <button 
-                  onClick={() => {
-                    navigator.clipboard.writeText(callbackUrl);
-                    alert('Callback URL copied to clipboard!');
-                  }}
-                  className="p-2 bg-blue-100 rounded hover:bg-blue-200 transition-colors"
-                >
-                  <LinkIcon size={14} className="text-blue-700" />
-                </button>
-              </div>
-              <p className="text-blue-700 text-xs">
-                Use this URL when setting up your GitHub OAuth App in the GitHub Developer Settings.
-              </p>
-            </div>
-          </div>
-        </div>
 
         <button
           onClick={connectToGitHub}
@@ -827,7 +853,7 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
                 </div>
 
                 <p className="text-text-secondary mb-4 line-clamp-2">{repo.description || 'No description available'}</p>
-
+                
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-4 text-sm text-text-muted">
                     <div className="flex items-center space-x-1">

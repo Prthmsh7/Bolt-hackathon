@@ -64,7 +64,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
   const milestones = [
     {
       year: '2023',
-      title: 'Seedora Founded',
+      title: 'Seedster Founded',
       description: 'Started with a vision to protect developer IP and connect innovators with investors.'
     },
     {
@@ -131,7 +131,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
           
           <div className="relative z-10 text-center max-w-3xl mx-auto">
             <h1 className="text-4xl lg:text-6xl font-black mb-6">
-              About <span className="text-primary">Seedora</span>
+              About <span className="text-primary">Seedster</span>
             </h1>
             <p className="text-xl text-text-secondary mb-8">
               We're on a mission to democratize innovation by protecting intellectual property and connecting developers with investors.
@@ -158,7 +158,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-text-primary mb-4">Our Story</h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-              How Seedora went from an idea to a platform empowering developers worldwide
+              How Seedster went from an idea to a platform empowering developers worldwide
             </p>
           </div>
 
@@ -167,19 +167,19 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
               <div>
                 <h3 className="text-2xl font-bold text-text-primary mb-4">From Problem to Solution</h3>
                 <p className="text-text-secondary mb-6 leading-relaxed">
-                  Seedora was born from a simple observation: developers often struggle to protect their intellectual property and connect with the right investors to bring their ideas to life.
+                  Seedster was born from a simple observation: developers often struggle to protect their intellectual property and connect with the right investors to bring their ideas to life.
                 </p>
                 <p className="text-text-secondary mb-6 leading-relaxed">
                   Our founders, Sarah and James, experienced this firsthand when they developed an innovative AI platform but had no clear path to protect their work or find investment.
                 </p>
                 <p className="text-text-secondary leading-relaxed">
-                  They created Seedora to solve these problems, building a platform that leverages blockchain technology for IP protection and AI-powered analytics to match projects with the right investors.
+                  They created Seedster to solve these problems, building a platform that leverages blockchain technology for IP protection and AI-powered analytics to match projects with the right investors.
                 </p>
               </div>
               <div className="relative">
                 <img 
                   src="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=2" 
-                  alt="Seedora founding team"
+                  alt="Seedster founding team"
                   className="rounded-2xl shadow-lg"
                 />
                 <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-3 shadow-lg">
@@ -196,7 +196,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-text-primary mb-4">Mission & Values</h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-              The principles that guide everything we do at Seedora
+              The principles that guide everything we do at Seedster
             </p>
           </div>
 
@@ -230,7 +230,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-text-primary mb-4">Meet Our Team</h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-              The passionate people behind Seedora
+              The passionate people behind Seedster
             </p>
           </div>
 
@@ -259,7 +259,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-text-primary mb-4">Our Journey</h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-              Key milestones in Seedora's growth
+              Key milestones in Seedster's growth
             </p>
           </div>
 
@@ -297,7 +297,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-text-primary mb-4">Get in Touch</h2>
             <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-              Have questions or want to learn more about Seedora?
+              Have questions or want to learn more about Seedster?
             </p>
           </div>
 
@@ -322,7 +322,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                     </div>
                     <div>
                       <h4 className="font-semibold text-text-primary mb-1">Email</h4>
-                      <p className="text-text-secondary">hello@seedora.dev</p>
+                      <p className="text-text-secondary">hello@seedster.dev</p>
                     </div>
                   </div>
                   

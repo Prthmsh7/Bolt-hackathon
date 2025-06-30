@@ -109,6 +109,52 @@ const InvestmentStream: React.FC<InvestmentStreamProps> = ({ onBack }) => {
         totalRaised: '$23.7M',
         investorsCount: 445
       }
+    },
+    {
+      id: '5',
+      title: 'Real Estate Tokenization - The Future of Property Investment',
+      channel: 'PropTech Innovators',
+      views: '980K views',
+      timestamp: '1 week ago',
+      duration: '25:10',
+      thumbnail: 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1280&h=720&dpr=2',
+      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      channelAvatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=2',
+      description: 'Discover how blockchain technology is revolutionizing real estate investment through tokenization. Learn about fractional ownership, increased liquidity, and global access to property markets.',
+      likes: '56K',
+      subscribers: '750K',
+      category: 'investment',
+      investmentData: {
+        fundName: 'Tokenized Real Estate Fund',
+        returnRate: '+18.5%',
+        riskLevel: 'Medium',
+        minInvestment: '$5,000',
+        totalRaised: '$32.1M',
+        investorsCount: 678
+      }
+    },
+    {
+      id: '6',
+      title: 'Healthcare Tech Startups - Investment Analysis 2024',
+      channel: 'MedTech Capital',
+      views: '1.2M views',
+      timestamp: '5 days ago',
+      duration: '19:45',
+      thumbnail: 'https://images.pexels.com/photos/3938023/pexels-photo-3938023.jpeg?auto=compress&cs=tinysrgb&w=1280&h=720&dpr=2',
+      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+      channelAvatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=2',
+      description: 'An in-depth analysis of the most promising healthcare technology startups of 2024. From AI diagnostics to remote patient monitoring, discover the innovations transforming healthcare.',
+      likes: '72K',
+      subscribers: '980K',
+      category: 'analysis',
+      investmentData: {
+        fundName: 'Healthcare Innovation Fund',
+        returnRate: '+62.7%',
+        riskLevel: 'Medium',
+        minInvestment: '$30,000',
+        totalRaised: '$54.3M',
+        investorsCount: 312
+      }
     }
   ]);
 
@@ -134,7 +180,7 @@ const InvestmentStream: React.FC<InvestmentStreamProps> = ({ onBack }) => {
   };
 
   const handleNextVideo = () => {
-    if (currentVideoIndex < videoQueue.length - 1) {
+    if (currentVideoIndex < filteredVideos.length - 1) {
       setCurrentVideoIndex(currentVideoIndex + 1);
     }
   };
@@ -160,6 +206,12 @@ const InvestmentStream: React.FC<InvestmentStreamProps> = ({ onBack }) => {
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-4 sm:py-6">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
             <div className="flex items-center space-x-3 sm:space-x-4">
+              <button
+                onClick={onBack}
+                className="p-3 bg-white border border-light-border rounded-xl hover:bg-light-hover transition-all duration-300 shadow-sm hover:shadow-md"
+              >
+                ←
+              </button>
               <div className="w-8 h-8 sm:w-10 h-10 lg:w-12 h-12 bg-primary rounded-lg lg:rounded-xl flex items-center justify-center pulse-glow morph-shape">
                 <TrendingUp size={16} className="sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
               </div>
