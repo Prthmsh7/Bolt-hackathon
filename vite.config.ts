@@ -15,6 +15,7 @@ export default defineConfig({
       protocolImports: true,
     }),
   ],
+  assetsInclude: ['**/*.fnt'],
   define: {
     'process.env': {},
     global: 'globalThis',
