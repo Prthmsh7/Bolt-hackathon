@@ -23,16 +23,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setLoading(false);
-      return;
-    }
+    // Check for demo user in localStorage
+    const checkDemoUser = () => {
+      try {
+        const storedAuth = localStorage.getItem('supabase.auth.token');
+        if (storedAuth) {
+          const session = JSON.parse(storedAuth).currentSession;
+          if (session && session.user) {
+            return session.user;
+          }
+        }
+        return null;
+      } catch (e) {
+        console.error('Error checking demo user:', e);
+        return null;
+      }
+    };
 
-    // Get initial session
     const getInitialSession = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
+        // First check for demo user
+        const demoUser = checkDemoUser();
+        if (demoUser) {
+          setUser(demoUser);
+          setLoading(false);
+          return;
+        }
+
+        // If no demo user, check Supabase
+        if (isSupabaseConfigured) {
+          const { data: { user } } = await supabase.auth.getUser();
+          setUser(user);
+        }
       } catch (error) {
         console.error('Error getting initial session:', error);
       } finally {
@@ -43,21 +65,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     getInitialSession();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
+    if (isSupabaseConfigured) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          setUser(session?.user ?? null);
+          setLoading(false);
+        }
+      );
 
-    return () => subscription.unsubscribe();
+      return () => subscription.unsubscribe();
+    }
   }, []);
 
   const signOut = async () => {
-    if (!isSupabaseConfigured) return;
-    
     try {
-      await supabase.auth.signOut();
+      // Check for demo user
+      const isDemoUser = user?.id === 'demo-user-id';
+      
+      if (isDemoUser) {
+        // Just remove from localStorage for demo users
+        localStorage.removeItem('supabase.auth.token');
+        setUser(null);
+        return;
+      }
+      
+      // Otherwise use Supabase
+      if (isSupabaseConfigured) {
+        await supabase.auth.signOut();
+      }
     } catch (error) {
       console.error('Error signing out:', error);
     }

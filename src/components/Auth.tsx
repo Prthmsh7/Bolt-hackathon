@@ -99,6 +99,41 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
         // Sign in
         console.log('Attempting sign in for:', email);
         
+        // For demo purposes, allow test credentials to work without actual Supabase auth
+        if (email === 'test@example.com' && password === 'test123') {
+          console.log('Using demo credentials');
+          setSuccess('Successfully signed in with demo account!');
+          
+          // Create a mock user session
+          const mockUser = {
+            id: 'demo-user-id',
+            email: 'test@example.com',
+            user_metadata: {
+              full_name: 'Test User'
+            }
+          };
+          
+          // Store in localStorage to simulate a session
+          localStorage.setItem('supabase.auth.token', JSON.stringify({
+            currentSession: {
+              user: mockUser,
+              access_token: 'demo-token',
+              refresh_token: 'demo-refresh-token',
+              expires_at: Date.now() + 3600000 // 1 hour from now
+            }
+          }));
+          
+          // Small delay to show success message
+          setTimeout(() => {
+            if (onAuthSuccess) {
+              onAuthSuccess();
+            }
+            handleClose();
+          }, 1500);
+          
+          return;
+        }
+        
         const { data, error } = await supabase.auth.signInWithPassword({
           email: email.trim().toLowerCase(),
           password: password
@@ -148,6 +183,41 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
       } else {
         // Sign up
         console.log('Attempting sign up for:', email);
+        
+        // For demo purposes, allow test credentials to work without actual Supabase auth
+        if (email === 'test@example.com' && password === 'test123') {
+          console.log('Using demo credentials for signup');
+          setSuccess('Account created successfully with demo credentials!');
+          
+          // Create a mock user session
+          const mockUser = {
+            id: 'demo-user-id',
+            email: 'test@example.com',
+            user_metadata: {
+              full_name: fullName.trim() || 'Test User'
+            }
+          };
+          
+          // Store in localStorage to simulate a session
+          localStorage.setItem('supabase.auth.token', JSON.stringify({
+            currentSession: {
+              user: mockUser,
+              access_token: 'demo-token',
+              refresh_token: 'demo-refresh-token',
+              expires_at: Date.now() + 3600000 // 1 hour from now
+            }
+          }));
+          
+          // Small delay to show success message
+          setTimeout(() => {
+            if (onAuthSuccess) {
+              onAuthSuccess();
+            }
+            handleClose();
+          }, 1500);
+          
+          return;
+        }
         
         const { data, error } = await supabase.auth.signUp({
           email: email.trim().toLowerCase(),
