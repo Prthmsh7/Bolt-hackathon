@@ -62,11 +62,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
   return (
     <div className={`min-h-screen bg-black text-white overflow-hidden transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
-      {/* CSS Endless Knot Background */}
-      <div className="endless-knot-container">
-        <div className="endless-knot">
-          <div className="knot-text">SEEDORA</div>
+      {/* Torus Knot Effect Background */}
+      <div className="torus-knot-effect">
+        <div className="torus-container">
+          <div className="torus-ring">
+            <div className="knot-pattern"></div>
+            <div className="knot-strands">
+              <div className="knot-strand"></div>
+              <div className="knot-strand"></div>
+              <div className="knot-strand"></div>
+              <div className="knot-strand"></div>
+            </div>
+          </div>
+          <div className="torus-text">SEEDORA</div>
         </div>
+        <div className="ambient-glow"></div>
       </div>
 
       {/* Hero Section */}
