@@ -115,12 +115,11 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
 
   // GitHub OAuth flow
   const connectToGitHub = async () => {
-    setIsLoading(true);
-    setError(null);
-
     try {
+      setIsLoading(true);
+      setError(null);
+
       // For demo purposes, we'll simulate the OAuth flow
-      // In a real app, you'd redirect to GitHub OAuth
       const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || '';
       
       if (!clientId) {
