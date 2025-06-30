@@ -31,8 +31,9 @@ import {
   Mail,
   Phone,
   AlertCircle,
-  Database,
-  Globe
+  Database as DatabaseIcon,
+  Globe,
+  MapPin
 } from 'lucide-react';
 import { demoProjects, developerProfiles, searchProjects, searchDevelopers, getDeveloperById, type DemoProject, type DeveloperProfile } from '../data/demoProjects';
 import { supabase } from '../lib/supabase';
@@ -74,11 +75,11 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState<'likes' | 'views' | 'price' | 'recent'>('likes');
-  const [projects, setProjects] = useState<DemoProject[]>(demoProjects);
+  const [projects, setProjects] = useState<(DemoProject | IPRegistration)[]>(demoProjects);
   const [developers, setDevelopers] = useState<DeveloperProfile[]>(developerProfiles);
-  const [filteredProjects, setFilteredProjects] = useState<DemoProject[]>(demoProjects);
+  const [filteredProjects, setFilteredProjects] = useState<(DemoProject | IPRegistration)[]>(demoProjects);
   const [filteredDevelopers, setFilteredDevelopers] = useState<DeveloperProfile[]>(developerProfiles);
-  const [selectedProject, setSelectedProject] = useState<DemoProject | null>(null);
+  const [selectedProject, setSelectedProject] = useState<DemoProject | IPRegistration | null>(null);
   const [selectedDeveloper, setSelectedDeveloper] = useState<DeveloperProfile | null>(null);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showDeveloperModal, setShowDeveloperModal] = useState(false);
@@ -214,7 +215,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
   }, [searchQuery, developers]);
 
   const handleProjectClick = (project: DemoProject | IPRegistration) => {
-    setSelectedProject(project as DemoProject);
+    setSelectedProject(project);
     setShowProjectModal(true);
   };
 
@@ -637,7 +638,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
                     rel="noopener noreferrer"
                     className="neo-btn flex items-center space-x-2 px-6 py-3 bg-secondary text-white"
                   >
-                    <Database size={18} />
+                    <DatabaseIcon size={18} />
                     <span>View on IPFS</span>
                     <ExternalLink size={16} />
                   </a>

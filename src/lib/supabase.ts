@@ -17,14 +17,14 @@ const isValidConfig =
   !supabaseUrl.includes('your-project-id') &&
   supabaseUrl.startsWith('https://');
 
-console.log('Is valid Supabase config:', isValidConfig);
+if (!isValidConfig) {
+  throw new Error('Invalid Supabase configuration. Please check your environment variables.');
+}
 
-// Only create the Supabase client if we have valid configuration
-export const supabase = isValidConfig 
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-      db: { schema: 'public' }
-    })
-  : null;
+// Create the Supabase client
+export const supabase = createClient(supabaseUrl!, supabaseAnonKey!, {
+  db: { schema: 'public' }
+});
 
 // Export configuration status
-export const isSupabaseConfigured = isValidConfig;
+export const isSupabaseConfigured = true;
