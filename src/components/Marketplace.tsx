@@ -113,8 +113,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
     try {
       const { data, error } = await supabase
         .from('marketplace_items')
-        .select('*')
-        .eq('status', 'active');
+        .select('*');
 
       if (error) {
         console.error('Error fetching marketplace items:', error);
@@ -134,10 +133,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
       // Fetch from Supabase
       const { data: ipRegistrations, error } = await supabase
         .from('ip_registrations')
-        .select(`
-          *,
-          profiles!inner(email)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -156,6 +152,8 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         return;
       }
 
+      console.log("Fetched IP registrations:", ipRegistrations);
+
       // Transform the data
       const transformedProjects = ipRegistrations?.map(project => ({
         id: project.id,
@@ -168,7 +166,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         ipfs_url: project.ipfs_url,
         ipfs_hash: project.ipfs_hash,
         created_at: project.created_at,
-        status: project.status,
+        status: project.status || 'pending',
         project_type: project.project_type,
         business_model: project.business_model,
         demo_link: project.demo_link,
@@ -212,78 +210,79 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
 
   const fetchDevelopers = async () => {
     try {
-      // Fetch developers who have registered projects
-      const { data: profiles, error } = await supabase
+      // Fetch all profiles
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          ip_registrations(*)
-        `);
+        .select('*');
 
-      if (error) {
-        console.error('Error fetching developers:', error);
-        // Fallback to demo data
-        setDevelopers(developerProfiles.map(dev => ({
-          id: dev.id,
-          name: dev.name,
-          email: dev.username + '@example.com',
-          created_at: '2024-01-01',
-          project_count: dev.projects.length,
-          total_likes: dev.total_likes,
-          total_views: dev.total_views,
-          projects: dev.projects.map(p => ({
-            ...p,
-            user_id: dev.id,
-            ipfs_url: `https://ipfs.io/ipfs/demo-${p.id}`,
-            ipfs_hash: `demo-hash-${p.id}`,
-            status: 'approved'
-          }))
-        })));
-        return;
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw new Error('Failed to fetch profiles');
       }
 
-      // Filter profiles that have IP registrations
-      const developersWithProjects = profiles?.filter(profile => 
-        profile.ip_registrations && profile.ip_registrations.length > 0
-      );
+      // Fetch all IP registrations
+      const { data: registrations, error: registrationsError } = await supabase
+        .from('ip_registrations')
+        .select('*');
 
-      // Transform the data
-      const transformedDevelopers = developersWithProjects?.map(profile => ({
-        id: profile.id,
-        name: profile.email?.split('@')[0] || 'Developer',
-        email: profile.email || '',
-        created_at: profile.created_at,
-        project_count: profile.ip_registrations?.length || 0,
-        total_likes: profile.ip_registrations?.reduce((sum: number, project: any) => sum + (Math.floor(Math.random() * 100) + 10), 0) || 0,
-        total_views: profile.ip_registrations?.reduce((sum: number, project: any) => sum + (Math.floor(Math.random() * 500) + 50), 0) || 0,
-        projects: profile.ip_registrations?.map((project: any) => ({
-          id: project.id,
-          title: project.title,
-          description: project.description || '',
-          founder_name: project.founder_name,
-          company_name: project.company_name,
-          category: project.category,
-          price: Math.floor(Math.random() * 50) + 10,
-          ipfs_url: project.ipfs_url,
-          ipfs_hash: project.ipfs_hash,
-          created_at: project.created_at,
-          status: project.status,
-          project_type: project.project_type,
-          business_model: project.business_model,
-          demo_link: project.demo_link,
-          presentation_video: project.presentation_video,
-          github_repo: project.github_repo,
-          developers: project.developers,
-          user_id: project.user_id,
-          likes_count: Math.floor(Math.random() * 200) + 10,
-          views_count: Math.floor(Math.random() * 1000) + 100,
-          purchase_count: Math.floor(Math.random() * 10)
-        })) || []
-      })) || [];
+      if (registrationsError) {
+        console.error('Error fetching IP registrations:', registrationsError);
+        throw new Error('Failed to fetch IP registrations');
+      }
+
+      // Group registrations by user_id
+      const projectsByUser: Record<string, any[]> = {};
+      registrations?.forEach(reg => {
+        if (!projectsByUser[reg.user_id]) {
+          projectsByUser[reg.user_id] = [];
+        }
+        projectsByUser[reg.user_id].push(reg);
+      });
+
+      // Create developer profiles for users with projects
+      const developersWithProjects = profiles
+        ?.filter(profile => projectsByUser[profile.id]?.length > 0)
+        .map(profile => {
+          const userProjects = projectsByUser[profile.id] || [];
+          return {
+            id: profile.id,
+            name: profile.email?.split('@')[0] || 'Developer',
+            email: profile.email || '',
+            created_at: profile.created_at,
+            project_count: userProjects.length,
+            total_likes: userProjects.reduce((sum, project) => sum + (Math.floor(Math.random() * 100) + 10), 0),
+            total_views: userProjects.reduce((sum, project) => sum + (Math.floor(Math.random() * 500) + 50), 0),
+            projects: userProjects.map(project => ({
+              id: project.id,
+              title: project.title,
+              description: project.description || '',
+              founder_name: project.founder_name,
+              company_name: project.company_name,
+              category: project.category,
+              price: Math.floor(Math.random() * 50) + 10,
+              ipfs_url: project.ipfs_url,
+              ipfs_hash: project.ipfs_hash,
+              created_at: project.created_at,
+              status: project.status,
+              project_type: project.project_type,
+              business_model: project.business_model,
+              demo_link: project.demo_link,
+              presentation_video: project.presentation_video,
+              github_repo: project.github_repo,
+              developers: project.developers,
+              user_id: project.user_id,
+              likes_count: Math.floor(Math.random() * 200) + 10,
+              views_count: Math.floor(Math.random() * 1000) + 100,
+              purchase_count: Math.floor(Math.random() * 10)
+            }))
+          };
+        }) || [];
+
+      console.log("Developers with projects:", developersWithProjects);
 
       // Combine with demo developers
       const allDevelopers = [
-        ...transformedDevelopers,
+        ...developersWithProjects,
         ...developerProfiles.map(dev => ({
           id: dev.id,
           name: dev.name,
@@ -315,6 +314,7 @@ const Marketplace: React.FC<MarketplaceProps> = ({ onBack }) => {
         project_count: dev.projects.length,
         total_likes: dev.total_likes,
         total_views: dev.total_views,
+        avatar_url: dev.avatar_url,
         projects: dev.projects.map(p => ({
           ...p,
           user_id: dev.id,
