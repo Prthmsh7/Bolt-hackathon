@@ -16,6 +16,16 @@ const createMockClient = () => {
     }
   ];
 
+  // In-memory storage for tables
+  const storage: Record<string, any[]> = {
+    profiles: [],
+    ip_registrations: [],
+    marketplace_items: [],
+    project_likes: [],
+    project_purchases: [],
+    videos: []
+  };
+
   // Check if we have a stored session
   const getStoredSession = () => {
     try {
@@ -32,6 +42,7 @@ const createMockClient = () => {
   return {
     auth: {
       signUp: async ({ email, password, options }: any) => {
+        console.log('Mock signUp called with:', email);
         // Check if user already exists
         if (mockUsers.some(u => u.email === email)) {
           return { data: null, error: { message: 'User already registered' } };
@@ -62,6 +73,7 @@ const createMockClient = () => {
       },
       
       signInWithPassword: async ({ email, password }: any) => {
+        console.log('Mock signInWithPassword called with:', email);
         // Check credentials
         const user = mockUsers.find(u => u.email === email);
         
@@ -108,7 +120,9 @@ const createMockClient = () => {
         // This is a simplified mock that doesn't actually listen for changes
         const session = getStoredSession();
         if (session) {
-          callback('SIGNED_IN', { user: session.user });
+          setTimeout(() => {
+            callback('SIGNED_IN', session);
+          }, 0);
         }
         
         return { 
@@ -121,15 +135,10 @@ const createMockClient = () => {
       }
     },
     from: (table: string) => {
-      // Simple in-memory storage
-      const storage: Record<string, any[]> = {
-        profiles: [],
-        ip_registrations: [],
-        marketplace_items: [],
-        project_likes: [],
-        project_purchases: [],
-        videos: []
-      };
+      // Initialize table if it doesn't exist
+      if (!storage[table]) {
+        storage[table] = [];
+      }
       
       return {
         select: (columns?: string) => {
@@ -165,10 +174,6 @@ const createMockClient = () => {
             ...item
           }));
           
-          if (!storage[table]) {
-            storage[table] = [];
-          }
-          
           storage[table].push(...itemsWithIds);
           
           return {
@@ -185,10 +190,6 @@ const createMockClient = () => {
         upsert: (data: any, options?: any) => {
           if (!Array.isArray(data)) {
             data = [data];
-          }
-          
-          if (!storage[table]) {
-            storage[table] = [];
           }
           
           // Handle upsert logic
@@ -218,10 +219,6 @@ const createMockClient = () => {
         update: (data: any) => {
           return {
             eq: (column: string, value: any) => {
-              if (!storage[table]) {
-                return { data: null, error: null };
-              }
-              
               const index = storage[table].findIndex(item => item[column] === value);
               
               if (index >= 0) {
@@ -246,10 +243,6 @@ const createMockClient = () => {
         delete: () => {
           return {
             eq: (column: string, value: any) => {
-              if (!storage[table]) {
-                return { data: null, error: null };
-              }
-              
               const index = storage[table].findIndex(item => item[column] === value);
               
               if (index >= 0) {
