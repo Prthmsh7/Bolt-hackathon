@@ -4,8 +4,8 @@ import gsap from 'gsap';
 import Gl from '../gl/index';
 import Type from '../gl/Type';
 import shaders from '../gl/shaders';
-import fontFile from '../assets/fonts/Orbitron-Black.fnt';
-import fontAtlas from '../assets/fonts/Orbitron-Black.png';
+import fontFileUrl from '../assets/fonts/Orbitron-Black.fnt?url';
+import fontAtlasUrl from '../assets/fonts/Orbitron-Black.png?url';
 
 interface EndlessEffectProps {
   word?: string;
@@ -40,8 +40,8 @@ const EndlessEffect: React.FC<EndlessEffectProps> = ({
         fragment: shaders.fragment
       },
       font: {
-        file: fontFile,
-        atlas: fontAtlas
+        file: fontFileUrl,
+        atlas: fontAtlasUrl
       }
     };
 
