@@ -154,83 +154,95 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
   return (
     <div className="min-h-screen bg-light-bg">
+      {/* Bolt Badge - clickable and linked to bolt.new */}
+      <div className="absolute top-6 right-6 z-50">
+        <a href="https://bolt.new/" target="_blank" rel="noopener noreferrer">
+          <img 
+            src="/bolt-badge.png"
+            alt="Bolt Badge" 
+            className="h-14 w-auto hover:scale-105 transition-transform duration-200 drop-shadow-lg cursor-pointer" 
+            style={{ maxWidth: '110px' }}
+          />
+        </a>
+      </div>
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-accent min-h-screen flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="space-y-6">
-                <div className="neo-btn inline-flex items-center space-x-2 bg-white px-4 py-2">
-                  <Sparkles size={16} className="text-primary" />
-                  <span className="text-sm font-medium text-text-primary">Powered by Blockchain & AI</span>
+        <div className="max-w-8xl mx-auto px-6 sm:px-8 lg:px-12 py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-10">
+              <div className="space-y-8">
+                <div className="neo-btn inline-flex items-center space-x-3 bg-white px-6 py-3">
+                  <Sparkles size={20} className="text-primary" />
+                  <span className="text-base font-medium text-text-primary">Powered by Blockchain & AI</span>
                 </div>
                 
-                <h1 className="text-5xl lg:text-7xl font-black leading-tight">
+                <h1 className="text-6xl lg:text-8xl font-black leading-tight">
                   <span className="text-primary">
                     Seedster
                   </span>
                 </h1>
                 
-                <p className="text-xl lg:text-2xl text-text-secondary leading-relaxed max-w-2xl">
+                <p className="text-2xl lg:text-3xl text-text-secondary leading-relaxed max-w-3xl">
                   The ultimate platform for developers and investors. Register your IP, showcase your projects, and discover the next big innovation.
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-6">
                 <button
-                  onClick={handleGetStartedClick}
-                  className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-primary text-white font-bold text-lg"
+                  onClick={onGetStarted}
+                  className="neo-btn flex items-center justify-center space-x-4 px-10 py-5 bg-primary text-white font-bold text-xl"
+
                 >
-                  <Rocket size={24} />
+                  <Rocket size={28} />
                   <span>Get Started Free</span>
-                  <ArrowRight size={20} />
+                  <ArrowRight size={24} />
                 </button>
                 
-                <button className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-white text-text-primary font-semibold text-lg">
-                  <Play size={20} />
+                <button className="neo-btn flex items-center justify-center space-x-4 px-10 py-5 bg-white text-text-primary font-semibold text-xl">
+                  <Play size={24} />
                   <span>Watch Demo</span>
                 </button>
               </div>
 
-              <div className="flex items-center space-x-8 text-sm text-text-muted">
-                <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-success" />
+              <div className="flex items-center space-x-10 text-base text-text-muted">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle size={20} className="text-success" />
                   <span>No credit card required</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <CheckCircle size={16} className="text-success" />
+                <div className="flex items-center space-x-3">
+                  <CheckCircle size={20} className="text-success" />
                   <span>Free forever plan</span>
                 </div>
               </div>
             </div>
 
             <div className="relative">
-              <div className="neo-card bg-white p-8">
-                <div className="space-y-6">
+              <div className="neo-card bg-white p-10">
+                <div className="space-y-8">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-text-primary">Live Platform Stats</h3>
-                    <div className="flex items-center space-x-2 text-success">
-                      <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
-                      <span className="text-sm font-medium">Live</span>
+                    <h3 className="text-2xl font-bold text-text-primary">Live Platform Stats</h3>
+                    <div className="flex items-center space-x-3 text-success">
+                      <div className="w-3 h-3 bg-success rounded-full animate-pulse"></div>
+                      <span className="text-base font-medium">Live</span>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-6">
                     {stats.map((stat, index) => (
-                      <div key={index} className="text-center p-4 neo-card bg-accent">
-                        <stat.icon size={24} className="mx-auto mb-2 text-primary" />
-                        <div className="text-2xl font-bold text-text-primary">{stat.number}</div>
-                        <div className="text-sm text-text-muted">{stat.label}</div>
+                      <div key={index} className="text-center p-6 neo-card bg-accent">
+                        <stat.icon size={32} className="mx-auto mb-3 text-primary" />
+                        <div className="text-3xl font-bold text-text-primary">{stat.number}</div>
+                        <div className="text-base text-text-muted mt-1">{stat.label}</div>
                       </div>
                     ))}
                   </div>
                   
-                  <div className="neo-card bg-accent p-4">
-                    <div className="flex items-center space-x-3">
-                      <MessageCircle size={20} className="text-primary" />
+                  <div className="neo-card bg-accent p-6">
+                    <div className="flex items-center space-x-4">
+                      <MessageCircle size={24} className="text-primary" />
                       <div>
-                        <p className="font-semibold text-text-primary">MCP Assistant Active</p>
-                        <p className="text-sm text-text-secondary">AI-powered investment insights</p>
+                        <p className="font-semibold text-lg text-text-primary">MCP Assistant Active</p>
+                        <p className="text-base text-text-secondary">AI-powered investment insights</p>
                       </div>
                     </div>
                   </div>
