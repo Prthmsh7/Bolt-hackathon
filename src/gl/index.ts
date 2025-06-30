@@ -1,8 +1,5 @@
 import * as THREE from 'three';
 
-// Make THREE available globally for three-bmfont-text - must be done immediately
-(window as any).THREE = THREE;
-
 export default new class {
   renderer: THREE.WebGLRenderer;
   camera: THREE.PerspectiveCamera;
