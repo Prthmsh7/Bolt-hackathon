@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import LandingPage from './components/LandingPage';
 import AuthModal from './components/Auth';
+import Dashboard from './components/Dashboard';
+import Marketplace from './components/Marketplace';
+import InvestmentStream from './components/InvestmentStream';
+import UserProfile from './components/UserProfile';
+import EnhancedAnalytics from './components/EnhancedAnalytics';
+import AboutPage from './components/AboutPage';
+import Navbar from './components/Navbar';
+import MCPAssistantButton from './components/MCPAssistantButton';
+import SystemTestButton from './components/SystemTestButton';
 import { supabase } from './lib/supabase';
 
 function App() {
@@ -8,6 +17,7 @@ function App() {
   const [showLanding, setShowLanding] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'about'>('dashboard');
 
   // Page load animation
   useEffect(() => {
@@ -45,6 +55,14 @@ function App() {
     checkAuthStatus();
   };
 
+  const handleNavigate = (page: 'dashboard' | 'marketplace' | 'investment-stream' | 'user-profile' | 'analytics' | 'about') => {
+    setCurrentPage(page);
+  };
+
+  const handleShowAuth = () => {
+    setShowAuthModal(true);
+  };
+
   // Show landing page if user is not authenticated
   if (showLanding && !user) {
     return (
@@ -57,23 +75,44 @@ function App() {
           onClose={() => setShowAuthModal(false)}
           onAuthSuccess={handleAuthSuccess}
         />
+
+        {/* System Test Button (available on landing page too) */}
+        <SystemTestButton />
       </div>
     );
   }
 
-  // Show a simple message for now since we're focusing on the landing page
+  // Show main application
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
-      <div className="text-center text-white">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Seedora</h1>
-        <p className="text-xl">You are now logged in.</p>
-        <button 
-          onClick={() => supabase.auth.signOut()}
-          className="mt-8 px-6 py-3 bg-white text-black rounded-xl font-medium"
-        >
-          Sign Out
-        </button>
-      </div>
+    <div className={`min-h-screen bg-light-bg transition-all duration-1000 ${isLoaded ? 'fade-in' : 'opacity-0'}`}>
+      {/* Navigation */}
+      <Navbar 
+        onNavigate={handleNavigate}
+        currentPage={currentPage}
+        user={user}
+        onShowAuth={handleShowAuth}
+      />
+
+      {/* Main Content */}
+      <main>
+        {currentPage === 'dashboard' && <Dashboard onNavigate={handleNavigate} />}
+        {currentPage === 'marketplace' && <Marketplace onBack={() => handleNavigate('dashboard')} />}
+        {currentPage === 'investment-stream' && <InvestmentStream onBack={() => handleNavigate('dashboard')} />}
+        {currentPage === 'user-profile' && <UserProfile onBack={() => handleNavigate('dashboard')} />}
+        {currentPage === 'analytics' && <EnhancedAnalytics onBack={() => handleNavigate('dashboard')} />}
+        {currentPage === 'about' && <AboutPage onBack={() => handleNavigate('dashboard')} />}
+      </main>
+
+      {/* Authentication Modal */}
+      <AuthModal 
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onAuthSuccess={handleAuthSuccess}
+      />
+
+      {/* Floating Action Buttons */}
+      <MCPAssistantButton />
+      <SystemTestButton />
     </div>
   );
 }
