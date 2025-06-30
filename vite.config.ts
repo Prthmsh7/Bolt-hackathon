@@ -19,7 +19,6 @@ export default defineConfig({
   define: {
     'process.env': {},
     global: 'globalThis',
-    THREE: 'window.THREE',
   },
   resolve: {
     alias: {
@@ -28,4 +27,14 @@ export default defineConfig({
       util: 'util',
     },
   },
+  build: {
+    rollupOptions: {
+      external: ['three'],
+      output: {
+        globals: {
+          three: 'THREE'
+        }
+      }
+    }
+  }
 })
