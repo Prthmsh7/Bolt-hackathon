@@ -40,12 +40,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         
         const { data: { user }, error } = await supabase.auth.getUser();
         
-        if (error) {
+        // Only log actual errors, not the normal case where no user is signed in
+        if (error && error.message !== 'Auth session missing!') {
           console.error('Error getting user:', error);
-          setUser(null);
-          setSession(null);
-          setLoading(false);
-          return;
         }
 
         if (user) {
