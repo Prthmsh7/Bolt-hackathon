@@ -15,18 +15,17 @@ const isValidConfig =
   supabaseUrl && 
   supabaseAnonKey && 
   !supabaseUrl.includes('your-project-id') &&
-  supabaseUrl.startsWith('https://');
+  supabaseUrl.startsWith('https://') &&
+  supabaseUrl.includes('.supabase.co');
 
 console.log('Is valid Supabase config:', isValidConfig);
 
-// Create the Supabase client with minimal configuration
-export const supabase = createClient(
-  supabaseUrl || 'https://example.supabase.co', 
-  supabaseAnonKey || 'demo-key', 
-  {
-    db: { schema: 'public' }
-  }
-);
+// Only create the Supabase client if we have valid configuration
+export const supabase = isValidConfig 
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      db: { schema: 'public' }
+    })
+  : null;
 
-// Export configuration status - use the actual validation result
+// Export configuration status
 export const isSupabaseConfigured = isValidConfig;
