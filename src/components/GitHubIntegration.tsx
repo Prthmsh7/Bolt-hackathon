@@ -92,6 +92,7 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
   const [filterBy, setFilterBy] = useState<'all' | 'public' | 'private'>('all');
   const [showSettings, setShowSettings] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [callbackUrl, setCallbackUrl] = useState<string>('');
 
   // Check if GitHub is already connected
   useEffect(() => {
@@ -111,6 +112,10 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
         localStorage.removeItem('github_token');
       }
     }
+
+    // Set the callback URL based on the current origin
+    const origin = window.location.origin;
+    setCallbackUrl(`${origin}/auth/github/callback`);
   }, []);
 
   // GitHub OAuth flow
@@ -130,7 +135,7 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
       }
 
       // Real GitHub OAuth flow
-      const redirectUri = `${window.location.origin}/auth/github/callback`;
+      const redirectUri = callbackUrl;
       const scope = 'repo,user:email';
       const state = Math.random().toString(36).substring(7);
       
@@ -526,6 +531,34 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
             </div>
           </div>
         )}
+
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <div className="flex items-start space-x-3">
+            <Globe size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+            <div className="text-sm flex-1">
+              <p className="text-blue-900 font-medium mb-2">
+                GitHub OAuth Callback URL
+              </p>
+              <div className="flex items-center space-x-2 mb-2">
+                <code className="bg-white p-2 rounded border border-blue-200 text-blue-800 font-mono text-xs flex-1 overflow-x-auto">
+                  {callbackUrl}
+                </code>
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(callbackUrl);
+                    alert('Callback URL copied to clipboard!');
+                  }}
+                  className="p-2 bg-blue-100 rounded hover:bg-blue-200 transition-colors"
+                >
+                  <LinkIcon size={14} className="text-blue-700" />
+                </button>
+              </div>
+              <p className="text-blue-700 text-xs">
+                Use this URL when setting up your GitHub OAuth App in the GitHub Developer Settings.
+              </p>
+            </div>
+          </div>
+        </div>
 
         <button
           onClick={connectToGitHub}

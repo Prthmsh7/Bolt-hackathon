@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import AuthModal from './components/Auth';
 import Dashboard from './components/Dashboard';
@@ -9,6 +10,7 @@ import EnhancedAnalytics from './components/EnhancedAnalytics';
 import AboutPage from './components/AboutPage';
 import Navbar from './components/Navbar';
 import MCPAssistantButton from './components/MCPAssistantButton';
+import GitHubCallback from './components/GitHubCallback';
 import { supabase } from './lib/supabase';
 
 function App() {
@@ -65,50 +67,66 @@ function App() {
   // Show landing page if user is not authenticated
   if (showLanding && !user) {
     return (
-      <div className={`transition-all duration-1000 ${isLoaded ? 'fade-in' : 'opacity-0'}`}>
-        <LandingPage onGetStarted={handleGetStarted} />
-        
-        {/* Authentication Modal */}
-        <AuthModal 
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          onAuthSuccess={handleAuthSuccess}
-        />
-      </div>
+      <Router>
+        <Routes>
+          <Route path="/auth/github/callback" element={<GitHubCallback />} />
+          <Route path="*" element={
+            <div className={`transition-all duration-1000 ${isLoaded ? 'fade-in' : 'opacity-0'}`}>
+              <LandingPage onGetStarted={handleGetStarted} />
+              
+              {/* Authentication Modal */}
+              <AuthModal 
+                isOpen={showAuthModal}
+                onClose={() => setShowAuthModal(false)}
+                onAuthSuccess={handleAuthSuccess}
+              />
+            </div>
+          } />
+        </Routes>
+      </Router>
     );
   }
 
   // Show main application
   return (
-    <div className={`min-h-screen bg-light-bg transition-all duration-1000 ${isLoaded ? 'fade-in' : 'opacity-0'}`}>
-      {/* Navigation */}
-      <Navbar 
-        onNavigate={handleNavigate}
-        currentPage={currentPage}
-        user={user}
-        onShowAuth={handleShowAuth}
-      />
+    <Router>
+      <div className={`min-h-screen bg-light-bg transition-all duration-1000 ${isLoaded ? 'fade-in' : 'opacity-0'}`}>
+        <Routes>
+          <Route path="/auth/github/callback" element={<GitHubCallback />} />
+          <Route path="*" element={
+            <>
+              {/* Navigation */}
+              <Navbar 
+                onNavigate={handleNavigate}
+                currentPage={currentPage}
+                user={user}
+                onShowAuth={handleShowAuth}
+              />
 
-      {/* Main Content */}
-      <main>
-        {currentPage === 'dashboard' && <Dashboard onNavigate={handleNavigate} />}
-        {currentPage === 'marketplace' && <Marketplace onBack={() => handleNavigate('dashboard')} />}
-        {currentPage === 'investment-stream' && <InvestmentStream onBack={() => handleNavigate('dashboard')} />}
-        {currentPage === 'user-profile' && <UserProfile onBack={() => handleNavigate('dashboard')} />}
-        {currentPage === 'analytics' && <EnhancedAnalytics onBack={() => handleNavigate('dashboard')} />}
-        {currentPage === 'about' && <AboutPage onBack={() => handleNavigate('dashboard')} />}
-      </main>
+              {/* Main Content */}
+              <main>
+                {currentPage === 'dashboard' && <Dashboard onNavigate={handleNavigate} />}
+                {currentPage === 'marketplace' && <Marketplace onBack={() => handleNavigate('dashboard')} />}
+                {currentPage === 'investment-stream' && <InvestmentStream onBack={() => handleNavigate('dashboard')} />}
+                {currentPage === 'user-profile' && <UserProfile onBack={() => handleNavigate('dashboard')} />}
+                {currentPage === 'analytics' && <EnhancedAnalytics onBack={() => handleNavigate('dashboard')} />}
+                {currentPage === 'about' && <AboutPage onBack={() => handleNavigate('dashboard')} />}
+              </main>
 
-      {/* Authentication Modal */}
-      <AuthModal 
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onAuthSuccess={handleAuthSuccess}
-      />
+              {/* Authentication Modal */}
+              <AuthModal 
+                isOpen={showAuthModal}
+                onClose={() => setShowAuthModal(false)}
+                onAuthSuccess={handleAuthSuccess}
+              />
 
-      {/* Floating Action Buttons */}
-      <MCPAssistantButton />
-    </div>
+              {/* Floating Action Buttons */}
+              <MCPAssistantButton />
+            </>
+          } />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

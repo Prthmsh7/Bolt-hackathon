@@ -19,7 +19,8 @@
     "gsap": "^3.12.2",
     "three": "^0.158.0",
     "load-bmfont": "^1.4.1",
-    "three-bmfont-text": "^3.0.1"
+    "three-bmfont-text": "^3.0.1",
+    "react-router-dom": "^6.20.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
