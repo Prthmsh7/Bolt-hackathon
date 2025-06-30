@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Github, 
   ExternalLink, 
@@ -120,6 +120,7 @@ const GitHubIntegration: React.FC<GitHubIntegrationProps> = ({
       setError(null);
 
       // For demo purposes, we'll simulate the OAuth flow
+      // In a real app, you'd redirect to GitHub OAuth
       const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || '';
       
       if (!clientId) {

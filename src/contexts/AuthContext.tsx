@@ -27,7 +27,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   useEffect(() => {
     console.log('AuthProvider initialized, isSupabaseConfigured:', isSupabaseConfigured);
     
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseConfigured || !supabase) {
       console.warn('Supabase is not configured properly. Auth functionality will be limited.');
       setLoading(false);
       return;
@@ -40,12 +40,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         
         const { data: { user }, error } = await supabase.auth.getUser();
         
-        if (error) {
+        // Only log actual errors, not the normal case where no user is signed in
+        if (error && error.message !== 'Auth session missing!') {
           console.error('Error getting user:', error);
-          setUser(null);
-          setSession(null);
-          setLoading(false);
-          return;
         }
 
         if (user) {
@@ -101,7 +98,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   }, []);
 
   const signOut = async () => {
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseConfigured || !supabase) {
       console.warn('Supabase not configured, sign out operation simulated');
       setUser(null);
       setSession(null);

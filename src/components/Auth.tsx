@@ -72,6 +72,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess })
       return;
     }
 
+    if (!supabase) {
+      setError('Authentication service is not available. Please try again later.');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
     setSuccess('');

@@ -145,6 +145,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
     }
   ];
 
+  const handleGetStartedClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onGetStarted) {
+      onGetStarted();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-light-bg">
       {/* Bolt Badge - clickable and linked to bolt.new */}
@@ -184,6 +191,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 <button
                   onClick={onGetStarted}
                   className="neo-btn flex items-center justify-center space-x-4 px-10 py-5 bg-primary text-white font-bold text-xl"
+
                 >
                   <Rocket size={28} />
                   <span>Get Started Free</span>
@@ -403,7 +411,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 </ul>
 
                 <button
-                  onClick={onGetStarted}
+                  onClick={handleGetStartedClick}
                   className={`neo-btn w-full py-3 font-semibold ${
                     plan.popular
                       ? 'bg-primary text-white'
@@ -430,7 +438,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={onGetStarted}
+              onClick={handleGetStartedClick}
               className="neo-btn flex items-center justify-center space-x-3 px-8 py-4 bg-white text-primary font-bold text-lg"
             >
               <Rocket size={24} />

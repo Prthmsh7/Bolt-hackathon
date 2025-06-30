@@ -35,6 +35,8 @@ function App() {
 
   // Listen for auth changes
   useEffect(() => {
+    if (!supabase) return;
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user || null);
       if (session?.user) {
@@ -46,6 +48,8 @@ function App() {
   }, []);
 
   const checkAuthStatus = async () => {
+    if (!supabase) return;
+    
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user);
     if (user) {
