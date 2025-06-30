@@ -302,7 +302,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             <p>&copy; 2024 Seedora. All rights reserved. Built with ❤️ for developers worldwide.</p>
           </div>
         </div>
-      </section>
+      </footer>
     </div>
   );
 };
