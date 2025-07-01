@@ -1,8 +1,8 @@
-# Seedster - Blockchain-Powered Investment Platform
+# Seedster - An Accelerator that helps Developers get Initial Funding
 
 ![Seedster](https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=1280&h=400&dpr=2)
 
-Seedster is a revolutionary platform that helps developers protect their intellectual property and connect with investors. Built for the Chainlink Hackathon 2025, Seedster leverages multiple blockchain technologies to create a secure, transparent, and efficient ecosystem for innovation funding.
+Seedster is a revolutionary platform that helps developers protect their intellectual property and connect with investors. Built for the Bolt Hackathon 2025, Seedster leverages multiple blockchain technologies to create a secure, transparent, and efficient ecosystem for innovation funding.
 
 ## 🚀 Features
 
@@ -13,9 +13,8 @@ Seedster is a revolutionary platform that helps developers protect their intelle
 - **AI-Powered Analytics**: Machine Callable Programs (MCPs) for investment insights
 - **Nouns-Style Auctions**: Daily auctions for project governance shares
 
-## 🏆 Hackathon Tracks
 
-### Chainlink Grand Prize Track
+### ChainLink Usage:
 
 Seedster leverages multiple Chainlink services to create a comprehensive platform:
 
@@ -24,7 +23,7 @@ Seedster leverages multiple Chainlink services to create a comprehensive platfor
 - **Chainlink Automation**: Milestone-based funding releases and verification
 - **Chainlink CCIP**: Cross-chain investment flows and liquidity
 
-### Onchain Finance Track
+### Onchain Finance
 
 #### DeFi Implementation
 
@@ -33,21 +32,21 @@ Seedster leverages multiple Chainlink services to create a comprehensive platfor
 - **Yield Farming**: Optimize returns across multiple protocols
 - **Derivatives**: Perpetual futures for project token trading
 
-#### Tokenization/RWA Track
+#### Tokenization/RWA 
 
 - **Real Estate Tokenization**: Fractional ownership of properties
 - **Carbon Credits**: Verified carbon offset projects
 - **Game Assets**: In-game items and virtual real estate
 - **Invoice Factoring**: Tokenized invoice discounting
 
-### Cross-Chain Solutions Track
+### Cross-Chain Solutions 
 
 - **Multi-Chain Wallet**: Unified interface for managing assets across chains
 - **Cross-Chain DEX**: Trade assets across different blockchains
 - **Cross-Chain Messaging**: Send data and assets between chains
 - **NFT Bridge**: Transfer NFTs across multiple blockchains
 
-### ElizaOS Track
+### ElizaOS Usage:
 
 #### DeFi & Web3 Agents
 
@@ -65,15 +64,15 @@ Seedster leverages multiple Chainlink services to create a comprehensive platfor
 - **Investment Analysis Swarm**: Coordinated analysis from specialized agents
 - **Multi-Agent Consensus System**: Collaborative decision-making
 
-### Avalanche Track
+### Avalanche Usage :
 
-#### Single EVM Chain Track
+#### Single EVM Chain 
 
 - **Token Deployment**: Create and manage tokens on Avalanche C-Chain
 - **NFT Marketplace**: Trade NFTs with low fees and fast transactions
 - **Lending Protocol**: Decentralized lending and borrowing on Avalanche
 
-#### Cross-Chain dApp Track
+#### Cross-Chain dApp 
 
 - **Cross-Chain DEX**: Trade across Avalanche subnets and external chains
 - **Multi-Chain Wallet**: Manage assets across all Avalanche chains
